@@ -249,7 +249,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <input type="file" id="fileInput" accept="image/*,.txt,.md,.markdown,.csv,.json,.xml,.html,.js,.ts,.py,.css,.log,.rtf,text/*" style="display:none" onchange="handleFileSelect(event)">
 <textarea id="q" rows="1" placeholder="Demande à NEXUS..." oninput="this.style.height='24px';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
 <button class="input-btn mic" id="micBtn" onclick="toggleDictation()" aria-label="Dictée">🎤</button>
-<button class="input-btn send" id="sendBtn" onclick="start()">➤</button>
+<button class="input-btn send" id="sendBtn" onpointerdown="event.preventDefault(); start()" onclick="start()">➤</button>
 <button class="input-btn stop" id="stopBtn" onclick="stopGeneration()" style="display:none" aria-label="Stop">■</button>
 </div>
 <div class="hint" id="modeHint">PUTER : modèle gratuit via Puter</div>
@@ -260,7 +260,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795029306993)"><span class="conv-del" onclick="deleteConversation(1795029306993,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795030163059)"><span class="conv-del" onclick="deleteConversation(1795030163059,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -933,7 +933,9 @@ function start(){
   $("#q").value = "";
   $("#q").style.height = '24px';
   removeAttachment();
-  $("#q").blur();
+  // Ne pas blur() tout de suite : sur iOS le 1er tap sert sinon à fermer le clavier et l'envoi est perdu.
+  // Le pointerdown du bouton a déjà preventDefault(), on ferme le clavier 150ms après l'envoi.
+  setTimeout(() => { try{ $("#q").blur(); }catch(e){} }, 150);
 
   save();
   render();
