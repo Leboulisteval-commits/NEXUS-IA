@@ -4,14 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>NEXUS AI — Vérification croisée par IA</title>
-<meta name="description" content="NEXUS AI : un producteur IA rédige, un vérificateur indépendant contrôle. Vérification croisée des réponses IA.">
+<meta name="description" content="NEXUS AI : un producteur IA rédige, un vérificateur indépendant contrôle.">
 <link rel="canonical" href="https://leboulisteval-commits.github.io/NEXUS-IA/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="NEXUS AI — Vérification croisée par IA">
-<meta property="og:description" content="Un producteur IA rédige, un vérificateur indépendant contrôle.">
-<meta property="og:url" content="https://leboulisteval-commits.github.io/NEXUS-IA/">
-<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧠%3C/text%3E%3C/svg%3E">
 <script src="https://js.puter.com/v2/" defer></script>
 <style>
@@ -20,197 +14,167 @@
 :root[data-theme="dark"]{--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;--wn:#3a2f14;--wt:#ffd98a;--wb:#5a4a20;color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:1rem}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-header,main,footer{max-width:720px;margin:0 auto;padding-left:14px;padding-right:14px}
-header{padding-top:14px}
-main{padding-bottom:24px}
-footer{padding-bottom:40px;color:var(--mu);font-size:13px}
-h1{font-size:22px;margin:4px 0 2px}
-.c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
-.mu{color:var(--mu);font-size:14px}
-textarea,select,input{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:6px 0}
-textarea{min-height:90px;resize:vertical}
-button{font:inherit;background:var(--ac);color:var(--bt);border:0;border-radius:10px;padding:10px 14px;margin:4px 6px 4px 0;cursor:pointer}
-button.s{background:var(--bd);color:var(--tx)}
-button:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-.bn{border-left:4px solid var(--wa);background:var(--bg);padding:10px;border-radius:8px;margin:8px 0}
-.bn.ok{border-color:var(--ok)}.bn.ko{border-color:var(--ko)}
-.warn{background:var(--wn);color:var(--wt);border:1px solid var(--wb);padding:10px 12px;border-radius:10px;margin:12px 0;font-size:14px}
-pre{white-space:pre-wrap;word-wrap:break-word;font:inherit;margin:8px 0}
-.res{background:var(--bg);padding:10px;border-radius:10px;border-left:4px solid var(--ac)}
-.j{display:block;width:100%;text-align:left;background:var(--bg);color:var(--tx);border:1px solid var(--bd);margin:4px 0;padding:10px;border-radius:10px;cursor:pointer}
-label{display:block;margin:8px 0 2px;font-size:14px;color:var(--mu)}
-label.chk{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:16px;margin:8px 0}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+header{background:var(--bg);text-align:center;padding:10px;border-bottom:1px solid var(--bd);flex-shrink:0;z-index:10}
+header h1{font-size:18px;margin:0}
+header .mu{font-size:12px}
+main{flex:1;overflow-y:auto;padding:14px;scroll-behavior:smooth;display:flex;flex-direction:column;gap:12px}
+.msg-user{align-self:flex-end;background:var(--ac);color:var(--bt);padding:10px 14px;border-radius:14px 14px 0 14px;max-width:85%;white-space:pre-wrap}
+.msg-ai{align-self:flex-start;background:var(--cd);border:1px solid var(--bd);padding:12px;border-radius:14px 14px 14px 0;max-width:90%;width:100%}
+.msg-ai pre{white-space:pre-wrap;margin:0;font:inherit}
+.verif-box{margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd);font-size:13px}
+.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:11px;margin-bottom:4px}
+.badge.ok{background:#e6f4ea;color:#17734a}.badge.wa{background:#fef7e0;color:#a35f00}.badge.ko{background:#fce8e6;color:#b3261e}
+@media(prefers-color-scheme:dark){.badge.ok{background:#1e3a2f;color:#4cc38a}.badge.wa{background:#3a2f14;color:#f0b04a}.badge.ko{background:#3a1a1a;color:#ff8a80}}
+.input-area{background:var(--bg);border-top:1px solid var(--bd);padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;font:inherit;color:var(--tx);background:var(--cd);border:1px solid var(--bd);border-radius:20px;padding:10px 14px;min-height:44px;max-height:120px;resize:none;margin:0;overflow-y:auto}
+button{font:inherit;background:var(--ac);color:var(--bt);border:0;border-radius:20px;padding:10px 16px;cursor:pointer;height:44px;font-weight:bold}
+button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+button.s{background:var(--bd);color:var(--tx);border-radius:10px;height:auto;padding:8px 12px;font-weight:normal;font-size:14px}
+details.c{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:0}
+summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--mu)}
+label{display:block;margin:8px 0 2px;font-size:13px;color:var(--mu)}
+label.chk{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:14px;margin:4px 0}
 label.chk input{width:auto;margin:0}
-summary{cursor:pointer;font-weight:600;font-size:16px}
-h3{margin:10px 0 5px;font-size:16px;border-bottom:1px solid var(--bd);padding-bottom:5px}
+input,select{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px;margin-bottom:6px}
+.bn{border-left:3px solid var(--wa);background:var(--bg);padding:8px;border-radius:4px;margin:6px 0;font-size:13px}
+.bn.ko{border-color:var(--ko)}
+h3{margin:12px 0 6px;font-size:14px;color:var(--mu)}
 </style>
 </head>
 <body>
 
 <header>
   <h1>NEXUS AI</h1>
-  <div class="mu">Vous demandez. Le système choisit, fait produire, puis fait vérifier par une autre IA.</div>
+  <div class="mu">Vérification croisée</div>
 </header>
 
-<main>
-
-<div class="warn" role="note">
-  ⚠️ <strong>Usage personnel uniquement.</strong> Les clés API sont stockées dans <em>ce navigateur</em> (localStorage).
-</div>
-
-<section class="c">
-  <label for="q">Votre demande</label>
-  <textarea id="q" placeholder="Que voulez-vous demander ?"></textarea>
-  <label class="chk"><input type="checkbox" id="vf" checked> Faire vérifier par une autre IA</label>
-  <button type="button" onclick="start()">Envoyer</button>
-</section>
-
-<details class="c">
-  <summary>⚙️ Configuration (Mode & Réglages)</summary>
-  
-  <label for="mo">Mode de fonctionnement</label>
-  <select id="mo" onchange="toggleSettings()">
-    <option value="puter">Puter AI (Sans clé, recommandé)</option>
-    <option value="cles">Clés API (fournisseurs gratuits)</option>
-    <option value="manuel">Manuel (je colle entre mes IA gratuites)</option>
-  </select>
-
-  <div id="api-settings" style="display:none; margin-top: 15px; border-top: 1px solid var(--bd); padding-top: 15px;">
-    <p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur.</p>
-    <datalist id="dl">
-      <option value="https://api.groq.com/openai/v1/chat/completions"></option>
-      <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
-      <option value="https://api.mistral.ai/v1/chat/completions"></option>
-      <option value="https://openrouter.ai/api/v1/chat/completions"></option>
-    </datalist>
-
-    <h3>Producteur</h3>
-    <label for="up">Adresse de l’API</label>
-    <input id="up" list="dl" placeholder="https://…">
-    <label for="kp">Clé API</label>
-    <input id="kp" type="password" placeholder="Clé API" autocomplete="off">
-    <label for="mp2">Nom du modèle</label>
-    <input id="mp2" placeholder="ex. llama-3.1-8b-instant" autocomplete="off">
-    <button type="button" class="s" onclick="setPV();testP('p')">Enregistrer et tester</button>
-    <div class="mu" id="tp" aria-live="polite"></div>
-
-    <h3 style="margin-top:20px">Vérificateur</h3>
-    <label for="uv">Adresse de l’API</label>
-    <input id="uv" list="dl" placeholder="https://…">
-    <label for="kv">Clé API</label>
-    <input id="kv" type="password" placeholder="Clé API" autocomplete="off">
-    <label for="mv">Nom du modèle</label>
-    <input id="mv" placeholder="ex. mistral-small-latest" autocomplete="off">
-    <button type="button" class="s" onclick="setPV();testP('v')">Enregistrer et tester</button>
-    <div class="mu" id="tv" aria-live="polite"></div>
-
-    <p style="margin-top:20px"><button type="button" class="s" onclick="clearKeys()">Effacer les clés enregistrées</button></p>
-  </div>
-</details>
-
-<div id="out" aria-live="polite"></div>
-
-<section class="c">
-  <h3>Journal des demandes</h3>
-  <div id="jr"></div>
-  <p><button type="button" class="s" onclick="clearJournal()">Effacer le journal</button></p>
-</section>
-
-<details class="c">
-  <summary>Limites à connaître</summary>
-  <p class="mu">Certains fournisseurs refusent les appels depuis un navigateur : le bouton « tester » vous le dit. « Conforme à la demande » ne veut pas dire « vrai » ; un prix, une date ou un stock sans source restent non tranchables.</p>
-</details>
-
+<main id="chat">
+  <!-- Les messages s'afficheront ici -->
 </main>
 
-<footer>NEXUS AI — projet personnel. Aucune donnée sensible collectée.</footer>
+<div class="input-area">
+  <details class="c">
+    <summary>⚙️ Configuration (Mode & Réglages)</summary>
+    <div style="margin-top:8px">
+      <label for="mo">Mode de fonctionnement</label>
+      <select id="mo" onchange="toggleSettings()">
+        <option value="puter">Puter AI (Sans clé)</option>
+        <option value="cles">Clés API</option>
+        <option value="manuel">Manuel</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="vf" checked> Faire vérifier par une autre IA</label>
+    </div>
+    
+    <div id="api-settings" style="display:none; border-top:1px solid var(--bd); margin-top:10px;">
+      <datalist id="dl">
+        <option value="https://api.groq.com/openai/v1/chat/completions"></option>
+        <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
+        <option value="https://api.mistral.ai/v1/chat/completions"></option>
+      </datalist>
+      <h3>Producteur</h3>
+      <input id="up" list="dl" placeholder="Adresse API">
+      <input id="kp" type="password" placeholder="Clé API">
+      <input id="mp2" placeholder="Modèle (ex: llama-3.1-8b-instant)">
+      <button type="button" class="s" onclick="setPV();testP('p')">Tester Producteur</button>
+      <div class="mu" id="tp"></div>
+
+      <h3>Vérificateur</h3>
+      <input id="uv" list="dl" placeholder="Adresse API">
+      <input id="kv" type="password" placeholder="Clé API">
+      <input id="mv" placeholder="Modèle">
+      <button type="button" class="s" onclick="setPV();testP('v')">Tester Vérificateur</button>
+      <div class="mu" id="tv"></div>
+    </div>
+  </details>
+
+  <div class="input-row">
+    <textarea id="q" placeholder="Posez votre question..." rows="1"></textarea>
+    <button type="button" onclick="start()">Envoyer</button>
+  </div>
+</div>
 
 <script>
-const K="nexus_v0", KP="nexus_prov";
-let T=[],cur=null;
+const K="nexus_chat_v1", KP="nexus_prov";
+let T=[], busy=false;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function toggleSettings() {
-  const mode = $("#mo").value;
-  $("#api-settings").style.display = (mode === "cles") ? "block" : "none";
+  $("#api-settings").style.display = ($("#mo").value === "cles") ? "block" : "none";
 }
 
-function save(){try{localStorage.setItem(K,JSON.stringify(T.slice(0,30),(k,v)=>k[0]==="_"?undefined:v))}catch(e){}}
-function load(){try{T=JSON.parse(localStorage.getItem(K)||"[]")}catch(e){T=[]}
-  T.forEach(t=>{if(["en_cours","attente","manuel"].includes(t.status))t.status="interrompue"})}
+// --- SAUVEGARDE ET CHARGEMENT ---
+function save(){
+  try{
+    // On garde les 50 derniers messages pour la mémoire
+    localStorage.setItem(K, JSON.stringify(T.slice(-50), (k,v)=>k[0]==="_"?undefined:v));
+  }catch(e){}
+}
+function load(){
+  try{T=JSON.parse(localStorage.getItem(K)||"[]")}catch(e){T=[]}
+  T.forEach(t=>{
+    if(["en_cours","attente","manuel"].includes(t.status)) t.status="interrompue";
+  });
+}
 
-const VP="Tu es un vérificateur indépendant. Tu reçois une DEMANDE d’utilisateur et un RÉSULTAT. Question unique : le résultat correspond-il à la demande ? 1) Déduis de la demande 2 à 5 critères vérifiables. 2) Juge chaque critère : OUI, NON ou NON_TRANCHABLE, avec une preuve (calcul refait, contradiction, test logique) ou « aucune ». 3) Pour un prix, une date, un chiffre ou une citation que tu ne peux pas prouver : NON_TRANCHABLE, jamais OUI. Réponds UNIQUEMENT par ce JSON : {\"criteres\":[{\"critere\":\"\",\"verdict\":\"OUI|NON|NON_TRANCHABLE\",\"preuve\":\"\"}],\"ecarts\":[\"\"]}. Aucune phrase hors JSON. Il est interdit d’écrire « c’est solide ».";
+// --- PROMPTS ---
+const VP="Tu es un vérificateur indépendant. Tu reçois l'HISTORIQUE d'une conversation, une DEMANDE et un RÉSULTAT. Question unique : le résultat correspond-il à la demande ? 1) Déduis 2 à 5 critères. 2) Juge : OUI, NON ou NON_TRANCHABLE avec preuve. 3) Pour un prix/date non prouvable : NON_TRANCHABLE. Réponds UNIQUEMENT par ce JSON : {\"criteres\":[{\"critere\":\"\",\"verdict\":\"OUI|NON|NON_TRANCHABLE\",\"preuve\":\"\"}],\"ecarts\":[\"\"]}. Aucune phrase hors JSON.";
 
-function route(d){const t=d.toLowerCase();
+function route(d){
+  const t=d.toLowerCase();
   if(/(image|photo|dessin|logo|vidéo|video|voix|audio|musique|acheter|achat|commande|panier|stock)/.test(t))return{type:"non_supporte"};
-  if(/(code|fonction|script|programme|bug|python|javascript|html)/.test(t))return{type:"code",tier:"complex",why:"tâche de code : palier avancé"};
-  if(/(cherche|source|compare|prix|actualité|qui est|quand|combien)/.test(t))return{type:"question",tier:"default",why:"question factuelle : palier standard (sans accès web)"};
-  if(/(écris|rédige|mail|résume|traduis|reformule|texte)/.test(t))return{type:"rédaction",tier:"default",why:"rédaction : palier standard"};
-  return{type:"autre",tier:"quick",why:"demande simple : palier rapide"}}
+  if(/(code|fonction|script|programme|bug|python|javascript|html)/.test(t))return{type:"code",tier:"complex"};
+  if(/(cherche|source|compare|prix|actualité|qui est|quand|combien)/.test(t))return{type:"question",tier:"default"};
+  if(/(écris|rédige|mail|résume|traduis|reformule|texte)/.test(t))return{type:"rédaction",tier:"default"};
+  return{type:"autre",tier:"quick"};
+}
 
 function pj(s){try{const m=String(s).match(/\{[\s\S]*\}/);return m?JSON.parse(m[0]):null}catch(e){return null}}
 
+// --- API & PUTER ---
 function PV(k){try{return JSON.parse(localStorage.getItem(KP)||"{}")[k]||{}}catch(e){return{}}}
 function setPV(){const o={};["p","v"].forEach(k=>{o[k]={url:$("#u"+k).value.trim(),key:$("#k"+k).value.trim(),modele:$(k==="p"?"#mp2":"#mv").value.trim()}});try{localStorage.setItem(KP,JSON.stringify(o))}catch(e){}}
 function fillS(){["p","v"].forEach(k=>{const p=PV(k);$("#u"+k).value=p.url||"";$("#k"+k).value=p.key||"";$(k==="p"?"#mp2":"#mv").value=p.modele||""})}
-function clearKeys(){if(!confirm("Effacer les clés API enregistrées dans ce navigateur ?"))return;try{localStorage.removeItem(KP)}catch(e){}fillS();$("#tp").textContent="";$("#tv").textContent="";}
-function clearJournal(){if(!confirm("Effacer le journal des demandes ?"))return;T=[];cur=null;save();render();}
 
 async function callP(k,prompt){
   const p=PV(k);
-  if(!p.url||!p.key||!p.modele)throw new Error("Réglages incomplets : adresse, clé et modèle sont nécessaires.");
+  if(!p.url||!p.key||!p.modele)throw new Error("Réglages API incomplets.");
   let r;
   try{r=await fetch(p.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+p.key},body:JSON.stringify({model:p.modele,messages:[{role:"user",content:prompt}]})})}
-  catch(e){throw new Error("Appel bloqué ou réseau coupé.")}
+  catch(e){throw new Error("Appel bloqué ou réseau.")}
   if(r.status===429){const e=new Error("Quota épuisé");e.code="rate_limited";throw e}
-  if(!r.ok)throw new Error("Erreur "+r.status+" : "+(await r.text()).slice(0,200));
+  if(!r.ok)throw new Error("Erreur API "+r.status);
   const j=await r.json();
   return (j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";
 }
-async function testP(k){const e=$("#t"+k);e.textContent="Test en cours…";try{await callP(k,"Réponds uniquement : ok");e.textContent="Connexion réussie."}catch(x){e.textContent=x.message}}
+async function testP(k){const e=$("#t"+k);e.textContent="Test…";try{await callP(k,"Réponds ok");e.textContent="✅ Succès"}catch(x){e.textContent="❌ "+x.message}}
 
 async function callPuter(prompt) {
-  if (!window.puter || !puter.ai) throw new Error("Puter n'est pas chargé.");
-  try {
-    const r = await puter.ai.chat(prompt);
-    return String(r);
-  } catch(e) {
-    throw new Error("Puter a refusé la connexion.");
-  }
+  if (!window.puter || !puter.ai) throw new Error("Puter non chargé.");
+  const r = await puter.ai.chat(prompt);
+  return String(r);
 }
 
-function wait(t,role,n){const d=[60,300,900,3600][Math.min(n,3)];
-  return new Promise(res=>{
-    t.status="attente";t.att={role,fin:Date.now()+d*1000};
-    const iv=setInterval(()=>{const s=Math.max(0,Math.round((t.att.fin-Date.now())/1000));const e=$("#cd");if(e)e.textContent=s+" s";if(s<=0)done()},1000);
-    function done(){clearInterval(iv);t._skip=null;t.status="en_cours";render();res()}
-    t._skip=done;render();save()})}
-function manual(t,role,prompt){return new Promise(res=>{t.status="manuel";t._m={role,prompt,res};render()})}
+// --- LOGIQUE DE CONVERSATION ---
+function manual(t,role,prompt){return new Promise(res=>{t.status="manuel";t._m={role,prompt,res};save();render()})}
 
 async function ask(t,role,prompt,tier,json){
-  for(let n=0,k=0;;){
-    let txt;
-    if(t.mode==="puter"){
-      txt=await callPuter(prompt);
-    }else if(t.mode==="manuel"){
-      txt=await manual(t,role,prompt);
-    }else{
-      try{txt=await callP(role.startsWith("Vérif")?"v":"p",prompt)}
-      catch(e){if(e&&e.code==="rate_limited"){await wait(t,role,n++);continue}throw e}
-    }
-    if(!json)return txt;
-    const o=pj(txt);if(o)return o;
-    if(k++>=1)return null;
-    prompt+="\n\nRappel : réponds UNIQUEMENT par le JSON demandé.";
-  }
+  let txt;
+  if(t.mode==="puter") txt=await callPuter(prompt);
+  else if(t.mode==="manuel") txt=await manual(t,role,prompt);
+  else txt=await callP(role.startsWith("Vérif")?"v":"p",prompt);
+
+  if(!json) return txt;
+  const o=pj(txt);if(o)return o;
+  const o2=pj(await (t.mode==="puter"?callPuter(prompt+"\nRappel: JSON uniquement."):callP(role.startsWith("Vérif")?"v":"p",prompt+"\nRappel: JSON uniquement.")));
+  return o2;
 }
 
 async function verifier(t){
-  const vt={quick:"default",default:"complex",complex:"default"}[t.tier]||"default";
-  const o=await ask(t,"Vérificateur",VP+"\n\nDEMANDE :\n"+t.demande+"\n\nRÉSULTAT :\n"+t.result,vt,true);
-  if(!o||!Array.isArray(o.criteres)||!o.criteres.length)return{verdict:"NON_TRANCHABLE",criteres:[],ecarts:["Réponse du vérificateur illisible."]};
+  const o=await ask(t,"Vérificateur",VP+"\n\nHISTORIQUE:\n"+t.hist+"\n\nDEMANDE:\n"+t.demande+"\n\nRÉSULTAT:\n"+t.result,t.tier,true);
+  if(!o||!Array.isArray(o.criteres)||!o.criteres.length)return{verdict:"NON_TRANCHABLE",criteres:[],ecarts:["Réponse vérificateur illisible."]};
   const c=o.criteres.map(x=>({critere:String(x.critere||""),verdict:String(x.verdict||"").toUpperCase(),preuve:String(x.preuve||"")}));
   const v=c.some(x=>x.verdict==="NON")?"NON":c.some(x=>x.verdict!=="OUI")?"NON_TRANCHABLE":"OUI";
   const ec=(Array.isArray(o.ecarts)?o.ecarts:[]).concat(c.filter(x=>x.verdict==="NON").map(x=>x.critere));
@@ -218,109 +182,139 @@ async function verifier(t){
 }
 
 async function run(t){
-  t.status="en_cours";t.err="";render();
+  t.status="en_cours";t.err="";save();render();
   try{
-    if(!t.result){t.step="Production";render();t.result=await ask(t,"Producteur",t.demande,t.tier,false);save()}
+    if(!t.result){
+      t.step="Production";
+      // Construction du prompt avec mémoire (historique)
+      let promptP = t.hist ? `Voici l'historique de notre conversation :\n${t.hist}\n\nNouvelle demande :\n${t.demande}` : t.demande;
+      t.result = await ask(t,"Producteur",promptP,t.tier,false);
+      save();render();
+    }
     if(t.verif){
       while(t.round<3){
-        t.step="Vérification (tour "+(t.round+1)+")";render();
-        const v=await verifier(t);t.round++;t.v=v;t.log.push({tour:t.round,verdict:v.verdict,criteres:v.criteres,ecarts:v.ecarts});save();
+        t.step="Vérification ("+(t.round+1)+")";save();render();
+        const v=await verifier(t);t.round++;t.v=v;
         if(v.verdict!=="NON"||t.round>=3)break;
-        t.step="Correction";render();
-        t.result=await ask(t,"Correcteur (producteur)","Voici la demande de l’utilisateur, ton résultat précédent et les écarts relevés par un vérificateur indépendant. Corrige uniquement ces points et renvoie le texte complet corrigé.\n\nDEMANDE :\n"+t.demande+"\n\nRÉSULTAT :\n"+t.result+"\n\nÉCARTS :\n- "+v.ecarts.join("\n- "),t.tier,false);save()
+        t.step="Correction";save();render();
+        t.result=await ask(t,"Correcteur","Corrige ces écarts :\n"+v.ecarts.join("\n- ")+"\n\nRéponse précédente :\n"+t.result,t.tier,false);
+        save();render();
       }
     }
     t.status="fini";
   }
-  catch(e){t.status="erreur";t.err=e&&e.code==="not_granted"?"Autorisation refusée : utilisez le mode manuel.":((e&&e.message)||"Erreur inconnue")}
+  catch(e){t.status="erreur";t.err=e.message||"Erreur"}
   save();render();
 }
 
+// --- INTERFACE ---
 function start(){
-  const d=$("#q").value.trim();if(!d)return;
+  const d=$("#q").value.trim();if(!d || busy)return;
   const r=route(d);
-  const t={id:Date.now(),demande:d,mode:$("#mo").value,verif:$("#vf").checked,type:r.type,tier:r.tier,why:r.why,status:"en_cours",round:0,log:[]};
-  T.unshift(t);cur=t;$("#q").value="";save();
-  if(r.type==="non_supporte"){t.status="non_supporte";render();return}
-  run(t);
+  
+  // Récupération de l'historique pour la mémoire (les 5 derniers échanges réussis)
+  const hist = T.filter(x=>x.id && x.result).slice(-5).map(x=>`Utilisateur: ${x.demande}\nIA: ${x.result}`).join('\n---\n');
+
+  const t={id:Date.now(),demande:d,mode:$("#mo").value,verif:$("#vf").checked,type:r.type,tier:r.tier,status:"en_cours",round:0,hist:hist};
+  T.push(t);
+  $("#q").value=""; $("#q").style.height="44px";
+  
+  if(r.type==="non_supporte"){t.status="non_supporte";save();render();return}
+  
+  busy=true;
+  run(t).finally(()=>{busy=false;});
 }
 
-function niveau(t){const v=t.v;if(!t.verif||!v)return["Non vérifié","ko"];
-  const sp=(v.criteres||[]).some(x=>x.verdict==="OUI"&&(!x.preuve||/aucune|non vérifiable/i.test(x.preuve)));
-  if(v.verdict==="OUI")return sp?["OUI sans preuve","wa"]:["Vérifié (avec preuves)","ok"];
-  if(v.verdict==="NON_TRANCHABLE")return["Partiellement vérifié : points non tranchables","wa"];
-  return["Non résolu après "+t.round+" tour(s) : écarts restants","ko"]}
+function niveau(t){
+  if(!t.verif||!t.v)return["Non vérifié","ko"];
+  if(t.v.verdict==="OUI")return["Vérifié","ok"];
+  if(t.v.verdict==="NON_TRANCHABLE")return["Partiellement vérifié","wa"];
+  return["Écarts détectés","ko"];
+}
 
-function skip(){if(cur&&cur._skip)cur._skip()}
-function resume(){if(cur)run(cur)}
-function openT(i){cur=T[i];render()}
-function copyP(){const e=$("#mp");try{navigator.clipboard.writeText(cur._m.prompt)}catch(x){e.select();document.execCommand("copy")}}
-function okM(){const v=$("#mr").value.trim();if(!v||!cur._m)return;const m=cur._m;cur._m=null;cur.status="en_cours";m.res(v);render()}
+function resume(id){
+  const t=T.find(x=>x.id===id);if(t){busy=true;run(t).finally(()=>busy=false);}
+}
+
+function skip(id){
+  const t=T.find(x=>x.id===id);if(t&&t._skip)t._skip();
+}
+
+function okM(id){
+  const t=T.find(x=>x.id===id);const v=prompt("Collez la réponse de l'IA :");
+  if(!v||!t._m)return;const m=t._m;t._m=null;t.status="en_cours";m.res(v);
+}
+
+function copyP(id){
+  const t=T.find(x=>x.id===id);
+  if(t&&t._m) navigator.clipboard.writeText(t._m.prompt);
+}
 
 function render(){
-  const t=cur;let h="";
-  if(t){
-    // --- BLOC 1 : QUESTION ET RÉPONSE ---
-    h+='<section class="c">';
-    
-    let modeName = "";
-    if(t.mode==="manuel") modeName = "Manuel";
-    else if(t.mode==="puter") modeName = "Puter AI";
-    else modeName = "API (" + (PV("p").modele || "?") + ")";
+  const chat = $("#chat");
+  // On garde le scroll en bas si on y était déjà
+  const isScrolledToBottom = chat.scrollHeight - chat.clientHeight <= chat.scrollTop + 50;
 
-    h+='<div class="mu">Demande ('+esc(modeName)+')</div>';
-    h+='<b>'+esc(t.demande)+'</b>';
+  let h="";
+  T.forEach(t=>{
+    // Bulle Utilisateur
+    h+='<div class="msg-user">'+esc(t.demande)+'</div>';
     
-    if(t.status==="non_supporte")h+='<div class="bn ko">Image, voix, vidéo et achat : non supportés.</div>';
-    if(t.status==="en_cours")h+='<div class="bn">'+esc(t.step||"En cours")+'…</div>';
-    if(t.status==="attente")h+='<div class="bn">En attente : quota épuisé. Reprise dans <b id="cd"></b>.<br><button type="button" onclick="skip()">Réessayer</button></div>';
-    if(t.status==="manuel"&&t._m)h+='<div class="bn"><b>'+esc(t._m.role)+'</b><br><span class="mu">Copiez ce texte dans l’IA de votre choix, puis collez sa réponse ci-dessous.</span><textarea id="mp" readonly>'+esc(t._m.prompt)+'</textarea><button type="button" class="s" onclick="copyP()">Copier</button><label for="mr">Réponse de l’IA</label><textarea id="mr"></textarea><button type="button" onclick="okM()">Valider</button></div>';
-    if(t.status==="erreur")h+='<div class="bn ko">'+esc(t.err)+'<br><button type="button" onclick="resume()">Reprendre</button></div>';
-    if(t.status==="interrompue")h+='<div class="bn wa">Tâche interrompue.<br><button type="button" onclick="resume()">Reprendre</button></div>';
-    
-    // La réponse finale
-    if(t.result&&(t.status==="fini"||t.status==="erreur"||t.status==="interrompue")){
-      h+='<h3 style="margin-top:15px">Réponse finale</h3>';
-      h+='<pre class="res">'+esc(t.result)+'</pre>';
-    }
-    h+='</section>';
-
-    // --- BLOC 2 : VÉRIFICATION (Séparé) ---
-    if(t.verif && t.v) {
-      h+='<section class="c" style="border-left: 4px solid var(--ac);">';
-      h+='<h3>Vérification indépendante</h3>';
-      const n=niveau(t);
-      h+='<div class="bn '+n[1]+'"><b>'+esc(n[0])+'</b><div class="mu">Conforme à la demande ne veut pas dire vrai.</div></div>';
+    // Bulle IA
+    if(t.status==="non_supporte"){
+      h+='<div class="msg-ai"><div class="bn ko">Désolé, les images, vidéos et achats ne sont pas supportés.</div></div>';
+    } else if(t.status==="manuel" && t._m){
+      h+='<div class="msg-ai"><b>'+esc(t._m.role)+'</b><br><span class="mu" style="font-size:12px">Copiez ce texte dans l\'IA, puis collez sa réponse.</span>';
+      h+='<textarea readonly style="width:100%;height:80px;margin:8px 0;font-size:12px">'+esc(t._m.prompt)+'</textarea>';
+      h+='<button class="s" onclick="copyP('+t.id+')">Copier</button> ';
+      h+='<button class="s" onclick="okM('+t.id+')">Coller la réponse</button></div>';
+    } else if(t.status==="erreur"){
+      h+='<div class="msg-ai"><div class="bn ko">'+esc(t.err)+'</div><button class="s" onclick="resume('+t.id+')">Réessayer</button></div>';
+    } else if(t.status==="interrompue"){
+      h+='<div class="msg-ai"><div class="bn">Tâche interrompue.</div><button class="s" onclick="resume('+t.id+')">Reprendre</button></div>';
+    } else if(t.status==="attente"){
+      h+='<div class="msg-ai"><div class="bn">Quota épuisé. Reprise dans <b id="cd-'+t.id+'"></b>.</div><button class="s" onclick="skip('+t.id+')">Forcer</button></div>';
+    } else if(t.status==="en_cours" || t.result) {
+      // Affichage de la réponse (même si en cours, on montre la partie déjà générée)
+      h+='<div class="msg-ai"><pre>'+esc(t.result || "Réflexion en cours...")+'</pre>';
       
-      if(t.mode==="puter")h+='<div class="bn ko">Note : en mode Puter, le même fournisseur sert pour les deux rôles.</div>';
-      else if(t.mode==="cles"&&PV("p").url===PV("v").url)h+='<div class="bn ko">Note : producteur et vérificateur utilisent la même adresse.</div>';
-      
-      if(t.v.ecarts&&t.v.ecarts.length&&t.v.verdict!=="OUI")h+='<div class="bn wa">Écarts : '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
-
-      if(t.log&&t.log.length){
-        h+='<details style="margin-top:10px"><summary>Détail du circuit ('+t.log.length+' tour(s))</summary>';
-        h+='<div style="margin-top:10px">';
-        h+=t.log.map(l=>'<p class="mu"><b>Tour '+l.tour+' : '+esc(l.verdict)+'</b><br>'+(l.criteres||[]).map(c=>esc(c.verdict)+' · '+esc(c.critere)+(c.preuve?' (preuve : '+esc(c.preuve)+')':'')).join("<br>")+'</p>').join("");
-        h+='</div></details>';
+      // Bloc de vérification (caché si pas fini ou pas demandé)
+      if(t.verif && t.v){
+        const n = niveau(t);
+        h+='<div class="verif-box">';
+        h+='<span class="badge '+n[1]+'">'+n[0]+'</span>';
+        if(t.v.ecarts && t.v.ecarts.length) h+='<div class="mu" style="font-size:12px;color:var(--ko)">⚠️ '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
+        
+        // Détail des preuves (rétractable)
+        if(t.log && t.log.length){
+          h+='<details style="margin-top:4px"><summary style="font-size:12px">Voir le détail</summary>';
+          h+=t.log.map(l=>'<div style="margin-top:4px">'+(l.criteres||[]).map(c=>'<span class="mu">'+esc(c.verdict)+' : </span>'+esc(c.critere)+'</div>').join("")+'</details>';
+        }
+        h+='</div>';
       }
-      h+='</section>';
+      h+='</div>';
     }
-  }
+  });
   
-  $("#out").innerHTML=h;
-  $("#jr").innerHTML=T.length
-    ? T.map((x,i)=>'<button type="button" class="j" onclick="openT('+i+')">'+esc(new Date(x.id).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))+' · '+esc(x.status)+' · '+esc(x.demande.slice(0,60))+'</button>').join("")
-    : '<div class="mu">Aucune demande pour l’instant.</div>';
+  chat.innerHTML = h;
+  
+  if(isScrolledToBottom) chat.scrollTop = chat.scrollHeight;
 }
 
-// Initialisation
-load();
-render();
-fillS();
-toggleSettings(); // Pour cacher les clés API si on est en mode Puter au chargement
+// Auto-resize du textarea
+$("#q").addEventListener("input", function() {
+  this.style.height = '44px';
+  this.style.height = (this.scrollHeight) + 'px';
+});
+$("#q").addEventListener("keydown", function(e) {
+  if(e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    start();
+  }
+});
 
-// Écouter les changements de mode pour sauvegarder automatiquement le choix
-$("#mo").addEventListener("change", toggleSettings);
+// Init
+load(); render(); fillS(); toggleSettings();
 </script>
 </body>
 </html>
