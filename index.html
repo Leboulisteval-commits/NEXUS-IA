@@ -285,7 +285,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 }
 </style>
 <meta name="theme-color" content="#0a0a10"></head>
-<body style="top: 0px;" class="">
+<body style="top: 0px;">
 
 <header>
 <button class="icon-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
@@ -298,22 +298,22 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 
 <main>
 <div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Bonjour.</h2><p>Pose une question, joins une image ou un document,<br>ou demande une vérification croisée.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
-<div id="suggestions" class="">
-<button class="sugg" onclick="useSuggestion('Explique la relativité simplement')" style="">Relativité simple</button>
-<button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')" style="">Poème sur la mer</button>
-<button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')" style="">Vérifie un fait</button>
-<button class="sugg" onclick="useSuggestion('Aide-moi à réviser pour un examen')" style="">Réviser</button>
-<button class="sugg" onclick="useSuggestion('Écris une fonction JavaScript pour trier un tableau')" style="">Code JS</button>
+<div id="suggestions">
+<button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button>
+<button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')">Poème sur la mer</button>
+<button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button>
+<button class="sugg" onclick="useSuggestion('Aide-moi à réviser pour un examen')">Réviser</button>
+<button class="sugg" onclick="useSuggestion('Écris une fonction JavaScript pour trier un tableau')">Code JS</button>
 </div>
 <div id="inputArea">
-<div id="attachmentPreview" style="display: none;"><img id="previewImg" src="" alt="" style="display: block;"><span class="file-name">Image jointe</span><button onclick="removeAttachment()">✕</button></div>
+<div id="attachmentPreview"><img id="previewImg" src="" alt=""><span class="file-name">Image jointe</span><button onclick="removeAttachment()">✕</button></div>
 <div class="input-wrapper">
 <button class="input-btn attach" onclick="document.getElementById('fileInput').click()" aria-label="Joindre">📎</button>
 <input type="file" id="fileInput" accept="image/*,.txt,.md,.markdown,.csv,.json,.xml,.html,.js,.ts,.py,.css,.log,.rtf,text/*" style="display:none" onchange="handleFileSelect(event)">
-<textarea id="q" rows="1" placeholder="Demande à NEXUS..." oninput="this.style.height='24px';this.style.height=Math.min(this.scrollHeight,120)+'px'" style="height: 24px;"></textarea>
+<textarea id="q" rows="1" placeholder="Demande à NEXUS..." oninput="this.style.height='24px';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
 <button class="input-btn mic" id="micBtn" onclick="toggleDictation()" aria-label="Dictée">🎤</button>
-<button class="input-btn send" id="sendBtn" onpointerdown="event.preventDefault(); start()" onclick="start()" style="display: grid;">➤</button>
-<button class="input-btn stop" id="stopBtn" onclick="stopGeneration()" style="display: none;" aria-label="Stop">■</button>
+<button class="input-btn send" id="sendBtn" onpointerdown="event.preventDefault(); start()" onclick="start()">➤</button>
+<button class="input-btn stop" id="stopBtn" onclick="stopGeneration()" style="display:none" aria-label="Stop">■</button>
 </div>
 <div class="hint" id="modeHint">PUTER : modèle gratuit via Puter</div>
 </div>
@@ -323,7 +323,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795041135411)"><span class="conv-del" onclick="deleteConversation(1795041135411,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div><div class="conv " onclick="switchConversation(1795041113543)"><span class="conv-del" onclick="deleteConversation(1795041113543,event)">✕</span><div class="conv-title">Écris un poème sur la mer</div><div class="conv-meta"><span>1 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795041573619)"><span class="conv-del" onclick="deleteConversation(1795041573619,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()" class=""></div>
@@ -798,10 +798,10 @@ async function callPuter(prompt, signal, image = null){
       return extractPuterText(res);
     }catch(e){
       if(e.name === 'AbortError') throw e;
-      // CORRIGÉ : avant, callPuter() jetait juste l'erreur crédits sans jamais basculer.
-      // C'est POURTANT le chemin que prend ton chat principal (ask() -> callPuter()).
-      // Maintenant, sur erreur crédits / quota / limite, on bascule sur Kilo puis Pollinations, comme callPuterProducteur().
-      if(nexusEstErreurCredits(e)){
+      // CORRIGÉ v2 : on ne se fie PLUS au texte exact de l'erreur Puter (il change : funding / Low Balance / upgrade / ...).
+      // Sur N'IMPORTE QUELLE erreur Puter (sauf annulation), on essaie d'abord Kilo puis Pollinations.
+      // On n'affiche l'erreur Puter que si les deux secours échouent aussi.
+      if(true){
         try{
           const msgs = [{ role: 'user', content: String(prompt || '') }];
           const secours = await nexusSecoursKilo(msgs);
@@ -949,7 +949,7 @@ async function nexusGenerateImage(prompt, signal){
 function nexusTraduireErreur(msg){
   const s = String(msg||'');
   const low = s.toLowerCase();
-  if(/doesn'?t have enough credits|not enough credits|insufficient_funds|insufficient funds|out of credits|no credits left|credit.*exhausted/.test(low))
+  if(/doesn'?t have enough credits|not enough credits|insufficient_funds|insufficient funds|out of credits|no credits left|credit.*exhausted|funding|low.?balance|please upgrade|not enough funding|does not have enough/.test(low))
     return "Ton compte Puter n'a plus assez de crédits pour cette demande. Attends que tes crédits gratuits se rechargent, ou passe à un forfait payant sur puter.com pour continuer.";
   if(/moderation_flagged|content filter|content policy|blocked.*content|inappropriate/.test(low))
     return "Ta demande a été refusée par le filtre de contenu de Puter. Essaie de reformuler ta demande autrement.";
@@ -1214,10 +1214,18 @@ async function nexusSecoursPollinations(messages){
 }
 
 function nexusEstErreurCredits(e){
-  // CORRIGÉ : avant, ce test était trop strict et ratait beaucoup de messages Puter (ex : "402", "quota exceeded", "daily limit", message traduit en français).
-  // Maintenant on teste le message brut + l'objet entier, en anglais ET en français.
-  const s = String((e && e.message) || e || '').toLowerCase() + ' ' + String(e || '').toLowerCase();
-  return /credit|crédit|insufficient|quota|billing|payment|402|429|rate.?limit|too many|limit|exceeded|balance|out of|ran out|no more|daily|free tier|usage|plus assez|n.?a plus|plus de/.test(s);
+  // CORRIGÉ v2 (bug vu sur capture : Puter dit "not enough funding" / "Low Balance / Please upgrade") :
+  // Avant on ne lisait que e.message et on cherchait "credit" -> on ratait "funding", "upgrade", "Low Balance".
+  // Maintenant on lit TOUT l'objet erreur (message + error + reason + code + JSON complet), en anglais ET français.
+  let parts = [];
+  try{ parts.push(String((e && e.message) || '')); }catch(_){}
+  try{ parts.push(String((e && e.error && (e.error.message || e.error)) || '')); }catch(_){}
+  try{ parts.push(String((e && e.reason) || '')); }catch(_){}
+  try{ parts.push(String((e && e.code) || '')); }catch(_){}
+  try{ parts.push(JSON.stringify(e) || ''); }catch(_){}
+  try{ parts.push(String(e || '')); }catch(_){}
+  const s = parts.join(' ').toLowerCase();
+  return /credit|crédit|funding|low.?balance|upgrade|insufficient|quota|billing|payment|402|429|rate.?limit|too many|limit|exceeded|balance|out of|ran out|no more|daily|free tier|usage|plus assez|n.?a plus|plus de|not enough|doesn.?t have enough|does not have enough|not have enough/.test(s);
 }
 
 async function callPuterProducteur(messages, signal, image = null){
@@ -1244,14 +1252,14 @@ async function callPuterProducteur(messages, signal, image = null){
       derniereErreur = e;
       const msg = String(e.message||'').toLowerCase();
       // Erreur crédits : on sort de la boucle pour aller au secours Pollinations (juste après), on ne jette pas l'erreur ici.
-      if(nexusEstErreurCredits(e)) break;
-      // On ne retente que si le problème vient du modèle (introuvable / indisponible). Sinon, on traduit et on s'arrête.
+      // CORRIGÉ v2 : ne plus jeter l'erreur Puter tout de suite. Sur toute erreur, on sort de la boucle pour aller aux secours.
+      // On ne retente un autre modèle Puter que si le problème vient du modèle lui-même.
       if(/model.*not found|unknown model|invalid.*model|model.*unavailable|not available|introuvable/.test(msg)) continue;
-      throw new Error(nexusTraduireErreur(e.message || "échec de génération"));
+      break;
     }
   }
-  // Plus de crédits Puter ? On bascule sur le secours sans clé, au lieu d'afficher juste l'erreur.
-  if(derniereErreur && nexusEstErreurCredits(derniereErreur)){
+  // Puter a échoué (crédits / funding / Low Balance / autre) ? On bascule sur les secours sans clé.
+  if(derniereErreur){
     // Secours 1 : Kilo (plus de modèles, plus fiable que Pollinations)
     try{
       const secours = await nexusSecoursKilo(messages);
