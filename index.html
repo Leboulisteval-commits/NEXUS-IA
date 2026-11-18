@@ -4,18 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>NEXUS AI — Vérification croisée par IA</title>
-<meta name="description" content="NEXUS AI : un producteur IA rédige, un vérificateur indépendant contrôle. Vérification croisée des réponses IA, mode clés API ou manuel.">
+<meta name="description" content="NEXUS AI : un producteur IA rédige, un vérificateur indépendant contrôle. Vérification croisée des réponses IA.">
 <link rel="canonical" href="https://leboulisteval-commits.github.io/NEXUS-IA/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="NEXUS AI — Vérification croisée par IA">
 <meta property="og:description" content="Un producteur IA rédige, un vérificateur indépendant contrôle.">
 <meta property="og:url" content="https://leboulisteval-commits.github.io/NEXUS-IA/">
-<meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧠%3C/text%3E%3C/svg%3E">
 <script src="https://js.puter.com/v2/" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/jsllm7@0.1.0/jsllm7.min.js" defer></script>
 <style>
 :root{--bg:#f6f6f3;--cd:#fff;--tx:#1c1c1a;--mu:#6b6b64;--ac:#4a49d6;--bt:#fff;--ok:#17734a;--ko:#b3261e;--wa:#a35f00;--bd:#dedcd4;--wn:#fff3cd;--wt:#664d03;--wb:#ffecb5;color-scheme:light}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;--wn:#3a2f14;--wt:#ffd98a;--wb:#5a4a20;color-scheme:dark}}
@@ -39,12 +37,13 @@ button:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-vis
 .bn.ok{border-color:var(--ok)}.bn.ko{border-color:var(--ko)}
 .warn{background:var(--wn);color:var(--wt);border:1px solid var(--wb);padding:10px 12px;border-radius:10px;margin:12px 0;font-size:14px}
 pre{white-space:pre-wrap;word-wrap:break-word;font:inherit;margin:8px 0}
-.res{background:var(--bg);padding:10px;border-radius:10px}
-.j{display:block;width:100%;text-align:left;background:var(--bg);color:var(--tx);border:1px solid var(--bd);margin:4px 0}
+.res{background:var(--bg);padding:10px;border-radius:10px;border-left:4px solid var(--ac)}
+.j{display:block;width:100%;text-align:left;background:var(--bg);color:var(--tx);border:1px solid var(--bd);margin:4px 0;padding:10px;border-radius:10px;cursor:pointer}
 label{display:block;margin:8px 0 2px;font-size:14px;color:var(--mu)}
 label.chk{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:16px;margin:8px 0}
 label.chk input{width:auto;margin:0}
-summary{cursor:pointer;font-weight:600}
+summary{cursor:pointer;font-weight:600;font-size:16px}
+h3{margin:10px 0 5px;font-size:16px;border-bottom:1px solid var(--bd);padding-bottom:5px}
 </style>
 </head>
 <body>
@@ -57,70 +56,70 @@ summary{cursor:pointer;font-weight:600}
 <main>
 
 <div class="warn" role="note">
-  ⚠️ <strong>Usage personnel uniquement.</strong> Les clés API sont stockées dans <em>ce navigateur</em> (localStorage). N’utilisez pas cette page sur un ordinateur partagé.
+  ⚠️ <strong>Usage personnel uniquement.</strong> Les clés API sont stockées dans <em>ce navigateur</em> (localStorage).
 </div>
 
 <section class="c">
   <label for="q">Votre demande</label>
   <textarea id="q" placeholder="Que voulez-vous demander ?"></textarea>
-  
-  <label for="mo">Mode</label>
-  <select id="mo">
-    <option value="puter">Puter AI (Sans clé, recommandé)</option>
-    <option value="jsllm7">jsllm7 (Sans clé, alternative)</option>
-    <option value="cles">Clés API (fournisseurs gratuits)</option>
-    <option value="manuel">Manuel (je colle entre mes IA gratuites)</option>
-  </select>
-  
   <label class="chk"><input type="checkbox" id="vf" checked> Faire vérifier par une autre IA</label>
   <button type="button" onclick="start()">Envoyer</button>
 </section>
 
 <details class="c">
-  <summary>Réglages : mes IA (clés API)</summary>
-  <p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur, jamais dans le fichier. (Non nécessaire si vous utilisez Puter ou jsllm7).</p>
-  <datalist id="dl">
-    <option value="https://api.groq.com/openai/v1/chat/completions"></option>
-    <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
-    <option value="https://api.mistral.ai/v1/chat/completions"></option>
-    <option value="https://openrouter.ai/api/v1/chat/completions"></option>
-  </datalist>
+  <summary>⚙️ Configuration (Mode & Réglages)</summary>
+  
+  <label for="mo">Mode de fonctionnement</label>
+  <select id="mo" onchange="toggleSettings()">
+    <option value="puter">Puter AI (Sans clé, recommandé)</option>
+    <option value="cles">Clés API (fournisseurs gratuits)</option>
+    <option value="manuel">Manuel (je colle entre mes IA gratuites)</option>
+  </select>
 
-  <b>Producteur</b>
-  <label for="up">Adresse de l’API</label>
-  <input id="up" list="dl" placeholder="https://…">
-  <label for="kp">Clé API</label>
-  <input id="kp" type="password" placeholder="Clé API" autocomplete="off">
-  <label for="mp2">Nom du modèle</label>
-  <input id="mp2" placeholder="ex. llama-3.1-8b-instant" autocomplete="off">
-  <button type="button" class="s" onclick="setPV();testP('p')">Enregistrer et tester</button>
-  <div class="mu" id="tp" aria-live="polite"></div>
+  <div id="api-settings" style="display:none; margin-top: 15px; border-top: 1px solid var(--bd); padding-top: 15px;">
+    <p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur.</p>
+    <datalist id="dl">
+      <option value="https://api.groq.com/openai/v1/chat/completions"></option>
+      <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
+      <option value="https://api.mistral.ai/v1/chat/completions"></option>
+      <option value="https://openrouter.ai/api/v1/chat/completions"></option>
+    </datalist>
 
-  <b>Vérificateur</b>
-  <label for="uv">Adresse de l’API</label>
-  <input id="uv" list="dl" placeholder="https://…">
-  <label for="kv">Clé API</label>
-  <input id="kv" type="password" placeholder="Clé API" autocomplete="off">
-  <label for="mv">Nom du modèle</label>
-  <input id="mv" placeholder="ex. mistral-small-latest" autocomplete="off">
-  <button type="button" class="s" onclick="setPV();testP('v')">Enregistrer et tester</button>
-  <div class="mu" id="tv" aria-live="polite"></div>
+    <h3>Producteur</h3>
+    <label for="up">Adresse de l’API</label>
+    <input id="up" list="dl" placeholder="https://…">
+    <label for="kp">Clé API</label>
+    <input id="kp" type="password" placeholder="Clé API" autocomplete="off">
+    <label for="mp2">Nom du modèle</label>
+    <input id="mp2" placeholder="ex. llama-3.1-8b-instant" autocomplete="off">
+    <button type="button" class="s" onclick="setPV();testP('p')">Enregistrer et tester</button>
+    <div class="mu" id="tp" aria-live="polite"></div>
 
-  <p><button type="button" class="s" onclick="clearKeys()">Effacer les clés enregistrées</button></p>
+    <h3 style="margin-top:20px">Vérificateur</h3>
+    <label for="uv">Adresse de l’API</label>
+    <input id="uv" list="dl" placeholder="https://…">
+    <label for="kv">Clé API</label>
+    <input id="kv" type="password" placeholder="Clé API" autocomplete="off">
+    <label for="mv">Nom du modèle</label>
+    <input id="mv" placeholder="ex. mistral-small-latest" autocomplete="off">
+    <button type="button" class="s" onclick="setPV();testP('v')">Enregistrer et tester</button>
+    <div class="mu" id="tv" aria-live="polite"></div>
+
+    <p style="margin-top:20px"><button type="button" class="s" onclick="clearKeys()">Effacer les clés enregistrées</button></p>
+  </div>
 </details>
 
 <div id="out" aria-live="polite"></div>
 
 <section class="c">
-  <b>Journal</b>
+  <h3>Journal des demandes</h3>
   <div id="jr"></div>
   <p><button type="button" class="s" onclick="clearJournal()">Effacer le journal</button></p>
 </section>
 
 <details class="c">
   <summary>Limites à connaître</summary>
-  <p class="mu">Certains fournisseurs refusent les appels depuis un navigateur : le bouton « tester » vous le dit. Les clés sont stockées dans ce navigateur : usage personnel seulement. Ne mettez jamais une clé dans le fichier. « Conforme à la demande » ne veut pas dire « vrai » ; un prix, une date ou un stock sans source restent non tranchables.</p>
-  <p class="mu">L’application ne travaille pas onglet fermé : rouvrez-la et touchez « Reprendre ». Image, voix, vidéo et achat vérifié ne sont pas inclus.</p>
+  <p class="mu">Certains fournisseurs refusent les appels depuis un navigateur : le bouton « tester » vous le dit. « Conforme à la demande » ne veut pas dire « vrai » ; un prix, une date ou un stock sans source restent non tranchables.</p>
 </details>
 
 </main>
@@ -132,6 +131,11 @@ const K="nexus_v0", KP="nexus_prov";
 let T=[],cur=null;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function toggleSettings() {
+  const mode = $("#mo").value;
+  $("#api-settings").style.display = (mode === "cles") ? "block" : "none";
+}
 
 function save(){try{localStorage.setItem(K,JSON.stringify(T.slice(0,30),(k,v)=>k[0]==="_"?undefined:v))}catch(e){}}
 function load(){try{T=JSON.parse(localStorage.getItem(K)||"[]")}catch(e){T=[]}
@@ -159,7 +163,7 @@ async function callP(k,prompt){
   if(!p.url||!p.key||!p.modele)throw new Error("Réglages incomplets : adresse, clé et modèle sont nécessaires.");
   let r;
   try{r=await fetch(p.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+p.key},body:JSON.stringify({model:p.modele,messages:[{role:"user",content:prompt}]})})}
-  catch(e){throw new Error("Appel bloqué ou réseau coupé : ce fournisseur n’accepte peut-être pas les appels depuis un navigateur.")}
+  catch(e){throw new Error("Appel bloqué ou réseau coupé.")}
   if(r.status===429){const e=new Error("Quota épuisé");e.code="rate_limited";throw e}
   if(!r.ok)throw new Error("Erreur "+r.status+" : "+(await r.text()).slice(0,200));
   const j=await r.json();
@@ -168,21 +172,12 @@ async function callP(k,prompt){
 async function testP(k){const e=$("#t"+k);e.textContent="Test en cours…";try{await callP(k,"Réponds uniquement : ok");e.textContent="Connexion réussie."}catch(x){e.textContent=x.message}}
 
 async function callPuter(prompt) {
-  if (!window.puter || !puter.ai) throw new Error("Puter n'est pas chargé. Vérifiez votre connexion.");
+  if (!window.puter || !puter.ai) throw new Error("Puter n'est pas chargé.");
   try {
     const r = await puter.ai.chat(prompt);
     return String(r);
   } catch(e) {
-    throw new Error("Puter a refusé la connexion. Réessayez plus tard.");
-  }
-}
-
-async function callJsllm7(prompt) {
-  if (typeof jsllm7 === 'undefined') throw new Error("Le service jsllm7 n'est pas chargé.");
-  try {
-    return await jsllm7(prompt);
-  } catch (e) {
-    throw new Error("Le service jsllm7 a échoué. Réessayez plus tard.");
+    throw new Error("Puter a refusé la connexion.");
   }
 }
 
@@ -199,8 +194,6 @@ async function ask(t,role,prompt,tier,json){
     let txt;
     if(t.mode==="puter"){
       txt=await callPuter(prompt);
-    }else if(t.mode==="jsllm7"){
-      txt=await callJsllm7(prompt);
     }else if(t.mode==="manuel"){
       txt=await manual(t,role,prompt);
     }else{
@@ -217,7 +210,7 @@ async function ask(t,role,prompt,tier,json){
 async function verifier(t){
   const vt={quick:"default",default:"complex",complex:"default"}[t.tier]||"default";
   const o=await ask(t,"Vérificateur",VP+"\n\nDEMANDE :\n"+t.demande+"\n\nRÉSULTAT :\n"+t.result,vt,true);
-  if(!o||!Array.isArray(o.criteres)||!o.criteres.length)return{verdict:"NON_TRANCHABLE",criteres:[],ecarts:["Réponse du vérificateur illisible ou sans critères."]};
+  if(!o||!Array.isArray(o.criteres)||!o.criteres.length)return{verdict:"NON_TRANCHABLE",criteres:[],ecarts:["Réponse du vérificateur illisible."]};
   const c=o.criteres.map(x=>({critere:String(x.critere||""),verdict:String(x.verdict||"").toUpperCase(),preuve:String(x.preuve||"")}));
   const v=c.some(x=>x.verdict==="NON")?"NON":c.some(x=>x.verdict!=="OUI")?"NON_TRANCHABLE":"OUI";
   const ec=(Array.isArray(o.ecarts)?o.ecarts:[]).concat(c.filter(x=>x.verdict==="NON").map(x=>x.critere));
@@ -267,41 +260,67 @@ function okM(){const v=$("#mr").value.trim();if(!v||!cur._m)return;const m=cur._
 function render(){
   const t=cur;let h="";
   if(t){
+    // --- BLOC 1 : QUESTION ET RÉPONSE ---
+    h+='<section class="c">';
+    
     let modeName = "";
-    if(t.mode==="manuel") modeName = "IA de votre choix";
+    if(t.mode==="manuel") modeName = "Manuel";
     else if(t.mode==="puter") modeName = "Puter AI";
-    else if(t.mode==="jsllm7") modeName = "jsllm7";
-    else modeName = "modèle " + (PV("p").modele || "?");
+    else modeName = "API (" + (PV("p").modele || "?") + ")";
 
-    h+='<section class="c"><div class="mu">'+esc(t.type)+(t.tier?" · "+modeName:"")+'</div><b>'+esc(t.demande)+'</b>';
-    if(t.why)h+='<div class="mu">Pourquoi : '+esc(t.why)+'</div>';
-    if(t.status==="non_supporte")h+='<div class="bn ko">Image, voix, vidéo et achat vérifié : non démontrables automatiquement à 0 € dans cette version.</div>';
+    h+='<div class="mu">Demande ('+esc(modeName)+')</div>';
+    h+='<b>'+esc(t.demande)+'</b>';
+    
+    if(t.status==="non_supporte")h+='<div class="bn ko">Image, voix, vidéo et achat : non supportés.</div>';
     if(t.status==="en_cours")h+='<div class="bn">'+esc(t.step||"En cours")+'…</div>';
-    if(t.status==="attente")h+='<div class="bn">En attente : quota épuisé ('+esc(t.att&&t.att.role)+'). Reprise dans <b id="cd"></b>. Rien n’est perdu.<br><button type="button" onclick="skip()">Réessayer maintenant</button></div>';
-    if(t.status==="manuel"&&t._m)h+='<div class="bn"><b>'+esc(t._m.role)+'</b><div class="mu">Copiez ce texte dans l’IA de votre choix (un fournisseur différent pour chaque rôle), puis collez sa réponse ci-dessous.</div><textarea id="mp" readonly>'+esc(t._m.prompt)+'</textarea><button type="button" class="s" onclick="copyP()">Copier</button><label for="mr">Réponse de l’IA</label><textarea id="mr" placeholder="Réponse de l’IA"></textarea><button type="button" onclick="okM()">Valider</button></div>';
+    if(t.status==="attente")h+='<div class="bn">En attente : quota épuisé. Reprise dans <b id="cd"></b>.<br><button type="button" onclick="skip()">Réessayer</button></div>';
+    if(t.status==="manuel"&&t._m)h+='<div class="bn"><b>'+esc(t._m.role)+'</b><br><span class="mu">Copiez ce texte dans l’IA de votre choix, puis collez sa réponse ci-dessous.</span><textarea id="mp" readonly>'+esc(t._m.prompt)+'</textarea><button type="button" class="s" onclick="copyP()">Copier</button><label for="mr">Réponse de l’IA</label><textarea id="mr"></textarea><button type="button" onclick="okM()">Valider</button></div>';
     if(t.status==="erreur")h+='<div class="bn ko">'+esc(t.err)+'<br><button type="button" onclick="resume()">Reprendre</button></div>';
     if(t.status==="interrompue")h+='<div class="bn wa">Tâche interrompue.<br><button type="button" onclick="resume()">Reprendre</button></div>';
-    if(t.result&&(t.status==="fini"||t.status==="erreur"||t.status==="interrompue"))h+='<pre class="res">'+esc(t.result)+'</pre>';
-    if(t.status==="fini"&&t.verif){
+    
+    // La réponse finale
+    if(t.result&&(t.status==="fini"||t.status==="erreur"||t.status==="interrompue")){
+      h+='<h3 style="margin-top:15px">Réponse finale</h3>';
+      h+='<pre class="res">'+esc(t.result)+'</pre>';
+    }
+    h+='</section>';
+
+    // --- BLOC 2 : VÉRIFICATION (Séparé) ---
+    if(t.verif && t.v) {
+      h+='<section class="c" style="border-left: 4px solid var(--ac);">';
+      h+='<h3>Vérification indépendante</h3>';
       const n=niveau(t);
       h+='<div class="bn '+n[1]+'"><b>'+esc(n[0])+'</b><div class="mu">Conforme à la demande ne veut pas dire vrai.</div></div>';
       
-      if(t.mode==="puter")h+='<div class="bn ko">Vérification dégradée : en mode Puter, le même fournisseur sert pour les deux rôles.</div>';
-      else if(t.mode==="jsllm7")h+='<div class="bn ko">Vérification dégradée : en mode jsllm7, le même fournisseur sert pour les deux rôles.</div>';
-      else if(t.mode==="cles"&&PV("p").url===PV("v").url)h+='<div class="bn ko">Vérification dégradée : producteur et vérificateur utilisent la même adresse (même fournisseur).</div>';
+      if(t.mode==="puter")h+='<div class="bn ko">Note : en mode Puter, le même fournisseur sert pour les deux rôles.</div>';
+      else if(t.mode==="cles"&&PV("p").url===PV("v").url)h+='<div class="bn ko">Note : producteur et vérificateur utilisent la même adresse.</div>';
       
-      if(t.v&&t.v.ecarts&&t.v.ecarts.length&&t.v.verdict!=="OUI")h+='<div class="bn wa">Écarts : '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
+      if(t.v.ecarts&&t.v.ecarts.length&&t.v.verdict!=="OUI")h+='<div class="bn wa">Écarts : '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
+
+      if(t.log&&t.log.length){
+        h+='<details style="margin-top:10px"><summary>Détail du circuit ('+t.log.length+' tour(s))</summary>';
+        h+='<div style="margin-top:10px">';
+        h+=t.log.map(l=>'<p class="mu"><b>Tour '+l.tour+' : '+esc(l.verdict)+'</b><br>'+(l.criteres||[]).map(c=>esc(c.verdict)+' · '+esc(c.critere)+(c.preuve?' (preuve : '+esc(c.preuve)+')':'')).join("<br>")+'</p>').join("");
+        h+='</div></details>';
+      }
+      h+='</section>';
     }
-    if(t.log&&t.log.length)h+='<details><summary>Détail du circuit ('+t.log.length+' tour(s))</summary>'+t.log.map(l=>'<p class="mu"><b>Tour '+l.tour+' : '+esc(l.verdict)+'</b><br>'+(l.criteres||[]).map(c=>esc(c.verdict)+' · '+esc(c.critere)+(c.preuve?' (preuve : '+esc(c.preuve)+')':'')).join("<br>")+'</p>').join("")+'</details>';
-    h+='</section>';
   }
+  
   $("#out").innerHTML=h;
   $("#jr").innerHTML=T.length
     ? T.map((x,i)=>'<button type="button" class="j" onclick="openT('+i+')">'+esc(new Date(x.id).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))+' · '+esc(x.status)+' · '+esc(x.demande.slice(0,60))+'</button>').join("")
     : '<div class="mu">Aucune demande pour l’instant.</div>';
 }
 
-load();render();fillS();
+// Initialisation
+load();
+render();
+fillS();
+toggleSettings(); // Pour cacher les clés API si on est en mode Puter au chargement
+
+// Écouter les changements de mode pour sauvegarder automatiquement le choix
+$("#mo").addEventListener("change", toggleSettings);
 </script>
 </body>
 </html>
