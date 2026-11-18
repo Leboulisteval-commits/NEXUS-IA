@@ -40,6 +40,27 @@
 :where(code, pre, kbd, samp) {
   font-family: "Optimistic Mono", ui-monospace, monospace;
 }
+</style><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
 </style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
@@ -281,7 +302,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795032767707)"><span class="conv-del" onclick="deleteConversation(1795032767707,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795035290263)"><span class="conv-del" onclick="deleteConversation(1795035290263,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -774,6 +795,98 @@ async function callPuter(prompt, signal, image = null){
 // Problème 2 : système + historique + demande collés en une seule chaîne.
 // Cette fonction ne sert QUE pour le Producteur.
 // Vérificateur / Correcteur / callPuter / ask / verifier : INCHANGÉS.
+
+// ===== OUTILS NEXUS (AJOUT UNIQUEMENT) : image, horloge, calendrier, calculatrice, convertisseur, minuteur, chronomètre =====
+// Ces fonctions ne modifient aucune fonction existante. Elles sont appelées depuis run() uniquement pour ces outils.
+// Principe : l'APP calcule (heure, date, calcul, conversion, minuteur...), le modèle reprend le résultat tel quel au lieu de deviner.
+function nexusNow(){
+  const d = new Date();
+  return { date: d,
+    dateFR: d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
+    heure: d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', second:'2-digit' }) };
+}
+function nexusCalendar(){
+  const out = [];
+  for(let i=0;i<7;i++){ const d=new Date(); d.setDate(d.getDate()+i);
+    out.push((i===0?'Aujourd\u2019hui : ':i===1?'Demain : ':'') + d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })); }
+  return out.join('\n');
+}
+function nexusCalc(expr){
+  const clean = String(expr||'').replace(/\s+/g,'').replace(/,/g,'.').replace(/x/gi,'*').replace(/÷/g,'/').replace(/×/g,'*');
+  if(!/^[0-9+\-*/().%]+$/.test(clean) || !/[0-9]/.test(clean) || clean.length>60) return null;
+  try{ const v = Function('"use strict"; return ('+clean+')')(); if(typeof v!=='number'||!isFinite(v)) return null; return { expr: clean, value: v }; }catch(e){ return null; }
+}
+function nexusConvert(val, from, to){
+  const u = (s)=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const f=u(from), tt=u(to); const v=Number(val); if(!isFinite(v)) return null;
+  const len = { 'km':1000,'kilometre':1000,'kilometres':1000,'m':1,'metre':1,'metres':1,'cm':0.01,'mm':0.001,'mile':1609.34,'miles':1609.34,'pied':0.3048,'pieds':0.3048,'pouce':0.0254,'pouces':0.0254 };
+  const mass = { 'kg':1,'kilo':1,'kilos':1,'kilogramme':1,'g':0.001,'gramme':0.001,'livre':0.453592,'livres':0.453592,'oz':0.0283495,'once':0.0283495 };
+  const vol = { 'l':1,'litre':1,'litres':1,'ml':0.001,'cl':0.01,'gallon':3.78541,'gallons':3.78541 };
+  const time = { 'h':60,'heure':60,'heures':60,'min':1,'minute':1,'minutes':1,'sec':1/60,'seconde':1/60,'secondes':1/60,'jour':1440,'jours':1440 };
+  if((f==='c'||f==='celsius'||f==='degre'||f==='degres') && (tt==='f'||tt==='fahrenheit')) return { text: v+' °C = '+(v*9/5+32).toFixed(2)+' °F' };
+  if((f==='f'||f==='fahrenheit') && (tt==='c'||tt==='celsius'||tt==='degre'||tt==='degres')) return { text: v+' °F = '+((v-32)*5/9).toFixed(2)+' °C' };
+  const maps=[len,mass,vol,time];
+  for(const m of maps){ if(m[f]!=null && m[tt]!=null){ const r=v*m[f]/m[tt]; return { text: v+' '+from+' = '+(Math.round(r*1000)/1000)+' '+to }; } }
+  return null;
+}
+function nexusToolContext(demande){
+  const s=(demande||'').toLowerCase(); const parts=[]; const now=nexusNow();
+  if(/(heure|date|quel jour|on est|aujourd)/.test(s)) parts.push('HORLOGE : Nous sommes le '+now.dateFR+'. Il est '+now.heure+' (heure locale du navigateur).');
+  if(/(calendrier|agenda|demain|apres-demain|après-demain|semaine|prochain)/.test(s)) parts.push('CALENDRIER (7 prochains jours) :\n'+nexusCalendar());
+  const mc = s.match(/(?:calcule|calcul|combien\s+(?:font|fait|vaut)|resultat\s+de|résultat\s+de)\s*[:=]?\s*([0-9][0-9\s+\-*/().%x×÷,]*)/) || s.match(/^\s*([0-9][0-9\s+\-*/().%x×÷,]{1,40})\s*\?*\s*$/);
+  if(mc){ const c=nexusCalc(mc[1]); if(c) parts.push('CALCULATRICE : '+c.expr+' = '+c.value); }
+  const mv = s.match(/(?:convertis|convertir|conversion|convert)\s+([0-9]+(?:[.,][0-9]+)?)\s*([a-z°]+)\s+en\s+([a-z°]+)/);
+  if(mv){ const cv=nexusConvert(mv[1].replace(',','.'), mv[2], mv[3]); if(cv) parts.push('CONVERTISSEUR : '+cv.text); }
+  if(!parts.length) return '';
+  return '[DONNÉES OUTILS - À REPRENDRE TELLES QUELLES, NE PAS LES RECALCULER NI LES INVENTER]\n'+parts.join('\n')+'\n[FIN DONNÉES OUTILS]';
+}
+// --- Minuteur / Chronomètre : état en localStorage, survit à un re-render ---
+function nexusOutilsLoad(){ try{ return JSON.parse(localStorage.getItem('nexus_outils')||'{}')||{}; }catch(e){ return {}; } }
+function nexusOutilsSave(o){ try{ localStorage.setItem('nexus_outils', JSON.stringify(o)); }catch(e){} }
+function nexusFmtMs(ms){ ms=Math.max(0, Math.floor(ms/1000)); const h=String(Math.floor(ms/3600)).padStart(2,'0'), m=String(Math.floor(ms/60)%60).padStart(2,'0'), s=String(ms%60).padStart(2,'0'); return h+':'+m+':'+s; }
+function nexusParseDuree(s){
+  const m = String(s||'').toLowerCase().match(/([0-9]+(?:[.,][0-9]+)?)\s*(h|heure|heures|min|minute|minutes|sec|seconde|secondes|s)?/);
+  if(!m) return null; const v=parseFloat(m[1].replace(',','.')); const u=m[2]||'min';
+  if(u.startsWith('h')) return v*3600000; if(u.startsWith('sec')||u==='s') return v*1000; return v*60000;
+}
+function nexusTimerChronoCommand(demande){
+  const s=(demande||'').toLowerCase(); const o=nexusOutilsLoad();
+  if(/\b(minuteur|timer)\b/.test(s)){
+    const d=nexusParseDuree(s); if(!d) return { text:'Dis-moi une durée : par exemple "minuteur 5 minutes".', tool:{ type:'timer', label:'Minuteur', until:0 } };
+    o.timer={ until: Date.now()+d, duree:d }; nexusOutilsSave(o);
+    setTimeout(()=>{ try{ render(); }catch(e){} }, d+50);
+    return { text:'Minuteur lancé : '+nexusFmtMs(d)+' (il se terminera à '+new Date(o.timer.until).toLocaleTimeString('fr-FR')+'). Laisse NEXUS ouvert, il t\u2019affichera la fin.', tool:{ type:'timer', label:'Minuteur', until:o.timer.until } };
+  }
+  if(/démarre|demarre|lance.*chrono|start.*chrono/.test(s) && /chrono/.test(s)){
+    o.chrono={ start: Date.now(), running:true }; nexusOutilsSave(o);
+    return { text:'Chronomètre démarré.', tool:{ type:'chrono', label:'Chronomètre', start:o.chrono.start, running:true } };
+  }
+  if(/(stop|arrête|arrete|pause).*chrono|chrono.*(stop|arrêt|arret)/.test(s)){
+    if(!o.chrono || !o.chrono.start) return { text:'Aucun chronomètre en cours.', tool:null };
+    const elapsed = Date.now()-o.chrono.start; o.chrono={ start:o.chrono.start, running:false, elapsed }; nexusOutilsSave(o);
+    return { text:'Chronomètre arrêté : '+nexusFmtMs(elapsed)+'.', tool:{ type:'chrono', label:'Chronomètre', start:o.chrono.start, running:false, elapsed } };
+  }
+  if(/chrono/.test(s) && /(temps|combien|où en|ou en)/.test(s)){
+    if(!o.chrono || !o.chrono.start) return { text:'Aucun chronomètre en cours. Dis "démarre le chronomètre".', tool:null };
+    const elapsed = o.chrono.running ? Date.now()-o.chrono.start : (o.chrono.elapsed||0);
+    return { text:'Chronomètre : '+nexusFmtMs(elapsed)+'.', tool:{ type:'chrono', label:'Chronomètre', start:o.chrono.start, running:!!o.chrono.running, elapsed } };
+  }
+  return null;
+}
+function nexusImagePrompt(demande){
+  const s=(demande||'').trim();
+  if(/^\/image\b/i.test(s)) return s.replace(/^\/image\b/i,'').trim();
+  if(/\b(génère|genere|crée|cree|dessine|fais-moi|fais moi|crée-moi|crée moi)\b[^.]*\b(image|dessin|illustration|photo)\b/i.test(s)){
+    return s.replace(/^(génère|genere|crée|cree|dessine|fais-moi|fais moi|crée-moi|crée moi)\s+(une\s+|un\s+|une\s+image\s+de\s+|une\s+image\s+|image\s+de\s+|image\s+)?/i,'').trim() || s;
+  }
+  return null;
+}
+async function nexusGenerateImage(prompt, signal){
+  if(!window.puter || !puter.ai || !puter.ai.txt2img) throw new Error("Génération d'image non disponible. Vérifie que Puter est chargé.");
+  const img = await puter.ai.txt2img(prompt, false, { model: "gpt-image-2.6-flare" });
+  return img && img.src ? img.src : String(img||'');
+}
+
 async function callPuterProducteur(messages, signal, image = null){
   if(!window.puter || !puter.ai) throw new Error("Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.");
   if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
@@ -858,6 +971,21 @@ async function run(t){
     if(!t.result){
       t.step = "Génération en cours…";
       save(); render();
+      // OUTILS DIRECTS (image / minuteur / chronomètre) : pas de chat, pas de vérification texte.
+      // Le reste du run() (vérification comprise) n'est pas modifié.
+      const _imgPrompt = nexusImagePrompt(t.demande);
+      if(_imgPrompt && t.mode === "puter" && !t.image){
+        t.step = "Génération de l'image…"; save(); render();
+        t.generatedImage = await nexusGenerateImage(_imgPrompt, currentController ? currentController.signal : undefined);
+        t.result = "Voici ton image : " + _imgPrompt;
+        t.pProvider = "puter"; t.verif = false;
+        t.step = ""; save(); render();
+      } else {
+      const _tc = nexusTimerChronoCommand(t.demande);
+      if(_tc){
+        t.result = _tc.text; if(_tc.tool) t.tool = _tc.tool; t.pProvider = "puter"; t.verif = false;
+        t.step = ""; save(); render();
+      } else {
       const pastMessages = [];
       conv.messages.filter(x => x.id !== t.id && x.result).slice(-5).forEach(x => {
         pastMessages.push({ role: "user", content: x.demande });
@@ -876,9 +1004,11 @@ Règles importantes :
         systemBlock += `\n\nRÔLE À ADOPTER (prioritaire) :\n${persona}`;
       }
 
+      const _toolCtx = nexusToolContext(t.demande);
       const messagesP = [
         { role: "system", content: systemBlock },
         ...pastMessages,
+        ...(_toolCtx ? [{ role: "user", content: _toolCtx }] : []),
         { role: "user", content: t.demande + (t.image ? "\n\n[Image jointe — analyse-la si elle est pertinente pour répondre.]" : "") }
       ];
 
@@ -890,11 +1020,14 @@ Règles importantes :
         // Mode "cles" : INCHANGÉ, passe par l'ancien chemin ask -> callCustom.
         // On reconstruit le texte équivalent pour callCustom qui attend une chaîne.
         const promptP = `[INSTRUCTIONS SYSTÈME]\n${systemBlock}\n\n` +
+          (_toolCtx ? _toolCtx + "\n\n" : "") +
           (pastMessages.length ? `[HISTORIQUE RÉCENT]\n${pastMessages.map(m => (m.role === "user" ? "Q : " : "R : ") + m.content).join("\n\n")}\n\n` : "") +
           `[DEMANDE ACTUELLE]\n${t.demande}` +
           (t.image ? "\n\n[Image jointe — analyse-la si elle est pertinente pour répondre.]" : "");
         t.result = await ask(t, "Producteur", promptP, t.tier, false, t.image);
       }
+      } // fin else minuteur/chrono
+      } // fin else image
       t.step = ""; save(); render();
     }
     if(t.verif){
@@ -1014,7 +1147,7 @@ function regenerate(id){
   if(idx === -1) return;
   conv.messages = conv.messages.slice(0, idx + 1);
   const t = conv.messages[idx];
-  t.result = null; t.v = null; t.round = 0; t.status = "en_cours"; t.step = ""; t.err = ""; t.pProvider = null; t.vProvider = null;
+  t.result = null; t.generatedImage = null; t.tool = null; t.v = null; t.round = 0; t.status = "en_cours"; t.step = ""; t.err = ""; t.pProvider = null; t.vProvider = null;
   t.mode = $("#mo").value; t.verif = $("#vf").checked;
   save(); render();
   run(t);
@@ -1093,7 +1226,7 @@ function render(){
       h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI ' + (t.step ? '• ' + esc(t.step) : '') + '</div><div class="ai-body"><div class="typing"><i></i><i></i><i></i></div></div></div></div>';
       return;
     }
-    h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI' + (t.step ? ' • ' + esc(t.step) : '') + '</div><div class="ai-body">' + formatMarkdown(t.result || "") + '</div>';
+    h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI' + (t.step ? ' • ' + esc(t.step) : '') + '</div><div class="ai-body">' + formatMarkdown(t.result || "") + (t.generatedImage ? '<img class="msg-image" src="' + t.generatedImage + '" style="margin-top:8px">' : '') + (t.tool ? '<div class="msg-system" style="margin-top:8px">⏱ ' + esc(t.tool.label) + ' : <span class="nexus-tool-live" data-tool-type="' + esc(t.tool.type) + '" data-until="' + (t.tool.until||0) + '" data-start="' + (t.tool.start||0) + '" data-running="' + (t.tool.running?1:0) + '" data-elapsed="' + (t.tool.elapsed||0) + '">' + esc(t.tool.type==='timer' ? nexusFmtMs(Math.max(0,(t.tool.until||0)-Date.now())) : nexusFmtMs(t.tool.running ? Date.now()-(t.tool.start||Date.now()) : (t.tool.elapsed||0))) + '</span></div>' : '') + '</div>';
     h += '<div class="msg-meta"><span>' + niveau(t.verif ? t.v : null) + '</span>';
     if(t.pProvider) h += '<span>Prod : ' + providerLabel(t.pProvider) + '</span>';
     if(t.vProvider) h += '<span>Vérif : ' + providerLabel(t.vProvider) + '</span>';
@@ -1113,6 +1246,7 @@ function render(){
   chat.innerHTML = h;
   if(isScrolledToBottom) chat.scrollTop = chat.scrollHeight;
 }
+setInterval(()=>{ try{ document.querySelectorAll('.nexus-tool-live').forEach(el=>{ if(el.dataset.toolType==='timer'){ const r=Math.max(0, Number(el.dataset.until||0)-Date.now()); el.textContent=nexusFmtMs(r); } else { const run=el.dataset.running==='1'; el.textContent=nexusFmtMs(run?Date.now()-Number(el.dataset.start||Date.now()):Number(el.dataset.elapsed||0)); } }); }catch(e){} }, 1000);
 function useSuggestion(txt){
   if(busy) return;
   // Remplir + envoyer automatiquement SANS activer le clavier
@@ -1160,4 +1294,4 @@ fillS();
 toggleSettings();
 </script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
