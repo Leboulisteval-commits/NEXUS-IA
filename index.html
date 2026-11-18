@@ -319,14 +319,14 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 </div>
 </main>
 
-<aside id="sidebar" class="">
+<aside id="sidebar">
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795042458670)"><span class="conv-del" onclick="deleteConversation(1795042458670,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795043659855)"><span class="conv-del" onclick="deleteConversation(1795043659855,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
-<div id="overlay" onclick="closeSidebar()" class=""></div>
+<div id="overlay" onclick="closeSidebar()"></div>
 
 <dialog id="settingsModal">
 <div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
@@ -1145,6 +1145,7 @@ async function nexusAppelerModele(messages, signal, image, modele){
 // Testée en live il y a 2 jours (17/17 tests OK sur kilo-auto/free).
 // Attention : comme toutes les routes gratuites, Kilo peut journaliser les prompts. Ne pas y envoyer de données confidentielles.
 async function nexusSecoursKilo(messages){
+  try{ window.__nexusKiloErreur = ''; }catch(e){}
   // KILO POUSSÉ AU MAX (seule fonction Kilo touchée) :
   // - 5 modèles en cascade (au lieu de 3), adaptés à la demande
   // - Messages réduits aux 8 derniers + système renforcé (moins de tokens = plus rapide, moins d'erreurs)
@@ -1214,6 +1215,7 @@ async function nexusSecoursKilo(messages){
       }
     }
   }
+  try{ window.__nexusKiloErreur = String((derniereErreur && derniereErreur.message) || derniereErreur || 'Kilo indisponible').slice(0,120); }catch(e){}
   throw derniereErreur || new Error('Kilo indisponible');
 }
 
@@ -1253,7 +1255,7 @@ async function nexusSecoursPollinations(messages){
         if(!res.ok) throw new Error('Pollinations ' + modele + ' indisponible (' + res.status + ')');
         const txt = (await res.text() || '').trim();
         if(!txt || txt.length < 20 || /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txt)) throw new Error('Pollinations ' + modele + ' réponse insuffisante');
-        try{ window.__nexusDernierModele = 'secours Pollinations ' + modele + ' (gratuit, sans clé)'; }catch(e2){}
+        try{ const _k = String(window.__nexusKiloErreur || ''); window.__nexusDernierModele = 'secours Pollinations ' + modele + ' (gratuit, sans clé)' + (_k ? ' — Kilo échoué : ' + _k : ''); }catch(e2){}
         return txt;
       }catch(e){
         derniereErreur = e;
