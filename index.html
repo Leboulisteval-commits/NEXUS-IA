@@ -319,14 +319,14 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 </div>
 </main>
 
-<aside id="sidebar">
+<aside id="sidebar" class="">
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795041991614)"><span class="conv-del" onclick="deleteConversation(1795041991614,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795042458670)"><span class="conv-del" onclick="deleteConversation(1795042458670,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
-<div id="overlay" onclick="closeSidebar()"></div>
+<div id="overlay" onclick="closeSidebar()" class=""></div>
 
 <dialog id="settingsModal">
 <div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
@@ -480,7 +480,16 @@ function showToast(msg, ms = 2500){
 }
 
 function save(){
-  try{ localStorage.setItem(K, JSON.stringify(state)); }catch(e){ console.warn('Sauvegarde impossible (quota ?)', e); }
+  // CORRIGÉ pièces jointes : avant, l'image entière (base64) était sauvée dans localStorage à chaque message.
+  // localStorage = ~5 Mo max -> au bout de quelques photos, la sauvegarde plantait.
+  // Maintenant : on essaie d'abord de tout sauver. Si le quota est dépassé, on re-sauve SANS les images (le texte des conversations est gardé).
+  // L'image reste en mémoire pour l'envoi en cours, elle disparaît juste de l'historique après rechargement.
+  try{ localStorage.setItem(K, JSON.stringify(state)); return; }catch(e){ console.warn('Sauvegarde complète impossible (quota ?), on re-sauve sans les images.', e); }
+  try{
+    const copie = JSON.parse(JSON.stringify(state));
+    (copie.convs || []).forEach(c => (c.messages || []).forEach(m => { if(m.image){ m.image = null; m.imageEnvoyee = true; } }));
+    localStorage.setItem(K, JSON.stringify(copie));
+  }catch(e2){ console.warn('Sauvegarde impossible.', e2); }
 }
 function load(){
   try{
@@ -559,6 +568,8 @@ function handleFileSelect(event){
   const file = event.target.files[0];
   event.target.value = '';
   if(!file) return;
+  // Fichiers volumineux acceptés : jusqu'à 50 Mo en entrée. On compresse après, on ne refuse plus une photo d'iPhone.
+  if(file.size > 50 * 1024 * 1024){ showToast("Fichier trop lourd (max 50 Mo)."); return; }
 
   // Réinitialiser les pièces jointes précédentes
   pendingImage = null;
@@ -566,50 +577,65 @@ function handleFileSelect(event){
 
   const isImage = file.type.startsWith('image/');
   const isText = file.type.startsWith('text/') ||
-                 /\.(txt|md|markdown|csv|json|xml|html|js|ts|py|css|log|rtf)$/i.test(file.name);
+                 /\.(txt|md|markdown|csv|json|xml|html|js|ts|jsx|tsx|py|css|log|rtf|srt|yaml|yml|toml|sql|java|c|cpp|h|hpp|php|rb|go|rs|swift|kt|sh|bat|ini|env)$/i.test(file.name);
 
   if(!isImage && !isText){
-    showToast("Formats supportés : images, .txt, .md, .csv, .json, code…");
+    showToast("Formats supportés : images, .txt, .md, .csv, .json, code… (PDF / Word / Excel ne sont pas lisibles ici, copie-colle leur texte).");
     return;
   }
 
+  const tailleMo = (file.size / (1024 * 1024)).toFixed(1);
   const reader = new FileReader();
   reader.onerror = () => showToast("Impossible de lire ce fichier.");
 
   if(isImage){
     reader.onload = e => {
       const img = new Image();
-      img.onerror = () => showToast("Image illisible.");
+      img.onerror = () => showToast("Image illisible. Sur iPhone, si c'est du HEIC, convertis-la en JPG dans Photos avant de l'envoyer.");
       img.onload = () => {
-        const MAX_SIZE = 1024;
-        let width = img.width, height = img.height;
-        if(width > height && width > MAX_SIZE){ height *= MAX_SIZE / width; width = MAX_SIZE; }
-        else if(height > MAX_SIZE){ width *= MAX_SIZE / height; height = MAX_SIZE; }
+        // COMPRESSION ADAPTATIVE : on vise max ~350 Ko, pas une qualité fixe.
+        // On réduit d'abord les dimensions (max 1600px), puis la qualité (0.85 -> 0.7 -> 0.55 -> 0.4), puis encore les dimensions si besoin.
+        // Une photo de 12 Mo devient ~0,3 Mo, elle passe dans le contexte et ne fait plus planter la sauvegarde.
         const canvas = document.createElement('canvas');
-        canvas.width = Math.round(width);
-        canvas.height = Math.round(height);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        pendingImage = canvas.toDataURL('image/jpeg', 0.85);
+        const ctx = canvas.getContext('2d');
+        let maxDim = 1600;
+        let qualite = 0.85;
+        let dataUrl = '';
+        for(let essai = 0; essai < 6; essai++){
+          let width = img.width, height = img.height;
+          if(width > height && width > maxDim){ height *= maxDim / width; width = maxDim; }
+          else if(height > maxDim){ width *= maxDim / height; height = maxDim; }
+          canvas.width = Math.round(width);
+          canvas.height = Math.round(height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          dataUrl = canvas.toDataURL('image/jpeg', qualite);
+          // dataURL base64 = ~1,37x la taille réelle. On vise <= 480 000 caractères ~= 350 Ko.
+          if(dataUrl.length <= 480000 || (qualite <= 0.4 && maxDim <= 800)) break;
+          if(qualite > 0.4) qualite -= 0.15;
+          else maxDim = Math.round(maxDim * 0.7);
+        }
+        pendingImage = dataUrl;
+        const tailleFinaleKo = Math.round(dataUrl.length * 0.75 / 1024);
         $("#previewImg").src = pendingImage;
         $("#previewImg").style.display = 'block';
-        $("#attachmentPreview .file-name").textContent = file.name || "Image jointe";
+        $("#attachmentPreview .file-name").textContent = (file.name || "Image jointe") + " (" + tailleMo + " Mo → " + tailleFinaleKo + " Ko)";
         $("#attachmentPreview").style.display = 'flex';
+        showToast("Photo compressée : " + tailleMo + " Mo → " + tailleFinaleKo + " Ko.");
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   } else {
-    // Document texte
+    // Document texte : limite passée de 12 000 à 60 000 caractères pour les gros fichiers.
     reader.onload = e => {
       let text = e.target.result || "";
-      // Limiter la taille pour ne pas exploser le contexte
-      if(text.length > 12000){
-        text = text.slice(0, 12000) + "\n\n[… document tronqué à 12 000 caractères …]";
-        showToast("Document trop long → tronqué à 12 000 caractères.");
+      if(text.length > 60000){
+        text = text.slice(0, 60000) + "\n\n[… document tronqué à 60 000 caractères …]";
+        showToast("Document trop long → tronqué à 60 000 caractères.");
       }
       pendingDocText = text;
       $("#previewImg").style.display = 'none';
-      $("#attachmentPreview .file-name").textContent = "📄 " + (file.name || "Document");
+      $("#attachmentPreview .file-name").textContent = "📄 " + (file.name || "Document") + " (" + tailleMo + " Mo)";
       $("#attachmentPreview").style.display = 'flex';
     };
     reader.readAsText(file, 'UTF-8');
@@ -1147,13 +1173,29 @@ async function nexusSecoursKilo(messages){
         const ctrl = new AbortController();
         const timer = setTimeout(() => ctrl.abort(), 60000);
         let res;
+        const kiloBody = JSON.stringify({ model: modele, messages: msgsRenforces, temperature: temperature, max_tokens: 4000, top_p: 0.95 });
         try{
-          res = await fetch('https://api.kilo.ai/api/gateway/chat/completions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: modele, messages: msgsRenforces, temperature: temperature, max_tokens: 4000, top_p: 0.95 }),
-            signal: ctrl.signal
-          });
+          // Tentative 1 : direct.
+          try{
+            res = await fetch('https://api.kilo.ai/api/gateway/chat/completions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: kiloBody,
+              signal: ctrl.signal
+            });
+          }catch(eDirect){
+            // CORRIGÉ v4 : Kilo n'envoie pas les en-têtes CORS, Safari bloque en direct avec "Load failed".
+            // Tentative 2 : même requête via un proxy CORS gratuit (corsproxy.io), qui lui laisse passer. Kilo n'a pas besoin de clé, donc le proxy ne bloque pas.
+            // Si le proxy échoue aussi, on laisse l'erreur remonter et on passe au modèle suivant.
+            if(String(eDirect && (eDirect.message || eDirect)).toLowerCase().includes('load failed') || (eDirect && eDirect.name === 'TypeError')){
+              res = await fetch('https://corsproxy.io/?url=' + encodeURIComponent('https://api.kilo.ai/api/gateway/chat/completions'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: kiloBody,
+                signal: ctrl.signal
+              });
+            } else { throw eDirect; }
+          }
         } finally { clearTimeout(timer); }
         if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 2000)); continue; }
         if(!res.ok) throw new Error('Kilo ' + modele + ' indisponible (' + res.status + ')');
@@ -1176,26 +1218,26 @@ async function nexusSecoursKilo(messages){
 }
 
 async function nexusSecoursPollinations(messages){
-  // POLLINATIONS CORRIGÉ v3 (bug trouvé en relisant tout le code) :
-  // Avant : POST JSON vers /openai -> le navigateur envoie une requête preflight CORS, Pollinations la bloque, le secours échouait instantanément.
-  // Maintenant : GET simple vers https://text.pollinations.ai/{prompt}?model=... -> pas de preflight, c'est le mode officiel pour navigateur.
-  // Réponse = texte brut (pas du JSON OpenAI), on le lit avec res.text().
+  // POLLINATIONS CORRIGÉ v4 (causes vues sur ta capture + docs) :
+  // Cause 402 : le tier ANONYME rejette tout message "system" avec 402 Payment Required. Avant on envoyait &system=... -> 402 à chaque fois.
+  //   -> Maintenant : PAS de paramètre system. Le système est fusionné DANS le prompt utilisateur.
+  // Cause 404 / 402 : openai-large, mistral, deepseek, qwen-coder sont des modèles PAYANTS (Flower/Nectar), pas anonymes.
+  //   -> Maintenant : seuls les 2 modèles ANONYMES : openai-fast puis openai (GPT-OSS 20B).
+  // + referrer=nexus-ai : Pollinations l'utilise pour identifier l'app navigateur sans clé.
+  // + 1 req / 30s en anonyme : on n'essaie que 2 modèles, et on attend 5s sur 429 au lieu de spammer.
   const texteDemande = messages.map(m => String(m.content||'')).join('\n').toLowerCase();
   const estCode = /code|fonction|python|javascript|html|css|bug|erreur|script|programme|algorithme|debug|sql|java|c\+\+|rust|php/.test(texteDemande);
   const estTraduction = /traduis|traduire|translation|translate/.test(texteDemande);
-  const modeles = estCode
-    ? ['qwen-coder', 'openai-large', 'openai', 'mistral']
-    : ['openai-large', 'openai', 'mistral', 'deepseek'];
+  const modeles = ['openai-fast', 'openai'];
   const temperature = (estCode || estTraduction) ? 0.2 : 0.7;
-  // Messages réduits : système séparé (?system=), reste en prompt.
   const msgs = messages.length > 9 ? [messages[0]].concat(messages.slice(-8)) : messages.slice();
-  let systeme = '';
-  const corps = [];
+  // Système FUSIONNÉ dans le prompt, jamais en paramètre system (sinon 402).
+  const parties = [];
   msgs.forEach(m => {
-    if(m.role === 'system' && !systeme) systeme = String(m.content||'') + '\n\nRÈGLES SECOURS : réponds de façon précise et complète. Ne jamais inventer de faits, chiffres ou sources. Si tu ne sais pas, dis-le. Pour du code : donne le code complet, qui marche, sans rien tronquer.';
-    else corps.push((m.role === 'user' ? '' : (m.role + ' : ')) + String(m.content||''));
+    if(m.role === 'system') parties.push('[INSTRUCTIONS] ' + String(m.content||'') + '\nRÈGLES : réponds de façon précise et complète. Ne jamais inventer de faits, chiffres ou sources. Si tu ne sais pas, dis-le. Pour du code : donne le code complet, qui marche, sans rien tronquer.');
+    else parties.push(String(m.content||''));
   });
-  const prompt = corps.join('\n\n') || 'Réponds.';
+  const prompt = (parties.join('\n\n') || 'Réponds.').slice(0, 8000);
   let derniereErreur = null;
   for(const modele of modeles){
     for(let tentative = 0; tentative < 2; tentative++){
@@ -1204,10 +1246,10 @@ async function nexusSecoursPollinations(messages){
         const timer = setTimeout(() => ctrl.abort(), 60000);
         let res;
         try{
-          const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt) + '?model=' + encodeURIComponent(modele) + '&temperature=' + temperature + (systeme ? '&system=' + encodeURIComponent(systeme) : '');
+          const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt) + '?model=' + encodeURIComponent(modele) + '&temperature=' + temperature + '&referrer=nexus-ai';
           res = await fetch(url, { method: 'GET', signal: ctrl.signal });
         } finally { clearTimeout(timer); }
-        if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 2000)); continue; }
+        if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 5000)); continue; }
         if(!res.ok) throw new Error('Pollinations ' + modele + ' indisponible (' + res.status + ')');
         const txt = (await res.text() || '').trim();
         if(!txt || txt.length < 20 || /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txt)) throw new Error('Pollinations ' + modele + ' réponse insuffisante');
