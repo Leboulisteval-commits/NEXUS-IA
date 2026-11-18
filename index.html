@@ -297,36 +297,36 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 </header>
 
 <main>
-<div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Bonjour.</h2><p>Pose une question, joins une image ou un document,<br>ou demande une vérification croisée.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
-<div id="suggestions">
-<button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button>
-<button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')">Poème sur la mer</button>
-<button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button>
-<button class="sugg" onclick="useSuggestion('Aide-moi à réviser pour un examen')">Réviser</button>
-<button class="sugg" onclick="useSuggestion('Écris une fonction JavaScript pour trier un tableau')">Code JS</button>
+<div id="chat"><div class="msg user"><div class="bubble">Vérifie ce fait : Paris est la capitale de la France</div><div class="msg-meta">23:23</div></div><div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI</div><div class="ai-body"><div class="msg-system err">⚠ Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.</div><div class="msg-actions"><button class="btn-regenerate" onclick="regenerate(1795040633025)">↻ Réessayer</button></div></div></div></div></div>
+<div id="suggestions" class="hidden">
+<button class="sugg" onclick="useSuggestion('Explique la relativité simplement')" style="">Relativité simple</button>
+<button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')" style="">Poème sur la mer</button>
+<button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')" style="">Vérifie un fait</button>
+<button class="sugg" onclick="useSuggestion('Aide-moi à réviser pour un examen')" style="">Réviser</button>
+<button class="sugg" onclick="useSuggestion('Écris une fonction JavaScript pour trier un tableau')" style="">Code JS</button>
 </div>
 <div id="inputArea">
-<div id="attachmentPreview"><img id="previewImg" src="" alt=""><span class="file-name">Image jointe</span><button onclick="removeAttachment()">✕</button></div>
+<div id="attachmentPreview" style="display: none;"><img id="previewImg" src="" alt="" style="display: block;"><span class="file-name">Image jointe</span><button onclick="removeAttachment()">✕</button></div>
 <div class="input-wrapper">
 <button class="input-btn attach" onclick="document.getElementById('fileInput').click()" aria-label="Joindre">📎</button>
 <input type="file" id="fileInput" accept="image/*,.txt,.md,.markdown,.csv,.json,.xml,.html,.js,.ts,.py,.css,.log,.rtf,text/*" style="display:none" onchange="handleFileSelect(event)">
-<textarea id="q" rows="1" placeholder="Demande à NEXUS..." oninput="this.style.height='24px';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+<textarea id="q" rows="1" placeholder="Demande à NEXUS..." oninput="this.style.height='24px';this.style.height=Math.min(this.scrollHeight,120)+'px'" style="height: 24px;"></textarea>
 <button class="input-btn mic" id="micBtn" onclick="toggleDictation()" aria-label="Dictée">🎤</button>
-<button class="input-btn send" id="sendBtn" onpointerdown="event.preventDefault(); start()" onclick="start()">➤</button>
-<button class="input-btn stop" id="stopBtn" onclick="stopGeneration()" style="display:none" aria-label="Stop">■</button>
+<button class="input-btn send" id="sendBtn" onpointerdown="event.preventDefault(); start()" onclick="start()" style="display: grid;">➤</button>
+<button class="input-btn stop" id="stopBtn" onclick="stopGeneration()" style="display: none;" aria-label="Stop">■</button>
 </div>
 <div class="hint" id="modeHint">PUTER : modèle gratuit via Puter</div>
 </div>
 </main>
 
-<aside id="sidebar">
+<aside id="sidebar" class="">
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795038992517)"><span class="conv-del" onclick="deleteConversation(1795038992517,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795040607989)"><span class="conv-del" onclick="deleteConversation(1795040607989,event)">✕</span><div class="conv-title">Vérifie ce fait : Paris est la capitale de la Fr...</div><div class="conv-meta"><span>1 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
-<div id="overlay" onclick="closeSidebar()"></div>
+<div id="overlay" onclick="closeSidebar()" class=""></div>
 
 <dialog id="settingsModal">
 <div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
@@ -902,10 +902,15 @@ function nexusImagePrompt(demande){
   }
   return null;
 }
-// Image Pollinations en secours : même principe que le texte, sans clé.
-// https://image.pollinations.ai/prompt/<texte> répond directement une image, sans clé.
+// Image Pollinations en secours : CORRIGÉ.
+// Depuis le 1er nov. 2026, la nouvelle API gen.pollinations.ai exige une clé (401 sans clé) et TOUS les modèles image exigent une authentification.
+// L'ancienne API image.pollinations.ai répond encore parfois sans clé, mais seulement sur le modèle "sana", en 768px max,
+// avec watermark, 1 requête / 15s, et des échecs fréquents (401 / 402 / 502). Donc : pas de nologo (exige une clé), pas de 1024px.
+// Si l'image ne charge pas, le onerror dans render() affichera un message en français au lieu d'une image cassée.
 function nexusSecoursImagePollinations(prompt){
-  return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=1024&height=1024&seed=' + Math.floor(Math.random()*1000000) + '&nologo=true';
+  // IMAGE POUSSÉE AU MAX : avant modèle 'sana' (petit, flou) en 768x768.
+  // Maintenant modèle 'flux' (bien meilleur), 1024x1024, enhance=true (il améliore le prompt), nologo=true (pas de filigrane).
+  return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=1024&height=1024&seed=' + Math.floor(Math.random()*1000000) + '&model=flux&enhance=true&nologo=true';
 }
 async function nexusGenerateImage(prompt, signal){
   if(!window.puter || !puter.ai || !puter.ai.txt2img) throw new Error("Génération d'image non disponible. Vérifie que Puter est chargé.");
@@ -914,7 +919,7 @@ async function nexusGenerateImage(prompt, signal){
     return img && img.src ? img.src : String(img||'');
   }catch(e){
     // Plus de crédits Puter pour l'image ? On bascule sur l'image Pollinations, sans clé.
-    if(nexusEstErreurCredits(e)) return nexusSecoursImagePollinations(prompt);
+    if(nexusEstErreurCredits(e)){ try{ window.__nexusDernierModele = 'secours Pollinations image flux (gratuit, sans clé)'; }catch(e2){} return nexusSecoursImagePollinations(prompt); }
     throw new Error(nexusTraduireErreur(e.message || e));
   }
 }
@@ -1077,18 +1082,119 @@ async function nexusAppelerModele(messages, signal, image, modele){
 // Pollinations : VÉRIFIÉ - l'ancienne API text.pollinations.ai répond encore sans clé (vérifiée le 16-17 nov 2026),
 // sur un seul modèle (GPT-OSS 20B). La nouvelle API gen.pollinations.ai, elle, demande une clé et renvoie 401 sans clé.
 // Donc secours = Pollinations legacy uniquement, sans clé, sans compte, sans crédit.
-async function nexusSecoursPollinations(messages){
-  const res = await fetch('https://text.pollinations.ai/openai', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'openai', messages: messages.map(m => ({ role: m.role, content: String(m.content||'') })), temperature: 0.7 })
-  });
-  if(!res.ok) throw new Error('Secours indisponible (' + res.status + ')');
-  const data = await res.json();
-  const txt = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-  if(!txt) throw new Error('Secours sans réponse');
-  return txt;
+
+// ===== SECOURS N°2 : Kilo Gateway, sans clé (AJOUT UNIQUEMENT) =====
+// On NE peut pas ajouter des passerelles À Pollinations : Pollinations est fermé.
+// Par contre on peut ajouter des passerelles À CÔTÉ, dans NEXUS, en cascade :
+// Puter (principal) -> Kilo (secours 1) -> Pollinations (secours 2)
+// Kilo : vérifié - passerelle OpenAI-compatible, sans clé, sans compte, ~200 req / heure par IP,
+// modèles : kilo-auto/free (il choisit tout seul un modèle gratuit), openrouter/free, Nemotron, etc.
+// Testée en live il y a 2 jours (17/17 tests OK sur kilo-auto/free).
+// Attention : comme toutes les routes gratuites, Kilo peut journaliser les prompts. Ne pas y envoyer de données confidentielles.
+async function nexusSecoursKilo(messages){
+  // KILO POUSSÉ AU MAX (seule fonction Kilo touchée) :
+  // - 5 modèles en cascade (au lieu de 3), adaptés à la demande
+  // - Messages réduits aux 8 derniers + système renforcé (moins de tokens = plus rapide, moins d'erreurs)
+  // - max_tokens 4000 : les longs codes / traductions ne sont plus coupés
+  // - Contrôle qualité : réponse trop courte / refus / vide = on passe au modèle suivant, on n'affiche pas une mauvaise réponse
+  // - Retry 429 (2s), timeout 60s, température adaptée
+  const texteDemande = messages.map(m => String(m.content||'')).join('\n').toLowerCase();
+  const estCode = /code|fonction|python|javascript|html|css|bug|erreur|script|programme|algorithme|debug|sql|java|c\+\+|rust|php/.test(texteDemande);
+  const estTraduction = /traduis|traduire|translation|translate/.test(texteDemande);
+  const estEcriture = /rédige|écrire|ecrire|lettre|dissertation|histoire|poème|poeme|roman|article|mail|cv/.test(texteDemande);
+  let modeles;
+  if(estCode) modeles = ['cohere/north-mini-code:free', 'dots-studio/dots-3-note-preview:free', 'kilo-auto/free', 'openrouter/free', 'nvidia/nemotron-3.5-super-vl:free'];
+  else if(estEcriture) modeles = ['kilo-auto/free', 'reflection/beam-free', 'openrouter/free', 'liquid/lfm-3-1.7b:free', 'nvidia/nemotron-3.5-super-vl:free'];
+  else modeles = ['kilo-auto/free', 'openrouter/free', 'nvidia/nemotron-3.5-super-vl:free', 'reflection/beam-free', 'liquid/lfm-3-1.7b:free'];
+  const temperature = (estCode || estTraduction) ? 0.2 : (estEcriture ? 0.8 : 0.7);
+  // Messages courts : on garde le système + les 8 derniers échanges. Kilo répond plus vite et plante moins.
+  const msgs = messages.length > 9 ? [messages[0]].concat(messages.slice(-8)) : messages.slice();
+  // Système renforcé : on ne laisse pas le secours devenir vague ou inventer.
+  const msgsRenforces = msgs.map((m,i) => i === 0 && m.role === 'system'
+    ? { role: 'system', content: String(m.content||'') + '\n\nRÈGLES SECOURS : réponds de façon précise et complète. Ne jamais inventer de faits, chiffres ou sources. Si tu ne sais pas, dis-le. Pour du code : donne le code complet, qui marche, sans rien tronquer.' }
+    : { role: m.role, content: String(m.content||'') });
+  let derniereErreur = null;
+  for(const modele of modeles){
+    for(let tentative = 0; tentative < 2; tentative++){
+      try{
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 60000);
+        let res;
+        try{
+          res = await fetch('https://api.kilo.ai/api/gateway/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: modele, messages: msgsRenforces, temperature: temperature, max_tokens: 4000, top_p: 0.95 }),
+            signal: ctrl.signal
+          });
+        } finally { clearTimeout(timer); }
+        if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 2000)); continue; }
+        if(!res.ok) throw new Error('Kilo ' + modele + ' indisponible (' + res.status + ')');
+        const data = await res.json();
+        const txt = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+        // Contrôle qualité : réponse vide / trop courte / refus = mauvaise réponse, on passe au modèle suivant.
+        if(!txt || txt.trim().length < 20 || /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txt.trim())) throw new Error('Kilo ' + modele + ' réponse insuffisante');
+        try{ window.__nexusDernierModele = 'secours Kilo ' + modele + ' (gratuit, sans clé)'; }catch(e2){}
+        return txt;
+      }catch(e){
+        derniereErreur = e;
+        if(e && e.name === 'AbortError') break;
+        if(String(e.message||'').includes('429')) continue;
+        break;
+      }
+    }
+  }
+  throw derniereErreur || new Error('Kilo indisponible');
 }
+
+async function nexusSecoursPollinations(messages){
+  // POLLINATIONS POUSSÉ AU MAX (seule fonction Pollinations texte touchée) :
+  // Avant : 1 seul modèle (openai), pas de timeout, pas de retry, température fixe.
+  // Maintenant : 4 modèles en cascade, adaptés à la demande, timeout 60s, retry 429, température adaptée, messages réduits, contrôle qualité.
+  const texteDemande = messages.map(m => String(m.content||'')).join('\n').toLowerCase();
+  const estCode = /code|fonction|python|javascript|html|css|bug|erreur|script|programme|algorithme|debug|sql|java|c\+\+|rust|php/.test(texteDemande);
+  const estTraduction = /traduis|traduire|translation|translate/.test(texteDemande);
+  const modeles = estCode
+    ? ['qwen-coder', 'openai-large', 'openai', 'mistral']
+    : ['openai-large', 'openai', 'mistral', 'deepseek'];
+  const temperature = (estCode || estTraduction) ? 0.2 : 0.7;
+  const msgs = messages.length > 9 ? [messages[0]].concat(messages.slice(-8)) : messages.slice();
+  const msgsRenforces = msgs.map((m,i) => i === 0 && m.role === 'system'
+    ? { role: 'system', content: String(m.content||'') + '\n\nRÈGLES SECOURS : réponds de façon précise et complète. Ne jamais inventer de faits, chiffres ou sources. Si tu ne sais pas, dis-le. Pour du code : donne le code complet, qui marche, sans rien tronquer.' }
+    : { role: m.role, content: String(m.content||'') });
+  let derniereErreur = null;
+  for(const modele of modeles){
+    for(let tentative = 0; tentative < 2; tentative++){
+      try{
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 60000);
+        let res;
+        try{
+          res = await fetch('https://text.pollinations.ai/openai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: modele, messages: msgsRenforces, temperature: temperature, max_tokens: 4000 }),
+            signal: ctrl.signal
+          });
+        } finally { clearTimeout(timer); }
+        if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 2000)); continue; }
+        if(!res.ok) throw new Error('Secours ' + modele + ' indisponible (' + res.status + ')');
+        const data = await res.json();
+        const txt = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+        if(!txt || txt.trim().length < 20 || /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txt.trim())) throw new Error('Secours ' + modele + ' réponse insuffisante');
+        try{ window.__nexusDernierModele = 'secours Pollinations ' + modele + ' (gratuit, sans clé)'; }catch(e2){}
+        return txt;
+      }catch(e){
+        derniereErreur = e;
+        if(e && e.name === 'AbortError') break;
+        if(String(e.message||'').includes('429')) continue;
+        break;
+      }
+    }
+  }
+  throw derniereErreur || new Error('Secours indisponible');
+}
+
 function nexusEstErreurCredits(e){
   const s = String((e && e.message) || e || '').toLowerCase();
   return /doesn'?t have enough credits|not enough credits|insufficient_funds|out of credits|no credits left|credit.*exhausted|billing/.test(s);
@@ -1126,12 +1232,21 @@ async function callPuterProducteur(messages, signal, image = null){
   }
   // Plus de crédits Puter ? On bascule sur le secours sans clé, au lieu d'afficher juste l'erreur.
   if(derniereErreur && nexusEstErreurCredits(derniereErreur)){
+    // Secours 1 : Kilo (plus de modèles, plus fiable que Pollinations)
+    try{
+      const secours = await nexusSecoursKilo(messages);
+      // nexusSecoursKilo a déjà mémorisé le vrai modèle utilisé (ex : secours Kilo kilo-auto/free...), on ne l'écrase pas.
+      return secours;
+    }catch(eKilo){
+      // Kilo aussi indisponible : on essaie Pollinations.
+    }
+    // Secours 2 : Pollinations
     try{
       const secours = await nexusSecoursPollinations(messages);
-      try{ window.__nexusDernierModele = 'secours Pollinations (gratuit, sans clé)'; }catch(e2){}
+      // nexusSecoursPollinations a déjà mémorisé le vrai modèle utilisé, on ne l'écrase pas.
       return secours;
     }catch(eSecours){
-      // Secours aussi indisponible : on retombe sur l'erreur Puter traduite en français, comme avant.
+      // Les deux secours indisponibles : on retombe sur l'erreur Puter traduite en français, comme avant.
     }
   }
   throw new Error(nexusTraduireErreur(derniereErreur ? derniereErreur.message : "échec de génération"));
@@ -1207,7 +1322,7 @@ async function run(t){
       if(_trad){
         t.step = "Traduction en cours…"; save(); render();
         t.result = await nexusTranslate(_trad.texte, _trad.lang, t.mode, t, currentController ? currentController.signal : undefined);
-        t.pProvider = t.mode === "puter" ? "puter" : t.pProvider; t.verif = false;
+        t.pProvider = t.mode === "puter" ? "puter" : t.pProvider; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined; t.verif = false;
         t.step = ""; save(); render();
       } else {
       const _imgPrompt = nexusImagePrompt(t.demande);
@@ -1215,7 +1330,7 @@ async function run(t){
         t.step = "Génération de l'image…"; save(); render();
         t.generatedImage = await nexusGenerateImage(_imgPrompt, currentController ? currentController.signal : undefined);
         t.result = "Voici ton image : " + _imgPrompt;
-        t.pProvider = "puter"; t.verif = false;
+        t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined; t.verif = false;
         t.step = ""; save(); render();
       } else {
       const _tc = nexusTimerChronoCommand(t.demande);
@@ -1469,7 +1584,9 @@ function render(){
       h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI ' + (t.step ? '• ' + esc(t.step) : '') + '</div><div class="ai-body"><div class="typing"><i></i><i></i><i></i></div></div></div></div>';
       return;
     }
-    h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI' + (t.step ? ' • ' + esc(t.step) : '') + '</div><div class="ai-body">' + formatMarkdown(t.result || "") + (t.generatedImage ? '<img class="msg-image" src="' + t.generatedImage + '" style="margin-top:8px">' : '') + (t.tool ? '<div class="msg-system" style="margin-top:8px">⏱ ' + esc(t.tool.label) + ' : <span class="nexus-tool-live" data-tool-type="' + esc(t.tool.type) + '" data-until="' + (t.tool.until||0) + '" data-start="' + (t.tool.start||0) + '" data-running="' + (t.tool.running?1:0) + '" data-elapsed="' + (t.tool.elapsed||0) + '">' + esc(t.tool.type==='timer' ? nexusFmtMs(Math.max(0,(t.tool.until||0)-Date.now())) : nexusFmtMs(t.tool.running ? Date.now()-(t.tool.start||Date.now()) : (t.tool.elapsed||0))) + '</span></div>' : '') + '</div>';
+    const _estSecours = !!(t.pModel && String(t.pModel).includes('secours'));
+    const _banniereSecours = _estSecours ? '<div class="msg-system err" style="margin-bottom:8px; font-weight:700;">🔻 MODE DONNÉES RÉDUITES — Puter sans crédits. Réponse par secours gratuit (' + esc(t.pModel) + '). Qualité réduite, modèle plus petit.</div>' : '';
+    h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI' + (t.step ? ' • ' + esc(t.step) : '') + '</div><div class="ai-body">' + _banniereSecours + formatMarkdown(t.result || "") + (t.generatedImage ? '<img class="msg-image" src="' + t.generatedImage + '" style="margin-top:8px" onerror="this.outerHTML=\'<div class=\\\'msg-system err\\\'>⚠ L\\\'image de secours Pollinations n\\\'a pas pu être générée (service gratuit saturé ou clé requise). Réessaie dans quelques instants, ou attends tes crédits Puter.</div>\'">' : '') + (t.tool ? '<div class="msg-system" style="margin-top:8px">⏱ ' + esc(t.tool.label) + ' : <span class="nexus-tool-live" data-tool-type="' + esc(t.tool.type) + '" data-until="' + (t.tool.until||0) + '" data-start="' + (t.tool.start||0) + '" data-running="' + (t.tool.running?1:0) + '" data-elapsed="' + (t.tool.elapsed||0) + '">' + esc(t.tool.type==='timer' ? nexusFmtMs(Math.max(0,(t.tool.until||0)-Date.now())) : nexusFmtMs(t.tool.running ? Date.now()-(t.tool.start||Date.now()) : (t.tool.elapsed||0))) + '</span></div>' : '') + '</div>';
     h += '<div class="msg-meta"><span>' + niveau(t.verif ? t.v : null) + '</span>';
     if(t.pProvider) h += '<span>Prod : ' + providerLabel(t.pProvider) + (t.pModel ? ' • ' + esc(t.pModel) : '') + '</span>';
     if(t.vProvider) h += '<span>Vérif : ' + providerLabel(t.vProvider) + '</span>';
