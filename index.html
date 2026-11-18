@@ -12,7 +12,8 @@
 <meta name="theme-color" content="#0a0a10" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f4f4f7" media="(prefers-color-scheme: light)">
 <meta name="format-detection" content="telephone=no">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%2300e5c7'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%2302120f' font-family='system-ui' font-weight='900'%3EN%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300e5c7'/%3E%3Cstop offset='100%25' stop-color='%2300b89a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='128' height='128' rx='28' fill='%230a0a10'/%3E%3Crect x='8' y='8' width='112' height='112' rx='22' fill='url(%23g)' opacity='0.15'/%3E%3Ctext x='64' y='78' font-size='42' text-anchor='middle' fill='%2300e5c7' font-family='ui-monospace,SF Mono,Menlo,monospace' font-weight='800' letter-spacing='-1'%3ENX%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300e5c7'/%3E%3Cstop offset='100%25' stop-color='%2300b89a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='128' height='128' rx='28' fill='%230a0a10'/%3E%3Crect x='8' y='8' width='112' height='112' rx='22' fill='url(%23g)' opacity='0.15'/%3E%3Ctext x='64' y='78' font-size='42' text-anchor='middle' fill='%2300e5c7' font-family='ui-monospace,SF Mono,Menlo,monospace' font-weight='800' letter-spacing='-1'%3ENX%3C/text%3E%3C/svg%3E">
 <script defer src="https://js.puter.com/v2/"></script>
 <style>
 :root{--bg:#0a0a10;--surface:#13131e;--surface-2:#1a1a28;--border:rgba(255,255,255,.08);--text:#f2f2f7;--text-muted:#9d9db0;--text-dim:#66667a;--primary:#00e5c7;--primary-soft:rgba(0,229,199,.12);--accent:#b46bff;--danger:#ff5c7a;--warning:#ffcc00;--success:#00e676;--font-mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;--font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;--radius:14px}
@@ -43,6 +44,7 @@ body{
   padding-top:env(safe-area-inset-top);
   padding-left:env(safe-area-inset-left);
   padding-right:env(safe-area-inset-right);
+  /* Empêche le corps de bouger bizarrement sous le clavier */
   transition: none;
 }
 body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.25;pointer-events:none;z-index:0}
@@ -50,7 +52,7 @@ header{height:56px;flex-shrink:0;display:flex;align-items:center;gap:10px;paddin
 .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);display:grid;place-items:center;cursor:pointer;font-size:18px;flex-shrink:0}
 .icon-btn:active{transform:scale(.96)}
 .logo{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-weight:800;letter-spacing:.18em;font-size:15px;cursor:pointer}
-.logo-dot{width:22px;height:22px;border-radius:50%;background:var(--primary);display:grid;place-items:center;color:#02120f;font-size:12px;font-weight:900;box-shadow:0 0 18px var(--primary-soft)}
+.logo-dot{width:24px;height:24px;border-radius:8px;background:var(--primary);display:grid;place-items:center;color:#02120f;font-size:11px;font-weight:900;letter-spacing:-0.5px;box-shadow:0 0 18px var(--primary-soft)}
 .logo span:last-child{color:var(--primary)}
 .header-spacer{flex:1}
 .badge-verif{font-family:var(--font-mono);font-size:9px;letter-spacing:.12em;padding:4px 7px;border-radius:999px;border:1px solid var(--border);color:var(--text-muted);white-space:nowrap}
@@ -60,8 +62,8 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;position:relative;z-
 .msg.user{align-items:flex-end}
 .msg.ai{align-items:flex-start}
 .bubble{max-width:92%;padding:12px 14px;border-radius:var(--radius);white-space:pre-wrap;word-break:break-word}
-.msg.user .bubble{background:var(--primary);color:#02120f;font-weight:500;border-bottom-right-radius:4px}
-.msg.ai .bubble{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px;width:100%;max-width:100%;white-space:normal}
+.msg.user .bubble{background:var(--primary);color:#02120f;font-weight:500;border-bottom-right-radius:4px;box-shadow:0 4px 18px var(--primary-soft)}
+.msg.ai .bubble{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px;width:100%;max-width:100%;white-space:normal;box-shadow:0 2px 12px rgba(0,0,0,.18)}
 .ai-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
 .ai-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);box-shadow:0 0 8px var(--primary)}
 .ai-body{font-size:15px;line-height:1.6}
@@ -124,7 +126,7 @@ summary{cursor:pointer;font-family:var(--font-mono);font-size:11px;letter-spacin
   outline:none;
   color:var(--text);
   font-family:var(--font-sans);
-  font-size:16px;
+  font-size:16px; /* important: ≥16px pour éviter le zoom iOS */
   line-height:1.4;
   resize:none;
   min-height:24px;
@@ -178,17 +180,30 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
 #toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:200;max-width:92vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.empty{max-width:560px;margin:auto;text-align:center;padding:28px 12px}
-.empty h2{font-size:22px;margin:10px 0 8px}
-.empty p{color:var(--text-muted);font-size:14px}
-.empty .logo-dot{width:52px;height:52px;font-size:24px;margin:0 auto}
+.empty{max-width:560px;margin:auto;text-align:center;padding:36px 16px}
+.empty h2{font-size:22px;margin:14px 0 8px;font-weight:700}
+.empty p{color:var(--text-muted);font-size:14px;line-height:1.55}
+.empty-logo{
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-weight:800;
+  font-size:22px;
+  letter-spacing:.22em;
+  color:var(--primary);
+  padding:14px 22px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:var(--surface);
+  box-shadow:0 0 28px var(--primary-soft);
+  margin-bottom:4px;
+}
 </style>
 </head>
 <body>
 
 <header>
 <button class="icon-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
-<div class="logo" onclick="newConversation()"><div class="logo-dot">N</div><span>NEXUS&nbsp;AI</span></div>
+<div class="logo" onclick="newConversation()"><div class="logo-dot">NX</div><span>NEXUS&nbsp;AI</span></div>
 <div class="header-spacer"></div>
 <span class="badge-verif" id="modeBadge">PUTER</span>
 <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Thème">🌙</button>
@@ -208,7 +223,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div id="attachmentPreview"><img id="previewImg" src="" alt=""><span class="file-name">Image jointe</span><button onclick="removeAttachment()">✕</button></div>
 <div class="input-wrapper">
 <button class="input-btn attach" onclick="document.getElementById('fileInput').click()" aria-label="Joindre">📎</button>
-<input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+<input type="file" id="fileInput" accept="image/*,.txt,.md,.markdown,.csv,.json,.xml,.html,.js,.ts,.py,.css,.log,.rtf,text/*" style="display:none" onchange="handleFileSelect(event)">
 <textarea id="q" rows="1" placeholder="Demande à NEXUS..." oninput="this.style.height='24px';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
 <button class="input-btn mic" id="micBtn" onclick="toggleDictation()" aria-label="Dictée">🎤</button>
 <button class="input-btn send" id="sendBtn" onclick="start()">➤</button>
@@ -228,7 +243,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div id="overlay" onclick="closeSidebar()"></div>
 
 <dialog id="settingsModal">
-<div class="modal-head"><b>RÉGLAGES</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
+<div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
 <div class="modal-body">
 <div class="field"><label>Mode de fonctionnement</label>
 <select id="mo" onchange="toggleSettings();saveModeVerif()">
@@ -276,11 +291,13 @@ const KP = "nexus_prov";
 let state = { convs: [], currentId: null };
 let pendingImage = null;
 let busy = false;
+let sendLock = false; // verrou supplémentaire anti double-envoi
 let currentController = null;
 let recognition = null;
 let isListening = false;
 let micBaseText = "";
 let idCounter = 0;
+let pendingDocText = null; // contenu texte d'un document joint
 
 const $ = s => document.querySelector(s);
 function esc(s){ return String(s ?? "").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -303,8 +320,12 @@ function formatMarkdown(text){
 
 function setAppHeight(){
   const vv = window.visualViewport;
+  // Utiliser la hauteur visible réelle (très important quand le clavier est ouvert)
   const h = vv ? Math.round(vv.height) : window.innerHeight;
   document.documentElement.style.setProperty('--app-height', h + 'px');
+
+  // Sur iOS, le visualViewport peut avoir un offsetTop quand le clavier est ouvert.
+  // On compense seulement si nécessaire, sinon on reset.
   if(vv && vv.offsetTop > 0){
     document.body.style.top = vv.offsetTop + 'px';
   } else {
@@ -315,6 +336,7 @@ function onViewportChange(){
   setAppHeight();
   const chat = $("#chat");
   if(!chat) return;
+  // Toujours garder le bas de la conversation visible quand le clavier bouge
   requestAnimationFrame(() => {
     chat.scrollTop = chat.scrollHeight;
   });
@@ -324,6 +346,7 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('resize', onViewportChange);
   window.visualViewport.addEventListener('scroll', onViewportChange);
 }
+// Orientation change
 window.addEventListener('orientationchange', () => {
   setTimeout(onViewportChange, 150);
   setTimeout(onViewportChange, 400);
@@ -336,6 +359,7 @@ setTimeout(setAppHeight, 700);
 function updateThemeIcon(){ $("#themeBtn").textContent = document.body.classList.contains('light') ? '☀️' : '🌙'; }
 function updateThemeColor(){
   const light = document.body.classList.contains('light');
+  // Met à jour la couleur de la barre de statut (PWA / écran d'accueil)
   let meta = document.querySelector('meta[name="theme-color"]:not([media])');
   if(!meta){
     meta = document.createElement('meta');
@@ -441,33 +465,69 @@ function handleFileSelect(event){
   const file = event.target.files[0];
   event.target.value = '';
   if(!file) return;
-  if(!file.type.startsWith('image/')){ showToast("Choisis une image."); return; }
+
+  // Réinitialiser les pièces jointes précédentes
+  pendingImage = null;
+  pendingDocText = null;
+
+  const isImage = file.type.startsWith('image/');
+  const isText = file.type.startsWith('text/') ||
+                 /\.(txt|md|markdown|csv|json|xml|html|js|ts|py|css|log|rtf)$/i.test(file.name);
+
+  if(!isImage && !isText){
+    showToast("Formats supportés : images, .txt, .md, .csv, .json, code…");
+    return;
+  }
+
   const reader = new FileReader();
   reader.onerror = () => showToast("Impossible de lire ce fichier.");
-  reader.onload = e => {
-    const img = new Image();
-    img.onerror = () => showToast("Image illisible.");
-    img.onload = () => {
-      const MAX_SIZE = 1024;
-      let width = img.width, height = img.height;
-      if(width > height && width > MAX_SIZE){ height *= MAX_SIZE / width; width = MAX_SIZE; }
-      else if(height > MAX_SIZE){ width *= MAX_SIZE / height; height = MAX_SIZE; }
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(width);
-      canvas.height = Math.round(height);
-      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-      pendingImage = canvas.toDataURL('image/jpeg', 0.85);
-      $("#previewImg").src = pendingImage;
+
+  if(isImage){
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = () => showToast("Image illisible.");
+      img.onload = () => {
+        const MAX_SIZE = 1024;
+        let width = img.width, height = img.height;
+        if(width > height && width > MAX_SIZE){ height *= MAX_SIZE / width; width = MAX_SIZE; }
+        else if(height > MAX_SIZE){ width *= MAX_SIZE / height; height = MAX_SIZE; }
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        pendingImage = canvas.toDataURL('image/jpeg', 0.85);
+        $("#previewImg").src = pendingImage;
+        $("#previewImg").style.display = 'block';
+        $("#attachmentPreview .file-name").textContent = file.name || "Image jointe";
+        $("#attachmentPreview").style.display = 'flex';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // Document texte
+    reader.onload = e => {
+      let text = e.target.result || "";
+      // Limiter la taille pour ne pas exploser le contexte
+      if(text.length > 12000){
+        text = text.slice(0, 12000) + "\n\n[… document tronqué à 12 000 caractères …]";
+        showToast("Document trop long → tronqué à 12 000 caractères.");
+      }
+      pendingDocText = text;
+      $("#previewImg").style.display = 'none';
+      $("#attachmentPreview .file-name").textContent = "📄 " + (file.name || "Document");
       $("#attachmentPreview").style.display = 'flex';
     };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsText(file, 'UTF-8');
+  }
 }
 function removeAttachment(){
   pendingImage = null;
+  pendingDocText = null;
   $("#attachmentPreview").style.display = 'none';
   $("#previewImg").src = "";
+  $("#previewImg").style.display = 'block';
+  $("#attachmentPreview .file-name").textContent = "Image jointe";
 }
 
 function initRecognition(){
@@ -519,6 +579,7 @@ async function toggleDictation(){
   startRecognition();
 }
 
+const MODE_HINTS_DETAIL = MODE_HINTS;
 function toggleSettings(){
   const mode = $("#mo").value;
   $("#api-settings").style.display = (mode === "cles") ? "block" : "none";
@@ -535,6 +596,7 @@ function saveModeVerif(){
 function loadModeVerif(){
   try{
     let m = localStorage.getItem("nexus_mode");
+    // Migration : les anciens modes hybride / keyless n'existent plus
     if(m === "hybride" || m === "keyless" || !m) m = "puter";
     if(m !== "puter" && m !== "cles") m = "puter";
     $("#mo").value = m;
@@ -658,6 +720,7 @@ async function callPuter(prompt, signal, image = null){
 async function ask(t, role, prompt, tier, json, image = null){
   const signal = currentController ? currentController.signal : undefined;
   const isVerifier = role.startsWith("Vérif");
+  // Plus d'injection d'identité forcée
   const finalPrompt = prompt;
   let txt, usedProvider;
 
@@ -665,6 +728,7 @@ async function ask(t, role, prompt, tier, json, image = null){
     txt = await callPuter(finalPrompt, signal, image);
     usedProvider = "puter";
   } else {
+    // Mode "cles"
     txt = await callCustom(isVerifier ? "v" : "p", finalPrompt, signal, image);
     usedProvider = isVerifier ? "custom-v" : "custom-p";
   }
@@ -696,6 +760,7 @@ function setBusy(b){
   $("#sendBtn").style.display = b ? "none" : "grid";
   $("#stopBtn").style.display = b ? "grid" : "none";
   $("#q").disabled = b;
+  // Empêche aussi les suggestions pendant la génération
   document.querySelectorAll('.sugg').forEach(btn => {
     btn.style.pointerEvents = b ? 'none' : '';
     btn.style.opacity = b ? '0.5' : '';
@@ -714,10 +779,27 @@ async function run(t){
   try{
     const persona = localStorage.getItem("nexus_persona") || "";
     if(!t.result){
-      t.step = "NEXUS produit...";
+      t.step = "Génération en cours…";
       save(); render();
       const past = conv.messages.filter(x => x.id !== t.id && x.result).slice(-5).map(x => "Q : " + x.demande + "\nR : " + x.result).join("\n\n");
-      const promptP = (persona ? "[INSTRUCTION SYSTÈME : " + persona + "]\n\n" : "") + (past ? "HISTORIQUE :\n" + past + "\n\n" : "") + "DEMANDE ACTUELLE :\n" + t.demande + (t.image ? "\n\n[Image jointe. Analyse-la si elle est pertinente.]" : "");
+
+      // Prompt système plus strict pour réduire les hallucinations et mieux respecter le rôle
+      let systemBlock = `Tu es un assistant expert, précis et honnête.
+Règles importantes :
+- Ne jamais inventer de faits, de chiffres ou de sources.
+- Si tu n'es pas sûr, dis-le clairement.
+- Réponds de façon structurée et utile.
+- Respecte strictement le rôle / persona fourni s'il y en a un.`;
+
+      if(persona){
+        systemBlock += `\n\nRÔLE À ADOPTER (prioritaire) :\n${persona}`;
+      }
+
+      const promptP = `[INSTRUCTIONS SYSTÈME]\n${systemBlock}\n\n` +
+        (past ? `[HISTORIQUE RÉCENT]\n${past}\n\n` : "") +
+        `[DEMANDE ACTUELLE]\n${t.demande}` +
+        (t.image ? "\n\n[Image jointe — analyse-la si elle est pertinente pour répondre.]" : "");
+
       t.result = await ask(t, "Producteur", promptP, t.tier, false, t.image);
       t.step = ""; save(); render();
     }
@@ -733,7 +815,13 @@ async function run(t){
         if(v.verdict !== "NON" || t.round >= 3) break;
         t.step = "Correction en cours...";
         save(); render();
-        const promptC = (persona ? "[INSTRUCTION SYSTÈME : " + persona + "]\n\n" : "") + "Demande originale :\n" + t.demande + "\n\nCorrige ces écarts :\n- " + v.ecarts.join("\n- ") + "\n\nRéponse à corriger :\n" + t.result + "\n\nRenvoie la réponse corrigée complète, sans expliquer les corrections.";
+        let corrSystem = "Tu es un correcteur précis. Tu ne dois jamais inventer d'informations.";
+        if(persona) corrSystem += "\nRôle à respecter : " + persona;
+        const promptC = `[INSTRUCTIONS]\n${corrSystem}\n\n` +
+          `Demande originale :\n${t.demande}\n\n` +
+          `Écarts à corriger :\n- ${v.ecarts.join("\n- ")}\n\n` +
+          `Réponse à corriger :\n${t.result}\n\n` +
+          `Renvoie UNIQUEMENT la réponse corrigée complète, sans expliquer les modifications.`;
         t.result = await ask(t, "Correcteur", promptC, t.tier, false, null);
         t.step = ""; save(); render();
       }
@@ -757,13 +845,20 @@ async function run(t){
   }
 }
 function start(){
-  if(busy) return;
+  // Double protection contre les envois multiples (surtout clavier mobile)
+  if(busy || sendLock) return;
+  sendLock = true;
+
   const conv = currentConv();
-  if(!conv) return;
+  if(!conv){
+    sendLock = false;
+    return;
+  }
 
   const d = $("#q").value.trim();
-  if(!d && !pendingImage){
-    showToast("Écris une demande ou joins une image.");
+  if(!d && !pendingImage && !pendingDocText){
+    showToast("Écris une demande ou joins un fichier.");
+    sendLock = false;
     return;
   }
 
@@ -774,10 +869,16 @@ function start(){
 
   if(isListening){ try{ recognition.stop(); }catch(e){} }
 
-  const r = route(d || "Analyse image");
+  // Intégrer le document texte s'il y en a un
+  let fullDemande = d || (pendingImage ? "Analyse cette image." : "Analyse ce document.");
+  if(pendingDocText){
+    fullDemande = (d ? d + "\n\n" : "") + "--- DOCUMENT JOINT ---\n" + pendingDocText + "\n--- FIN DU DOCUMENT ---";
+  }
+
+  const r = route(fullDemande);
   const t = {
     id: genId(),
-    demande: d || "Analyse cette image.",
+    demande: fullDemande,
     image: pendingImage,
     result: null,
     v: null,
@@ -794,7 +895,8 @@ function start(){
 
   conv.messages.push(t);
   if(conv.messages.length === 1){
-    conv.title = (d ? d.slice(0, 48) : "Image") + (d && d.length > 48 ? "..." : "");
+    const titleBase = d || (pendingImage ? "Image" : "Document");
+    conv.title = titleBase.slice(0, 48) + (titleBase.length > 48 ? "..." : "");
   }
 
   $("#q").value = "";
@@ -804,7 +906,9 @@ function start(){
 
   save();
   render();
-  run(t);
+  run(t).finally(() => {
+    setTimeout(() => { sendLock = false; }, 500);
+  });
 }
 function regenerate(id){
   if(busy) return;
@@ -863,6 +967,7 @@ function render(){
   const chat = $("#chat");
   const suggestions = $("#suggestions");
   renderSidebar();
+  // Masquer les suggestions une fois qu'il y a des messages (plus de place pour le chat)
   if(suggestions){
     if(!conv || conv.messages.length === 0){
       suggestions.classList.remove('hidden');
@@ -871,7 +976,7 @@ function render(){
     }
   }
   if(!conv || conv.messages.length === 0){
-    chat.innerHTML = '<div class="empty"><div class="logo-dot">N</div><h2>Bonjour.</h2><p>Pose une question, joins une image, ou demande une vérification.<br>La vérification croisée peut être activée dans les réglages.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion(\'Explique la relativité simplement\')">Relativité simple</button><button class="sugg" onclick="useSuggestion(\'Vérifie ce fait : Paris est la capitale de la France\')">Vérifie un fait</button></div></div>';
+    chat.innerHTML = '<div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Bonjour.</h2><p>Pose une question, joins une image ou un document,<br>ou demande une vérification croisée.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion(\'Explique la relativité simplement\')">Relativité simple</button><button class="sugg" onclick="useSuggestion(\'Vérifie ce fait : Paris est la capitale de la France\')">Vérifie un fait</button></div></div>';
     return;
   }
   const isScrolledToBottom = chat.scrollHeight - chat.clientHeight <= chat.scrollTop + 100;
@@ -914,25 +1019,22 @@ function render(){
 }
 function useSuggestion(txt){
   if(busy) return;
+  // Remplir + envoyer automatiquement SANS activer le clavier
   $("#q").value = txt;
   $("#q").blur();
   start();
 }
 
+// Envoi avec Entrée — un seul gestionnaire pour éviter les doubles envois
 $("#q").addEventListener("keydown", e => {
   if(e.key === "Enter" && !e.shiftKey){
     e.preventDefault();
     e.stopPropagation();
-    start();
-  }
-});
-$("#q").addEventListener("keypress", e => {
-  if(e.key === "Enter" && !e.shiftKey){
-    e.preventDefault();
-    start();
+    if(!busy && !sendLock) start();
   }
 });
 
+// Quand le clavier s'ouvre, forcer le recalcul + garder le bas de la conversation visible
 $("#q").addEventListener("focus", () => {
   setTimeout(onViewportChange, 50);
   setTimeout(onViewportChange, 250);
