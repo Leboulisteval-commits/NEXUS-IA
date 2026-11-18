@@ -323,7 +323,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795036700290)"><span class="conv-del" onclick="deleteConversation(1795036700290,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795037915289)"><span class="conv-del" onclick="deleteConversation(1795037915289,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -1001,24 +1001,95 @@ async function nexusTranslate(texte, lang, mode, tObj, signal){
   return await ask(tObj, 'Producteur', prompt, tObj.tier, false, null);
 }
 
+
+// ===== ROUTEUR IA (AJOUT UNIQUEMENT) : Puter choisit la meilleure IA selon la demande =====
+// Puter n'est pas un modèle : c'est une passerelle vers GPT, Claude, Gemini, Grok, DeepSeek, etc.
+// Avant, ton app utilisait TOUJOURS gpt-5.5 pour tout. Maintenant elle choisit toute seule.
+// Si le modèle choisi est indisponible, elle retombe sur gpt-5.5, puis sur le modèle par défaut de Puter.
+const NEXUS_MODELES = [
+  { id: 'gpt-5.5', famille: 'GPT', pour: 'par défaut, raisonnement, questions complexes' },
+  { id: 'gpt-5.4-nano', famille: 'GPT', pour: 'réponses très rapides et courtes' },
+  { id: 'gpt-4o', famille: 'GPT', pour: 'questions générales, images' },
+  { id: 'claude-opus-5.5', famille: 'Claude', pour: 'rédaction, explication longue, lettre, histoire' },
+  { id: 'claude-sonnet-5.5', famille: 'Claude', pour: 'code, debug, raisonnement' },
+  { id: 'claude-haiku-5.5', famille: 'Claude', pour: 'réponses rapides et courtes' },
+  { id: 'gemini-3.6-flash', famille: 'Gemini', pour: 'questions rapides, résumé' },
+  { id: 'gemini-3.5-flash-lite', famille: 'Gemini', pour: 'questions très simples, très rapide' },
+  { id: 'grok-4.6', famille: 'Grok', pour: 'questions générales, ton direct' },
+  { id: 'deepseek-v4-flash', famille: 'DeepSeek', pour: 'code, maths, logique' },
+  { id: 'llama-3.1-8b', famille: 'Llama', pour: 'questions simples, rapide' },
+  { id: 'qwen-3', famille: 'Qwen', pour: 'questions générales, code' },
+  { id: 'mistral-large', famille: 'Mistral', pour: 'questions générales, rédaction' },
+  { id: 'kimi-k2', famille: 'Kimi', pour: 'longs textes, analyse' }
+];
+function nexusListeModelesTexte(){
+  return 'IA disponibles dans NEXUS (via Puter) :\\n' + NEXUS_MODELES.map(m => '- ' + m.id + ' (' + m.famille + ') : ' + m.pour).join('\\n') +
+    '\\n\\nPour forcer une IA : tape par exemple "/model claude" ou "/model gemini" devant ta demande.';
+}
+function nexusChoisirModele(messages){
+  const texte = (messages||[]).map(m => String(m.content||'')).join('\\n').toLowerCase();
+  // 1. Choix manuel explicite : "/model claude", "/ia gemini", "/model gpt..."
+  const manuel = texte.match(/(?:\/model|\/modele|\/ia)\s+([a-z0-9][a-z0-9\-]*)/);
+  if(manuel){
+    const mot = manuel[1];
+    const trouve = NEXUS_MODELES.find(m => m.id.startsWith(mot) || m.famille.toLowerCase() === mot || m.id.includes(mot));
+    if(trouve) return trouve.id;
+    return mot; // Puter essaiera ce nom, et retombera sur gpt-5.5 si inconnu
+  }
+  // 2. Traducteur : modèle fiable et précis
+  if(texte.includes('traducteur professionnel')) return 'gpt-5.5';
+  // 3. Code / debug : Claude Sonnet ou DeepSeek
+  if(/\b(code|debug|débog|bug|python|javascript|js\b|html|css|fonction|script|erreur de code|corrige.*code|typescript|sql)\b/.test(texte)) return 'claude-sonnet-5.5';
+  // 4. Rédaction longue : Claude Opus
+  if(/\b(rédige|redige|lettre|dissertation|histoire|roman|discours|exposé|expose|écris|ecris|rédaction|redaction|poème|poeme|article)\b/.test(texte)) return 'claude-opus-5.5';
+  // 5. Maths / logique / raisonnement : GPT-5.5 ou DeepSeek
+  if(/\b(calcule|math|maths|mathématique|logique|raisonne|démontre|demonstre|probabilité|équation|equation|analyse.*données|compare.*modèles)\b/.test(texte)) return 'gpt-5.5';
+  // 6. Résumé : Gemini Flash (avant la règle "question courte", sinon un résumé court partirait en Lite)
+  if(/\b(résume|resume|résumé|synthèse|synthese|condense)\b/.test(texte)) return 'gemini-3.6-flash';
+  // 7. Questions simples / rapides / définitions : Gemini Flash Lite, le plus rapide
+  if(/^(c'est quoi|qu'est-ce que|définition|definition|qui est|quelle est la capitale|combien font|traduis|quelle heure|quel jour|on est quel)/.test(texte.trim()) || texte.length < 80) return 'gemini-3.5-flash-lite';
+  // 8. Par défaut : GPT-5.5
+  return 'gpt-5.5';
+}
+async function nexusAppelerModele(messages, signal, image, modele){
+  const options = { model: modele };
+  if(signal) options.signal = signal;
+  if(image){
+    const txt = messages.map(m => m.content).join('\\n\\n');
+    return await puter.ai.chat(txt, image, false, options);
+  }
+  return await puter.ai.chat(messages, false, options);
+}
+
 async function callPuterProducteur(messages, signal, image = null){
   if(!window.puter || !puter.ai) throw new Error("Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.");
   if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
-  const options = { model: "gpt-5.5" };
-  if(signal) options.signal = signal;
-  try{
-    let res;
-    if(image){
-      const texte = messages.map(m => m.content).join("\n\n");
-      res = await puter.ai.chat(texte, image, false, options);
-    } else {
-      res = await puter.ai.chat(messages, false, options);
+  const modeleChoisi = nexusChoisirModele(messages);
+  // Mémorise le modèle utilisé pour l'afficher dans la conversation (Prod : PUTER • gpt-5.5, etc.)
+  try{ window.__nexusDernierModele = modeleChoisi; }catch(e){}
+  const essais = [modeleChoisi, 'gpt-5.5', null].filter((v,i,a) => a.indexOf(v) === i);
+  let derniereErreur = null;
+  for(const modele of essais){
+    try{
+      let res;
+      if(modele){
+        res = await nexusAppelerModele(messages, signal, image, modele);
+      } else {
+        // Dernier recours : sans modèle précisé, Puter choisit son modèle par défaut
+        res = image ? await puter.ai.chat(messages.map(m => m.content).join("\n\n"), image, false, {}) : await puter.ai.chat(messages, false, {});
+      }
+      try{ window.__nexusDernierModele = modele || 'défaut Puter'; }catch(e){}
+      return extractPuterText(res);
+    }catch(e){
+      if(e.name === 'AbortError') throw e;
+      derniereErreur = e;
+      const msg = String(e.message||'').toLowerCase();
+      // On ne retente que si le problème vient du modèle (introuvable / indisponible). Sinon, on traduit et on s'arrête.
+      if(/model.*not found|unknown model|invalid.*model|model.*unavailable|not available|introuvable/.test(msg)) continue;
+      throw new Error(nexusTraduireErreur(e.message || "échec de génération"));
     }
-    return extractPuterText(res);
-  }catch(e){
-    if(e.name === 'AbortError') throw e;
-    throw new Error(nexusTraduireErreur(e.message || "échec de génération"));
   }
+  throw new Error(nexusTraduireErreur(derniereErreur ? derniereErreur.message : "échec de génération"));
 }
 
 async function ask(t, role, prompt, tier, json, image = null){
@@ -1135,8 +1206,13 @@ Règles importantes :
 
       if(t.mode === "puter"){
         // Producteur Puter uniquement : n'utilise PAS ask(), pour ne pas toucher au chemin Vérificateur/Correcteur.
+        // Commande "quelles IA ?" : affiche la liste sans consommer de crédits Puter
+        if(/^\s*(quelles? (ia|intelligences?|modèles?|modeles?)|liste des (ia|modèles?|modeles?)|quels modèles?|quelles ia (sont )?disponibles?)\s*\??\s*$/i.test(t.demande)){
+          t.result = nexusListeModelesTexte(); t.pProvider = "puter"; t.pModel = "liste";
+        } else {
         t.result = await callPuterProducteur(messagesP, currentController ? currentController.signal : undefined, t.image);
-        t.pProvider = "puter";
+        t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
+        }
       } else {
         // Mode "cles" : INCHANGÉ, passe par l'ancien chemin ask -> callCustom.
         // On reconstruit le texte équivalent pour callCustom qui attend une chaîne.
@@ -1269,7 +1345,7 @@ function regenerate(id){
   if(idx === -1) return;
   conv.messages = conv.messages.slice(0, idx + 1);
   const t = conv.messages[idx];
-  t.result = null; t.generatedImage = null; t.tool = null; t.v = null; t.round = 0; t.status = "en_cours"; t.step = ""; t.err = ""; t.pProvider = null; t.vProvider = null;
+  t.result = null; t.generatedImage = null; t.tool = null; t.pModel = null; t.v = null; t.round = 0; t.status = "en_cours"; t.step = ""; t.err = ""; t.pProvider = null; t.vProvider = null;
   t.mode = $("#mo").value; t.verif = $("#vf").checked;
   save(); render();
   run(t);
@@ -1350,7 +1426,7 @@ function render(){
     }
     h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI' + (t.step ? ' • ' + esc(t.step) : '') + '</div><div class="ai-body">' + formatMarkdown(t.result || "") + (t.generatedImage ? '<img class="msg-image" src="' + t.generatedImage + '" style="margin-top:8px">' : '') + (t.tool ? '<div class="msg-system" style="margin-top:8px">⏱ ' + esc(t.tool.label) + ' : <span class="nexus-tool-live" data-tool-type="' + esc(t.tool.type) + '" data-until="' + (t.tool.until||0) + '" data-start="' + (t.tool.start||0) + '" data-running="' + (t.tool.running?1:0) + '" data-elapsed="' + (t.tool.elapsed||0) + '">' + esc(t.tool.type==='timer' ? nexusFmtMs(Math.max(0,(t.tool.until||0)-Date.now())) : nexusFmtMs(t.tool.running ? Date.now()-(t.tool.start||Date.now()) : (t.tool.elapsed||0))) + '</span></div>' : '') + '</div>';
     h += '<div class="msg-meta"><span>' + niveau(t.verif ? t.v : null) + '</span>';
-    if(t.pProvider) h += '<span>Prod : ' + providerLabel(t.pProvider) + '</span>';
+    if(t.pProvider) h += '<span>Prod : ' + providerLabel(t.pProvider) + (t.pModel ? ' • ' + esc(t.pModel) : '') + '</span>';
     if(t.vProvider) h += '<span>Vérif : ' + providerLabel(t.vProvider) + '</span>';
     if(t.round) h += '<span>' + t.round + ' tour(s)</span>';
     h += '<span>' + new Date(t.id).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) + '</span></div>';
