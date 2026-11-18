@@ -15,6 +15,7 @@
 <meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧠%3C/text%3E%3C/svg%3E">
 <script src="https://js.puter.com/v2/" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/jsllm7@0.1.0/jsllm7.min.js" defer></script>
 <style>
 :root{--bg:#f6f6f3;--cd:#fff;--tx:#1c1c1a;--mu:#6b6b64;--ac:#4a49d6;--bt:#fff;--ok:#17734a;--ko:#b3261e;--wa:#a35f00;--bd:#dedcd4;--wn:#fff3cd;--wt:#664d03;--wb:#ffecb5;color-scheme:light}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;--wn:#3a2f14;--wt:#ffd98a;--wb:#5a4a20;color-scheme:dark}}
@@ -66,6 +67,7 @@ summary{cursor:pointer;font-weight:600}
   <label for="mo">Mode</label>
   <select id="mo">
     <option value="puter">Puter AI (Sans clé, recommandé)</option>
+    <option value="jsllm7">jsllm7 (Sans clé, alternative)</option>
     <option value="cles">Clés API (fournisseurs gratuits)</option>
     <option value="manuel">Manuel (je colle entre mes IA gratuites)</option>
   </select>
@@ -76,7 +78,7 @@ summary{cursor:pointer;font-weight:600}
 
 <details class="c">
   <summary>Réglages : mes IA (clés API)</summary>
-  <p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur, jamais dans le fichier. (Non nécessaire si vous utilisez Puter).</p>
+  <p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur, jamais dans le fichier. (Non nécessaire si vous utilisez Puter ou jsllm7).</p>
   <datalist id="dl">
     <option value="https://api.groq.com/openai/v1/chat/completions"></option>
     <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
@@ -175,6 +177,15 @@ async function callPuter(prompt) {
   }
 }
 
+async function callJsllm7(prompt) {
+  if (typeof jsllm7 === 'undefined') throw new Error("Le service jsllm7 n'est pas chargé.");
+  try {
+    return await jsllm7(prompt);
+  } catch (e) {
+    throw new Error("Le service jsllm7 a échoué. Réessayez plus tard.");
+  }
+}
+
 function wait(t,role,n){const d=[60,300,900,3600][Math.min(n,3)];
   return new Promise(res=>{
     t.status="attente";t.att={role,fin:Date.now()+d*1000};
@@ -188,6 +199,8 @@ async function ask(t,role,prompt,tier,json){
     let txt;
     if(t.mode==="puter"){
       txt=await callPuter(prompt);
+    }else if(t.mode==="jsllm7"){
+      txt=await callJsllm7(prompt);
     }else if(t.mode==="manuel"){
       txt=await manual(t,role,prompt);
     }else{
@@ -254,7 +267,13 @@ function okM(){const v=$("#mr").value.trim();if(!v||!cur._m)return;const m=cur._
 function render(){
   const t=cur;let h="";
   if(t){
-    h+='<section class="c"><div class="mu">'+esc(t.type)+(t.tier?" · "+(t.mode==="manuel"?"IA de votre choix":t.mode==="puter"?"Puter AI":"modèle "+(PV("p").modele||"?")):"")+'</div><b>'+esc(t.demande)+'</b>';
+    let modeName = "";
+    if(t.mode==="manuel") modeName = "IA de votre choix";
+    else if(t.mode==="puter") modeName = "Puter AI";
+    else if(t.mode==="jsllm7") modeName = "jsllm7";
+    else modeName = "modèle " + (PV("p").modele || "?");
+
+    h+='<section class="c"><div class="mu">'+esc(t.type)+(t.tier?" · "+modeName:"")+'</div><b>'+esc(t.demande)+'</b>';
     if(t.why)h+='<div class="mu">Pourquoi : '+esc(t.why)+'</div>';
     if(t.status==="non_supporte")h+='<div class="bn ko">Image, voix, vidéo et achat vérifié : non démontrables automatiquement à 0 € dans cette version.</div>';
     if(t.status==="en_cours")h+='<div class="bn">'+esc(t.step||"En cours")+'…</div>';
@@ -266,8 +285,11 @@ function render(){
     if(t.status==="fini"&&t.verif){
       const n=niveau(t);
       h+='<div class="bn '+n[1]+'"><b>'+esc(n[0])+'</b><div class="mu">Conforme à la demande ne veut pas dire vrai.</div></div>';
+      
       if(t.mode==="puter")h+='<div class="bn ko">Vérification dégradée : en mode Puter, le même fournisseur sert pour les deux rôles.</div>';
-      if(t.mode==="cles"&&PV("p").url===PV("v").url)h+='<div class="bn ko">Vérification dégradée : producteur et vérificateur utilisent la même adresse (même fournisseur).</div>';
+      else if(t.mode==="jsllm7")h+='<div class="bn ko">Vérification dégradée : en mode jsllm7, le même fournisseur sert pour les deux rôles.</div>';
+      else if(t.mode==="cles"&&PV("p").url===PV("v").url)h+='<div class="bn ko">Vérification dégradée : producteur et vérificateur utilisent la même adresse (même fournisseur).</div>';
+      
       if(t.v&&t.v.ecarts&&t.v.ecarts.length&&t.v.verdict!=="OUI")h+='<div class="bn wa">Écarts : '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
     }
     if(t.log&&t.log.length)h+='<details><summary>Détail du circuit ('+t.log.length+' tour(s))</summary>'+t.log.map(l=>'<p class="mu"><b>Tour '+l.tour+' : '+esc(l.verdict)+'</b><br>'+(l.criteres||[]).map(c=>esc(c.verdict)+' · '+esc(c.critere)+(c.preuve?' (preuve : '+esc(c.preuve)+')':'')).join("<br>")+'</p>').join("")+'</details>';
