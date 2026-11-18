@@ -319,14 +319,14 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 </div>
 </main>
 
-<aside id="sidebar" class="">
+<aside id="sidebar">
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795041573619)"><span class="conv-del" onclick="deleteConversation(1795041573619,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795041991614)"><span class="conv-del" onclick="deleteConversation(1795041991614,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
-<div id="overlay" onclick="closeSidebar()" class=""></div>
+<div id="overlay" onclick="closeSidebar()"></div>
 
 <dialog id="settingsModal">
 <div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
@@ -792,6 +792,12 @@ function extractPuterText(res){
 async function callPuter(prompt, signal, image = null){
   if(!window.puter || !puter.ai) throw new Error("Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.");
   if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
+  // Puter déjà HS (crédits épuisés plus tôt dans cette session) : on ne le rappelle PAS, sinon sa popup "Low Balance" réapparaît à chaque fois.
+  // On va directement aux secours, sans ouvrir la popup Puter.
+  if(typeof window !== 'undefined' && window.__nexusPuterHS){
+    try{ return await nexusSecoursKilo([{ role: 'user', content: String(prompt || '') }]); }
+    catch(eKilo){ return await nexusSecoursPollinations([{ role: 'user', content: String(prompt || '') }]); }
+  }
   const chatPromise = (async () => {
     try{
       const res = image ? await puter.ai.chat(prompt, image) : await puter.ai.chat(prompt);
@@ -802,6 +808,8 @@ async function callPuter(prompt, signal, image = null){
       // Sur N'IMPORTE QUELLE erreur Puter (sauf annulation), on essaie d'abord Kilo puis Pollinations.
       // On n'affiche l'erreur Puter que si les deux secours échouent aussi.
       if(true){
+        try{ if(typeof window !== 'undefined') window.__nexusPuterHS = true; }catch(e2){}
+        try{ if(typeof window !== 'undefined') window.__nexusSecoursErreurs = ''; }catch(e2){}
         try{
           const msgs = [{ role: 'user', content: String(prompt || '') }];
           const secours = await nexusSecoursKilo(msgs);
@@ -812,7 +820,8 @@ async function callPuter(prompt, signal, image = null){
             const secours = await nexusSecoursPollinations(msgs);
             return secours;
           }catch(ePoll){
-            // Les deux secours échouent : on retombe sur l'erreur Puter traduite, comme avant.
+            // Les deux secours échouent : on affiche l'erreur Puter + LA CAUSE EXACTE du secours, pour diagnostiquer.
+            throw new Error(nexusTraduireErreur(e.message || "échec de génération") + " [Secours échoués :" + String((typeof window !== 'undefined' && window.__nexusSecoursErreurs) || ' ?') + "]");
           }
         }
       }
@@ -1156,6 +1165,7 @@ async function nexusSecoursKilo(messages){
         return txt;
       }catch(e){
         derniereErreur = e;
+        try{ window.__nexusSecoursErreurs = (window.__nexusSecoursErreurs || '') + ' [Kilo ' + modele + ' : ' + String(e.message || e) + ']'; }catch(e2){}
         if(e && e.name === 'AbortError') break;
         if(String(e.message||'').includes('429')) continue;
         break;
@@ -1166,9 +1176,10 @@ async function nexusSecoursKilo(messages){
 }
 
 async function nexusSecoursPollinations(messages){
-  // POLLINATIONS POUSSÉ AU MAX (seule fonction Pollinations texte touchée) :
-  // Avant : 1 seul modèle (openai), pas de timeout, pas de retry, température fixe.
-  // Maintenant : 4 modèles en cascade, adaptés à la demande, timeout 60s, retry 429, température adaptée, messages réduits, contrôle qualité.
+  // POLLINATIONS CORRIGÉ v3 (bug trouvé en relisant tout le code) :
+  // Avant : POST JSON vers /openai -> le navigateur envoie une requête preflight CORS, Pollinations la bloque, le secours échouait instantanément.
+  // Maintenant : GET simple vers https://text.pollinations.ai/{prompt}?model=... -> pas de preflight, c'est le mode officiel pour navigateur.
+  // Réponse = texte brut (pas du JSON OpenAI), on le lit avec res.text().
   const texteDemande = messages.map(m => String(m.content||'')).join('\n').toLowerCase();
   const estCode = /code|fonction|python|javascript|html|css|bug|erreur|script|programme|algorithme|debug|sql|java|c\+\+|rust|php/.test(texteDemande);
   const estTraduction = /traduis|traduire|translation|translate/.test(texteDemande);
@@ -1176,10 +1187,15 @@ async function nexusSecoursPollinations(messages){
     ? ['qwen-coder', 'openai-large', 'openai', 'mistral']
     : ['openai-large', 'openai', 'mistral', 'deepseek'];
   const temperature = (estCode || estTraduction) ? 0.2 : 0.7;
+  // Messages réduits : système séparé (?system=), reste en prompt.
   const msgs = messages.length > 9 ? [messages[0]].concat(messages.slice(-8)) : messages.slice();
-  const msgsRenforces = msgs.map((m,i) => i === 0 && m.role === 'system'
-    ? { role: 'system', content: String(m.content||'') + '\n\nRÈGLES SECOURS : réponds de façon précise et complète. Ne jamais inventer de faits, chiffres ou sources. Si tu ne sais pas, dis-le. Pour du code : donne le code complet, qui marche, sans rien tronquer.' }
-    : { role: m.role, content: String(m.content||'') });
+  let systeme = '';
+  const corps = [];
+  msgs.forEach(m => {
+    if(m.role === 'system' && !systeme) systeme = String(m.content||'') + '\n\nRÈGLES SECOURS : réponds de façon précise et complète. Ne jamais inventer de faits, chiffres ou sources. Si tu ne sais pas, dis-le. Pour du code : donne le code complet, qui marche, sans rien tronquer.';
+    else corps.push((m.role === 'user' ? '' : (m.role + ' : ')) + String(m.content||''));
+  });
+  const prompt = corps.join('\n\n') || 'Réponds.';
   let derniereErreur = null;
   for(const modele of modeles){
     for(let tentative = 0; tentative < 2; tentative++){
@@ -1188,29 +1204,25 @@ async function nexusSecoursPollinations(messages){
         const timer = setTimeout(() => ctrl.abort(), 60000);
         let res;
         try{
-          res = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: modele, messages: msgsRenforces, temperature: temperature, max_tokens: 4000 }),
-            signal: ctrl.signal
-          });
+          const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt) + '?model=' + encodeURIComponent(modele) + '&temperature=' + temperature + (systeme ? '&system=' + encodeURIComponent(systeme) : '');
+          res = await fetch(url, { method: 'GET', signal: ctrl.signal });
         } finally { clearTimeout(timer); }
         if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 2000)); continue; }
-        if(!res.ok) throw new Error('Secours ' + modele + ' indisponible (' + res.status + ')');
-        const data = await res.json();
-        const txt = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-        if(!txt || txt.trim().length < 20 || /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txt.trim())) throw new Error('Secours ' + modele + ' réponse insuffisante');
+        if(!res.ok) throw new Error('Pollinations ' + modele + ' indisponible (' + res.status + ')');
+        const txt = (await res.text() || '').trim();
+        if(!txt || txt.length < 20 || /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txt)) throw new Error('Pollinations ' + modele + ' réponse insuffisante');
         try{ window.__nexusDernierModele = 'secours Pollinations ' + modele + ' (gratuit, sans clé)'; }catch(e2){}
         return txt;
       }catch(e){
         derniereErreur = e;
+        try{ window.__nexusSecoursErreurs = (window.__nexusSecoursErreurs || '') + ' [Pollinations ' + modele + ' : ' + String(e.message || e) + ']'; }catch(e2){}
         if(e && e.name === 'AbortError') break;
         if(String(e.message||'').includes('429')) continue;
         break;
       }
     }
   }
-  throw derniereErreur || new Error('Secours indisponible');
+  throw derniereErreur || new Error('Secours Pollinations indisponible');
 }
 
 function nexusEstErreurCredits(e){
@@ -1231,6 +1243,15 @@ function nexusEstErreurCredits(e){
 async function callPuterProducteur(messages, signal, image = null){
   if(!window.puter || !puter.ai) throw new Error("Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.");
   if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
+  // Puter déjà HS : on va directement aux secours, sans rappeler Puter (sinon sa popup réapparaît).
+  if(typeof window !== 'undefined' && window.__nexusPuterHS){
+    try{ if(typeof window !== 'undefined') window.__nexusSecoursErreurs = ''; }catch(e2){}
+    try{ return await nexusSecoursKilo(messages); }
+    catch(eKilo){
+      try{ return await nexusSecoursPollinations(messages); }
+      catch(ePoll){ throw new Error("Puter sans crédits. [Secours échoués :" + String((typeof window !== 'undefined' && window.__nexusSecoursErreurs) || ' ?') + "]"); }
+    }
+  }
   const modeleChoisi = nexusChoisirModele(messages);
   // Mémorise le modèle utilisé pour l'afficher dans la conversation (Prod : PUTER • gpt-5.5, etc.)
   try{ window.__nexusDernierModele = modeleChoisi; }catch(e){}
@@ -1249,6 +1270,7 @@ async function callPuterProducteur(messages, signal, image = null){
       return extractPuterText(res);
     }catch(e){
       if(e.name === 'AbortError') throw e;
+      try{ if(typeof window !== 'undefined') window.__nexusPuterHS = true; }catch(e2){}
       derniereErreur = e;
       const msg = String(e.message||'').toLowerCase();
       // Erreur crédits : on sort de la boucle pour aller au secours Pollinations (juste après), on ne jette pas l'erreur ici.
@@ -1277,7 +1299,7 @@ async function callPuterProducteur(messages, signal, image = null){
       // Les deux secours indisponibles : on retombe sur l'erreur Puter traduite en français, comme avant.
     }
   }
-  throw new Error(nexusTraduireErreur(derniereErreur ? derniereErreur.message : "échec de génération"));
+  throw new Error(nexusTraduireErreur(derniereErreur ? derniereErreur.message : "échec de génération") + " [Secours échoués :" + String((typeof window !== 'undefined' && window.__nexusSecoursErreurs) || ' ?') + "]");
 }
 
 async function ask(t, role, prompt, tier, json, image = null){
