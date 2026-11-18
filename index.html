@@ -323,7 +323,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795037915289)"><span class="conv-del" onclick="deleteConversation(1795037915289,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795038992517)"><span class="conv-del" onclick="deleteConversation(1795038992517,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -902,12 +902,21 @@ function nexusImagePrompt(demande){
   }
   return null;
 }
+// Image Pollinations en secours : même principe que le texte, sans clé.
+// https://image.pollinations.ai/prompt/<texte> répond directement une image, sans clé.
+function nexusSecoursImagePollinations(prompt){
+  return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=1024&height=1024&seed=' + Math.floor(Math.random()*1000000) + '&nologo=true';
+}
 async function nexusGenerateImage(prompt, signal){
   if(!window.puter || !puter.ai || !puter.ai.txt2img) throw new Error("Génération d'image non disponible. Vérifie que Puter est chargé.");
   try{
     const img = await puter.ai.txt2img(prompt, false, { model: "gpt-image-2.6-flare" });
     return img && img.src ? img.src : String(img||'');
-  }catch(e){ throw new Error(nexusTraduireErreur(e.message || e)); }
+  }catch(e){
+    // Plus de crédits Puter pour l'image ? On bascule sur l'image Pollinations, sans clé.
+    if(nexusEstErreurCredits(e)) return nexusSecoursImagePollinations(prompt);
+    throw new Error(nexusTraduireErreur(e.message || e));
+  }
 }
 
 
@@ -1061,6 +1070,30 @@ async function nexusAppelerModele(messages, signal, image, modele){
   return await puter.ai.chat(messages, false, options);
 }
 
+
+// ===== SECOURS SANS CLÉ (AJOUT UNIQUEMENT) : quand Puter n'a plus de crédits =====
+// LLM7 : VÉRIFIÉ - l'ancien accès anonyme avec la clé "unused" n'est plus documenté.
+// Depuis novembre 2026, LLM7 demande un token gratuit depuis son dashboard. Donc on NE l'utilise PAS, comme tu l'as dit.
+// Pollinations : VÉRIFIÉ - l'ancienne API text.pollinations.ai répond encore sans clé (vérifiée le 16-17 nov 2026),
+// sur un seul modèle (GPT-OSS 20B). La nouvelle API gen.pollinations.ai, elle, demande une clé et renvoie 401 sans clé.
+// Donc secours = Pollinations legacy uniquement, sans clé, sans compte, sans crédit.
+async function nexusSecoursPollinations(messages){
+  const res = await fetch('https://text.pollinations.ai/openai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'openai', messages: messages.map(m => ({ role: m.role, content: String(m.content||'') })), temperature: 0.7 })
+  });
+  if(!res.ok) throw new Error('Secours indisponible (' + res.status + ')');
+  const data = await res.json();
+  const txt = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  if(!txt) throw new Error('Secours sans réponse');
+  return txt;
+}
+function nexusEstErreurCredits(e){
+  const s = String((e && e.message) || e || '').toLowerCase();
+  return /doesn'?t have enough credits|not enough credits|insufficient_funds|out of credits|no credits left|credit.*exhausted|billing/.test(s);
+}
+
 async function callPuterProducteur(messages, signal, image = null){
   if(!window.puter || !puter.ai) throw new Error("Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.");
   if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
@@ -1084,9 +1117,21 @@ async function callPuterProducteur(messages, signal, image = null){
       if(e.name === 'AbortError') throw e;
       derniereErreur = e;
       const msg = String(e.message||'').toLowerCase();
+      // Erreur crédits : on sort de la boucle pour aller au secours Pollinations (juste après), on ne jette pas l'erreur ici.
+      if(nexusEstErreurCredits(e)) break;
       // On ne retente que si le problème vient du modèle (introuvable / indisponible). Sinon, on traduit et on s'arrête.
       if(/model.*not found|unknown model|invalid.*model|model.*unavailable|not available|introuvable/.test(msg)) continue;
       throw new Error(nexusTraduireErreur(e.message || "échec de génération"));
+    }
+  }
+  // Plus de crédits Puter ? On bascule sur le secours sans clé, au lieu d'afficher juste l'erreur.
+  if(derniereErreur && nexusEstErreurCredits(derniereErreur)){
+    try{
+      const secours = await nexusSecoursPollinations(messages);
+      try{ window.__nexusDernierModele = 'secours Pollinations (gratuit, sans clé)'; }catch(e2){}
+      return secours;
+    }catch(eSecours){
+      // Secours aussi indisponible : on retombe sur l'erreur Puter traduite en français, comme avant.
     }
   }
   throw new Error(nexusTraduireErreur(derniereErreur ? derniereErreur.message : "échec de génération"));
