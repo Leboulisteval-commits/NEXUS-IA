@@ -2,227 +2,346 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NEXUS AI — Vérification croisée</title>
-<meta name="description" content="NEXUS AI : un producteur IA rédige, un vérificateur indépendant contrôle.">
-
-<!-- Balises PWA pour l'installation sur mobile -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>NEXUS AI</title>
+<meta name="description" content="NEXUS AI : Vérification croisée par IA.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="NEXUS AI">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'%3E%3C/circle%3E%3Ccircle cx='19' cy='5' r='2'%3E%3C/circle%3E%3Ccircle cx='5' cy='19' r='2'%3E%3C/circle%3E%3Cpath d='M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17'%3E%3C/path%3E%3C/svg%3E">
-<link rel="manifest" href='data:application/manifest+json,{"name":"NEXUS AI","short_name":"NEXUS","start_url":".","display":"standalone","background_color":"#09090b","theme_color":"#6366f1","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%236366f1%27/%3E%3Ctext x=%2750%27 y=%2755%27 font-size=%2750%27 text-anchor=%27middle%27 fill=%27white%27%3E🧠%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
-
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'%3E%3C/circle%3E%3Ccircle cx='19' cy='5' r='2'%3E%3C/circle%3E%3Ccircle cx='5' cy='19' r='2'%3E%3C/circle%3E%3Cpath d='M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17'%3E%3C/path%3E%3C/svg%3E">
+<meta name="theme-color" content="#0a0a10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'%3E%3C/circle%3E%3Ccircle cx='19' cy='5' r='2'%3E%3C/circle%3E%3Ccircle cx='5' cy='19' r='2'%3E%3C/circle%3E%3Cpath d='M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17'%3E%3C/path%3E%3C/svg%3E">
+<link rel="manifest" href='data:application/manifest+json,{"name":"NEXUS AI","short_name":"NEXUS","start_url":".","display":"standalone","background_color":"#0a0a10","theme_color":"#00e5ff"}'>
 <script src="https://js.puter.com/v2/" defer></script>
 <style>
 :root {
-  --bg: #09090b; --surface: rgba(24, 24, 27, 0.8); --surface-hover: rgba(39, 39, 42, 0.8);
-  --border: rgba(255, 255, 255, 0.1); --text: #f4f4f5; --text-muted: #a1a1aa;
-  --primary: #6366f1; --primary-hover: #4f46e5; --user-bg: #18181b;
-  --ok: #10b981; --wa: #f59e0b; --ko: #ef4444; --glass: rgba(255, 255, 255, 0.05);
-  --rec: #ef4444; --sidebar-w: 280px;
+  --bg: #0a0a10; --bg-2: #10101a;
+  --surface: rgba(20, 20, 30, 0.75); --surface-2: rgba(30, 30, 45, 0.6);
+  --border: rgba(0, 229, 255, 0.12); --border-hover: rgba(0, 229, 255, 0.3);
+  --text: #e8e8f0; --text-muted: #7a7a8a; --text-dim: #4a4a5a;
+  --primary: #00e5ff; --primary-dim: rgba(0, 229, 255, 0.15); --primary-glow: rgba(0, 229, 255, 0.4);
+  --accent: #ff006e; --accent-dim: rgba(255, 0, 110, 0.15);
+  --ok: #00ff88; --wa: #ffb800; --ko: #ff3860;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --sidebar-w: 300px;
 }
-/* Thème Clair */
 body.light-theme {
-  --bg: #f6f6f3; --surface: rgba(255, 255, 255, 0.8); --surface-hover: rgba(0, 0, 0, 0.05);
-  --border: rgba(0, 0, 0, 0.1); --text: #1c1c1a; --text-muted: #6b6b64;
-  --user-bg: #ffffff; --glass: rgba(0, 0, 0, 0.05); --primary: #4a49d6; --primary-hover: #3b3ab8;
+  --bg: #f5f5f0; --bg-2: #ebebe5;
+  --surface: rgba(255, 255, 255, 0.85); --surface-2: rgba(240, 240, 235, 0.9);
+  --border: rgba(0, 0, 0, 0.1); --border-hover: rgba(0, 150, 200, 0.4);
+  --text: #1a1a20; --text-muted: #6a6a7a; --text-dim: #9a9aaa;
+  --primary: #0099cc; --primary-dim: rgba(0, 153, 204, 0.12); --primary-glow: rgba(0, 153, 204, 0.3);
+  --accent: #d6005a; --accent-dim: rgba(214, 0, 90, 0.12);
 }
-body.light-theme .bg-blobs { opacity: 0.15; }
-body.light-theme .blob-1 { background: #a5b4fc; }
-body.light-theme .blob-2 { background: #c4b5fd; }
-body.light-theme .blob-3 { background: #7dd3fc; }
-body.light-theme .msg.ai .bubble { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-body.light-theme .msg.user .bubble { color: #fff; }
-body.light-theme .input-box { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-body.light-theme dialog { background: #fff; }
-body.light-theme header { background: rgba(246, 246, 243, 0.8); }
-body.light-theme #sidebar { background: rgba(246, 246, 243, 0.95); }
-body.light-theme .btn-copy { background: rgba(0,0,0,0.6); color: #fff; }
-body.light-theme .badge.ok { background: #d1fae5; color: #065f46; }
-body.light-theme .badge.wa { background: #fef3c7; color: #92400e; }
-body.light-theme .badge.ko { background: #fee2e2; color: #991b1b; }
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body {
-  height: 100%; height: 100dvh; overflow: hidden;
-  background-color: var(--bg); color: var(--text);
-  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100vh; height: var(--app-height, 100dvh); width: 100vw; overflow: hidden;
+  background: var(--bg); color: var(--text); font: 15px/1.55 var(--font-sans);
   transition: background-color 0.3s, color 0.3s;
 }
-body { display: flex; flex-direction: column; position: relative; }
-
-/* --- FOND ANIMÉ --- */
-.bg-blobs { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; }
-.blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: float 20s infinite alternate; }
-.blob-1 { background: #6366f1; width: 300px; height: 300px; top: -50px; left: -50px; }
-.blob-2 { background: #8b5cf6; width: 250px; height: 250px; bottom: 10%; right: -50px; animation-delay: -5s; }
-.blob-3 { background: #0ea5e9; width: 200px; height: 200px; top: 40%; left: 30%; animation-delay: -10s; }
-@keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-@keyframes pulse-mic { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-
-/* --- SIDEBAR --- */
+body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events: none; z-index: 0; opacity: 0.6;
+}
+body::after {
+  content: ''; position: fixed; top: -30vh; left: 50%; transform: translateX(-50%);
+  width: 150vw; height: 80vh; background: radial-gradient(ellipse at center, var(--primary-dim), transparent 55%);
+  pointer-events: none; z-index: 0;
+}
+#overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(3px); z-index: 98; display: none; opacity: 0; transition: opacity 0.25s; }
+#overlay.open { display: block; opacity: 1; }
 #sidebar {
   position: fixed; top: 0; left: calc(-1 * var(--sidebar-w)); width: var(--sidebar-w); height: 100%;
-  background: rgba(9, 9, 11, 0.95); backdrop-filter: blur(20px);
-  border-right: 1px solid var(--border); z-index: 100; transition: left 0.3s ease;
-  display: flex; flex-direction: column;
+  background: var(--bg-2); border-right: 1px solid var(--border); z-index: 99;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column;
 }
 #sidebar.open { left: 0; }
-.sidebar-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+.sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+.brand-small { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; }
 .btn-new {
-  width: 100%; padding: 10px; background: var(--primary); color: white; border: none;
-  border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 11px; background: var(--primary); color: var(--bg);
+  border: none; border-radius: 6px; font-weight: 700; cursor: pointer;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
 }
+.btn-new:hover { box-shadow: 0 0 20px var(--primary-glow); }
 .sidebar-search { position: relative; }
-.sidebar-search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 14px; height: 14px; }
-.sidebar-search input { width: 100%; padding: 8px 10px 8px 30px; border-radius: 8px; background: var(--user-bg); border: 1px solid var(--border); color: var(--text); font-size: 13px; outline: none; }
+.sidebar-search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); width: 14px; height: 14px; }
+.sidebar-search input {
+  width: 100%; padding: 8px 10px 8px 30px; border-radius: 6px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  font-family: var(--font-mono); font-size: 12px; outline: none;
+}
 .sidebar-search input:focus { border-color: var(--primary); }
 .btn-clear {
-  width: 100%; padding: 8px; background: transparent; color: var(--ko); border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 8px; background: transparent; color: var(--ko);
+  border: 1px solid rgba(255, 56, 96, 0.3); border-radius: 6px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;
 }
-.btn-clear:hover { background: rgba(239, 68, 68, 0.1); }
-.conv-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
+.btn-clear:hover { background: rgba(255, 56, 96, 0.1); }
+.conv-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 3px; }
+.conv-list::-webkit-scrollbar { width: 4px; }
+.conv-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 .conv-item {
-  padding: 10px 12px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between;
-  align-items: center; color: var(--text-muted); transition: 0.2s; border: 1px solid transparent;
+  padding: 10px 12px; border-radius: 4px; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--text-muted); transition: 0.15s; border-left: 2px solid transparent;
 }
-.conv-item:hover { background: var(--surface-hover); color: var(--text); }
-.conv-item.active { background: var(--surface); color: var(--text); border-color: var(--border); }
-.conv-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-size: 14px; }
-.btn-delete {
-  background: transparent; border: none; color: var(--ko); cursor: pointer; padding: 4px;
-  opacity: 0.5; transition: 0.2s; display: grid; place-items: center;
-}
+.conv-item:hover { background: var(--surface); color: var(--text); }
+.conv-item.active { background: var(--surface); color: var(--text); border-left-color: var(--primary); }
+.conv-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; font-size: 13px; }
+.btn-delete { background: transparent; border: none; color: var(--ko); cursor: pointer; padding: 4px; opacity: 0.4; transition: 0.2s; display: grid; place-items: center; }
 .btn-delete:hover { opacity: 1; }
-#overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); z-index: 99; display: none; opacity: 0; transition: opacity 0.3s; }
-#overlay.open { display: block; opacity: 1; }
-
-/* --- HEADER --- */
-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); z-index: 10; flex-shrink: 0; }
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--border);
+  z-index: 10; flex-shrink: 0; position: relative;
+}
 .header-left { display: flex; align-items: center; gap: 12px; }
-.logo-group { display: flex; align-items: center; gap: 8px; }
-.logo-group svg { width: 24px; height: 24px; color: var(--primary); }
-header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.5px; }
-header h1 span { color: var(--primary); }
-.icon-btn { background: var(--glass); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-.icon-btn:hover { background: var(--surface-hover); }
-.icon-btn.settings:hover { transform: rotate(90deg); }
-
-/* --- CHAT ZONE --- */
-main { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
-main::-webkit-scrollbar { width: 6px; }
-main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-
-.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center; gap: 20px; }
-.empty-state h2 { font-size: 20px; color: var(--text); margin-top: 10px; }
-.suggestions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 600px; }
-.suggestions button { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 10px 16px; border-radius: 20px; cursor: pointer; transition: 0.2s; font-size: 14px; }
-.suggestions button:hover { background: var(--surface-hover); border-color: var(--primary); }
-
-/* --- MESSAGES --- */
-.msg { display: flex; gap: 12px; animation: fadeIn 0.3s ease; max-width: 100%; }
-.msg.user { align-self: flex-end; flex-direction: row-reverse; max-width: 90%; }
-.msg.ai { align-self: flex-start; width: 100%; }
-.avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; font-weight: bold; font-size: 14px; }
-.msg.user .avatar { background: var(--primary); color: white; }
-.msg.ai .avatar { background: var(--user-bg); border: 1px solid var(--border); }
-.msg.ai .avatar svg { width: 16px; height: 16px; color: var(--primary); }
-
-.bubble { padding: 12px 16px; border-radius: 16px; font-size: 15px; line-height: 1.6; word-break: break-word; overflow-wrap: anywhere; min-width: 0; position: relative; }
-.msg.user .bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
-.msg.ai .bubble { background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(10px); border-bottom-left-radius: 4px; flex: 1; }
-
-.msg-img { max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 8px; object-fit: cover; border: 1px solid var(--border); }
-
-/* Markdown styles */
-.bubble strong { color: var(--primary); font-weight: 700; }
-.bubble em { font-style: italic; color: var(--text-muted); }
-.bubble code { background: var(--user-bg); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; color: #f59e0b; }
-.bubble pre { background: var(--user-bg); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; border: 1px solid var(--border); }
-.bubble pre code { background: transparent; padding: 0; color: var(--text); }
-
-.btn-copy {
-  position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); 
-  color: var(--text-muted); border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; 
-  display: flex; align-items: center; gap: 4px; transition: 0.2s; opacity: 0; z-index: 2;
+.brand { font-family: var(--font-mono); font-size: 14px; font-weight: 700; letter-spacing: 0.15em; color: var(--text); }
+.brand span { color: var(--primary); }
+.status-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ok); box-shadow: 0 0 8px var(--ok); margin-left: 8px;
+  animation: pulse-dot 2s infinite;
 }
-.msg.ai:hover .btn-copy { opacity: 1; }
-.btn-copy:hover { background: var(--primary); color: white; border-color: var(--primary); }
-
-.btn-regenerate {
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.icon-btn {
   background: transparent; border: 1px solid var(--border); color: var(--text-muted);
-  padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 10px;
-  display: inline-flex; align-items: center; gap: 4px; transition: 0.2s;
+  width: 34px; height: 34px; border-radius: 6px; display: grid; place-items: center;
+  cursor: pointer; transition: all 0.2s; flex-shrink: 0;
 }
-.btn-regenerate:hover { background: var(--surface-hover); color: var(--text); border-color: var(--primary); }
-
-/* --- VERIFICATION --- */
-.verif { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 13px; color: var(--text-muted); }
-.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; margin-bottom: 6px; }
-.badge.ok { background: rgba(16, 185, 129, 0.15); color: var(--ok); }
-.badge.wa { background: rgba(245, 158, 11, 0.15); color: var(--wa); }
-.badge.ko { background: rgba(239, 68, 68, 0.15); color: var(--ko); }
-.verif-details { margin-top: 8px; font-size: 12px; }
-.verif-details summary { cursor: pointer; color: var(--primary); outline: none; }
-.verif-details p { margin-top: 4px; padding-left: 8px; border-left: 2px solid var(--border); }
-
-/* --- INPUT AREA --- */
-.input-wrapper { padding: 12px 20px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--border); z-index: 10; flex-shrink: 0; transition: background-color 0.3s; display: flex; flex-direction: column; gap: 8px; max-width: 840px; margin: 0 auto; width: 100%; }
-.attachment-preview { display: none; align-items: center; gap: 10px; background: var(--surface); padding: 8px; border-radius: 12px; border: 1px solid var(--border); width: fit-content; }
-.attachment-preview img { height: 60px; border-radius: 8px; border: 1px solid var(--border); }
-.btn-remove-attach { background: transparent; border: none; color: var(--ko); cursor: pointer; padding: 4px; display: grid; place-items: center; }
-
-.input-box { display: flex; gap: 6px; background: var(--user-bg); border: 1px solid var(--border); border-radius: 24px; padding: 6px; align-items: flex-end; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: border-color 0.2s, background-color 0.3s; }
-.input-box:focus-within { border-color: var(--primary); }
-textarea { flex: 1; background: transparent; border: none; color: var(--text); font: inherit; resize: none; min-height: 24px; max-height: 100px; padding: 10px 8px; outline: none; overflow-y: auto; }
-
-/* --- BOUTONS --- */
-.icon-btn-action { background: transparent; color: var(--text-muted); border: none; border-radius: 50%; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-.icon-btn-action:hover { background: var(--glass); color: var(--text); }
-.icon-btn-action.listening { color: var(--rec); animation: pulse-mic 1.5s infinite; }
-button.send { background: var(--primary); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
-button.send:hover:not(:disabled) { background: var(--primary-hover); }
-button.send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-button.stop { background: var(--ko); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; flex-shrink: 0; }
-
-/* --- MODAL & TOAST --- */
-dialog { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 16px; padding: 20px; max-width: 400px; width: 90%; backdrop-filter: blur(20px); margin: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-dialog h2 { font-size: 18px; margin-bottom: 15px; }
-dialog label { display: block; font-size: 13px; color: var(--text-muted); margin: 10px 0 4px; }
-dialog input, dialog select, dialog textarea { width: 100%; background: var(--user-bg); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 8px; font: inherit; margin-bottom: 8px; outline: none; }
+.icon-btn:hover { border-color: var(--primary); color: var(--primary); }
+main {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 20px 16px; display: flex; flex-direction: column; gap: 24px;
+  z-index: 1; position: relative;
+}
+main::-webkit-scrollbar { width: 4px; }
+main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; text-align: center; gap: 24px; padding: 20px;
+}
+.empty-state .logo-big {
+  width: 72px; height: 72px; border: 2px solid var(--primary);
+  border-radius: 50%; display: grid; place-items: center;
+  box-shadow: 0 0 40px var(--primary-glow), inset 0 0 20px var(--primary-dim); position: relative;
+}
+.empty-state .logo-big::before {
+  content: ''; position: absolute; inset: -12px; border: 1px solid var(--primary-dim);
+  border-radius: 50%; animation: rotate 20s linear infinite;
+}
+@keyframes rotate { to { transform: rotate(360deg); } }
+.empty-state .logo-big svg { width: 36px; height: 36px; color: var(--primary); }
+.empty-state h2 {
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.3em;
+  color: var(--primary); text-transform: uppercase; font-weight: 500;
+}
+.empty-state p { color: var(--text-muted); font-size: 14px; max-width: 320px; }
+.suggestions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 500px; }
+.suggestions button {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  padding: 9px 14px; border-radius: 6px; cursor: pointer; transition: 0.2s;
+  font-size: 13px; font-family: var(--font-sans);
+}
+.suggestions button:hover { border-color: var(--primary); color: var(--primary); }
+.msg { display: flex; animation: fadeIn 0.3s ease; max-width: 100%; }
+.msg.user { align-self: flex-end; flex-direction: column; align-items: flex-end; max-width: 85%; }
+.msg.ai { align-self: flex-start; width: 100%; flex-direction: column; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.msg.user .bubble {
+  background: linear-gradient(135deg, var(--accent-dim), transparent);
+  border: 1px solid rgba(255, 0, 110, 0.3); border-right: 3px solid var(--accent);
+  padding: 12px 16px; border-radius: 4px 0 4px 4px;
+  color: var(--text); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;
+  position: relative; font-size: 14.5px;
+}
+.msg.user .meta {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;
+}
+.msg.ai .bubble {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  padding: 0; border-radius: 4px; width: 100%;
+  overflow: hidden; transition: border-color 0.3s;
+}
+.msg.ai .bubble:hover { border-color: var(--border-hover); }
+.ai-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 14px; background: var(--bg-2); border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--text-muted); text-transform: uppercase;
+}
+.ai-header-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ai-model { color: var(--primary); font-weight: 700; }
+.provider-tag {
+  font-size: 9px; padding: 1px 6px; border-radius: 3px;
+  background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border);
+}
+.provider-tag.puter { color: #ff8c00; border-color: rgba(255, 140, 0, 0.3); }
+.provider-tag.keyless { color: var(--primary); border-color: var(--primary-dim); }
+.ai-body { padding: 14px 16px; font-size: 14.5px; line-height: 1.6; word-break: break-word; overflow-wrap: anywhere; }
+.bubble strong { color: var(--primary); font-weight: 700; }
+.bubble em { color: var(--text-muted); font-style: italic; }
+.bubble code { background: var(--bg); padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); font-size: 13px; color: var(--wa); }
+.bubble pre { background: var(--bg); padding: 12px; border-radius: 4px; overflow-x: auto; margin: 10px 0; border: 1px solid var(--border); }
+.bubble pre code { background: transparent; padding: 0; color: var(--text); }
+.msg-img { max-width: 100%; max-height: 280px; border-radius: 4px; margin-top: 10px; object-fit: cover; border: 1px solid var(--border); display: block; }
+.msg-actions { display: flex; gap: 6px; margin-top: 8px; }
+.msg-actions button {
+  background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+  padding: 4px 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: 0.2s;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.msg-actions button:hover { border-color: var(--primary); color: var(--primary); }
+.verif {
+  margin: 0 14px 12px; padding: 10px 12px; border: 1px solid var(--border);
+  border-left: 3px solid var(--wa); background: var(--bg-2);
+  font-family: var(--font-mono); font-size: 11px; border-radius: 4px;
+}
+.verif.ok { border-left-color: var(--ok); }
+.verif.ko { border-left-color: var(--ko); }
+.verif-status { font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.verif.ok .verif-status { color: var(--ok); }
+.verif.wa .verif-status { color: var(--wa); }
+.verif.ko .verif-status { color: var(--ko); }
+.verif-errors { color: var(--ko); margin-top: 4px; }
+.verif details { margin-top: 8px; }
+.verif summary { cursor: pointer; color: var(--primary); }
+.verif-detail-item { margin-top: 4px; padding-left: 8px; border-left: 1px solid var(--border); color: var(--text-muted); }
+.loading-dots { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
+.loading-dots .dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; box-shadow: 0 0 8px var(--primary-glow); }
+.loading-dots .dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots .dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+.msg-system { padding: 12px 16px; font-size: 13px; color: var(--text-muted); font-family: var(--font-mono); }
+.msg-system.err { color: var(--ko); }
+.msg-system.wa { color: var(--wa); }
+.input-wrapper {
+  padding: 10px 16px; padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  background: var(--bg); border-top: 1px solid var(--border);
+  z-index: 10; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
+}
+.attachment-preview {
+  display: none; align-items: center; gap: 10px; background: var(--surface);
+  padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);
+  width: fit-content; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted);
+}
+.attachment-preview img { height: 50px; border-radius: 4px; border: 1px solid var(--border); }
+.attachment-preview .btn-remove-attach { background: transparent; border: none; color: var(--ko); cursor: pointer; padding: 4px; display: grid; place-items: center; }
+.listening-banner {
+  display: none; align-items: center; gap: 8px; padding: 8px 12px;
+  background: rgba(255, 0, 110, 0.1); border: 1px solid var(--accent);
+  border-radius: 6px; font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+  animation: pulse-border 1.5s infinite;
+}
+.listening-banner.show { display: flex; }
+.listening-banner .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse-dot 1s infinite; }
+@keyframes pulse-border { 0%, 100% { border-color: var(--accent); } 50% { border-color: transparent; } }
+.input-box {
+  display: flex; gap: 6px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px; align-items: flex-end;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-dim); }
+.prompt-indicator {
+  font-family: var(--font-mono); color: var(--primary); font-weight: 700;
+  font-size: 16px; padding: 8px 4px 8px 10px; user-select: none; line-height: 1;
+}
+textarea {
+  flex: 1; background: transparent; border: none; color: var(--text);
+  font: inherit; resize: none; min-height: 24px; max-height: 120px;
+  padding: 9px 4px; outline: none; overflow-y: auto; line-height: 1.5;
+}
+.icon-btn-action {
+  background: transparent; color: var(--text-muted); border: none;
+  border-radius: 6px; width: 38px; height: 38px; display: grid; place-items: center;
+  cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+}
+.icon-btn-action:hover { background: var(--surface-2); color: var(--text); }
+.icon-btn-action.recording { color: var(--accent); background: rgba(255, 0, 110, 0.15); }
+button.send {
+  background: var(--primary); color: var(--bg); border: none;
+  border-radius: 6px; width: 38px; height: 38px; display: grid; place-items: center;
+  cursor: pointer; transition: 0.2s; flex-shrink: 0;
+}
+button.send:hover:not(:disabled) { box-shadow: 0 0 20px var(--primary-glow); }
+button.send:disabled { opacity: 0.4; cursor: not-allowed; }
+button.stop { background: var(--ko); color: white; border: none; border-radius: 6px; width: 38px; height: 38px; display: grid; place-items: center; cursor: pointer; flex-shrink: 0; }
+dialog {
+  border: 1px solid var(--border); background: var(--bg-2); color: var(--text);
+  border-radius: 10px; padding: 22px; max-width: 440px; width: 90%;
+  margin: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  max-height: 85vh; overflow-y: auto;
+}
+dialog::backdrop { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+dialog h2 { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--primary); margin-bottom: 18px; }
+dialog label { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 14px 0 5px; }
+dialog input, dialog select, dialog textarea {
+  width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  padding: 10px; border-radius: 5px; font: inherit; font-size: 14px; outline: none; margin-bottom: 4px;
+}
 dialog input:focus, dialog select:focus, dialog textarea:focus { border-color: var(--primary); }
-dialog button.btn { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-dialog button.btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); margin-top: 8px; }
-
-#toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ok); color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.5); opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 1000; }
+dialog select { cursor: pointer; }
+dialog button.btn {
+  width: 100%; padding: 11px; background: var(--primary); color: var(--bg);
+  border: none; border-radius: 6px; font-weight: 700; cursor: pointer; margin-top: 14px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+dialog button.btn-secondary {
+  background: transparent; border: 1px solid var(--border); color: var(--text);
+  margin-top: 8px; font-weight: 400;
+}
+.checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 14px; }
+.checkbox-row input { width: auto; margin: 0; }
+.mode-hint {
+  margin-top: 6px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; font-family: var(--font-mono); font-size: 10px; line-height: 1.5;
+  color: var(--text-muted); letter-spacing: 0.03em;
+}
+#toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--bg-2); color: var(--text); padding: 10px 18px;
+  border-radius: 6px; border: 1px solid var(--primary);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
+  box-shadow: 0 0 20px var(--primary-glow); opacity: 0;
+  transition: all 0.3s; pointer-events: none; z-index: 1000;
+}
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+body.light-theme .msg.user .bubble { background: linear-gradient(135deg, rgba(214, 0, 90, 0.08), transparent); }
+body.light-theme .input-box { background: #fff; }
+body.light-theme .empty-state .logo-big { box-shadow: 0 0 40px rgba(0, 153, 204, 0.2), inset 0 0 20px rgba(0, 153, 204, 0.1); }
+@media (max-width: 500px) {
+  .msg.user { max-width: 92%; }
+  main { padding: 16px 12px; gap: 20px; }
+  .input-wrapper { padding: 8px 10px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+  .msg-actions button span { display: none; }
+  .msg-actions button { padding: 4px 8px; }
+}
 </style>
 </head>
 <body>
 
-<div class="bg-blobs">
-  <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
-</div>
-
 <div id="overlay" onclick="toggleSidebar()"></div>
 <div id="sidebar">
   <div class="sidebar-header">
+    <div class="brand-small">// conversations</div>
     <button class="btn-new" onclick="newConversation()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      Nouvelle discussion
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Nouveau
     </button>
     <div class="sidebar-search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <input type="text" id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()">
     </div>
     <button class="btn-clear" onclick="clearAllHistory()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
       Tout effacer
     </button>
   </div>
@@ -232,19 +351,16 @@ dialog button.btn-secondary { background: transparent; border: 1px solid var(--b
 <header>
   <div class="header-left">
     <button class="icon-btn" onclick="toggleSidebar()" title="Menu">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
-    <div class="logo-group">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="19" r="2"></circle><path d="M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17"></path></svg>
-      <h1>NEXUS <span>AI</span></h1>
-    </div>
+    <div class="brand">NEXUS<span>.</span>AI<span class="status-dot"></span></div>
   </div>
-  <div style="display:flex;gap:8px">
-    <button class="icon-btn" onclick="toggleTheme()" title="Changer de thème">
-      <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+  <div style="display:flex;gap:6px">
+    <button class="icon-btn" onclick="toggleTheme()" title="Thème">
+      <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
     </button>
-    <button class="icon-btn settings" onclick="document.getElementById('settingsModal').showModal()" title="Configuration">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    <button class="icon-btn" onclick="document.getElementById('settingsModal').showModal()" title="Configuration">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     </button>
   </div>
 </header>
@@ -252,46 +368,55 @@ dialog button.btn-secondary { background: transparent; border: 1px solid var(--b
 <main id="chat"></main>
 
 <div class="input-wrapper">
+  <div id="listeningBanner" class="listening-banner">
+    <span class="rec-dot"></span> Écoute en cours... parlez maintenant
+  </div>
   <div id="attachment-preview" class="attachment-preview">
+    <span>📎 IMAGE JOINTE</span>
     <img id="previewImg" src="" alt="Aperçu">
-    <button class="btn-remove-attach" onclick="removeAttachment()" title="Retirer l'image">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    <button class="btn-remove-attach" onclick="removeAttachment()" title="Retirer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
   </div>
   <div class="input-box">
-    <!-- Bouton Pièce Jointe -->
-    <button class="icon-btn-action" onclick="document.getElementById('fileInput').click()" title="Ajouter une image">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+    <span class="prompt-indicator">▸</span>
+    <button class="icon-btn-action" onclick="document.getElementById('fileInput').click()" title="Joindre">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
     </button>
     <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
     
     <button class="icon-btn-action" id="micBtn" onclick="toggleDictation()" title="Dicter">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
     </button>
-    <textarea id="q" placeholder="Posez une question ou joignez une image..." rows="1"></textarea>
-    <button class="send" id="sendBtn" onclick="start()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    
+    <textarea id="q" placeholder="Posez votre question..." rows="1"></textarea>
+    
+    <button class="send" id="sendBtn" onclick="start()" title="Envoyer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
     </button>
     <button class="stop" id="stopBtn" onclick="stopGeneration()" style="display:none" title="Arrêter">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"></rect></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"></rect></svg>
     </button>
   </div>
 </div>
 
 <dialog id="settingsModal">
-  <h2>⚙️ Configuration</h2>
-  <label for="mo">Mode de fonctionnement</label>
+  <h2>// Configuration</h2>
+  <label>Mode de fonctionnement</label>
   <select id="mo" onchange="toggleSettings()">
-    <option value="puter">Puter AI (Sans clé)</option>
-    <option value="cles">Clés API (Fournisseurs)</option>
+    <option value="hybride">⚡ Hybride (Puter + KeylessAI) — Recommandé</option>
+    <option value="puter">Puter AI seul (connexion requise)</option>
+    <option value="keyless">KeylessAI seul (sans connexion)</option>
+    <option value="cles">Clés API personnelles</option>
   </select>
-  <label style="display:flex;align-items:center;gap:8px;margin-top:15px;">
-    <input type="checkbox" id="vf" checked style="width:auto;margin:0;"> Activer la vérification croisée
-  </label>
-
-  <label for="persona" style="margin-top:15px">Rôle de l'IA (Optionnel)</label>
-  <textarea id="persona" placeholder="Ex: Tu es un expert en cuisine. Tu réponds de manière concise." style="height:60px;resize:none"></textarea>
-
+  <div class="mode-hint" id="modeHint"></div>
+  
+  <div class="checkbox-row">
+    <input type="checkbox" id="vf" checked>
+    <span>Activer la vérification croisée</span>
+  </div>
+  <label>Rôle de l'IA (Persona)</label>
+  <textarea id="persona" placeholder="Ex: Tu es un expert en cuisine..." style="height:60px;resize:none"></textarea>
   <div id="api-settings" style="display:none; border-top:1px solid var(--border); margin-top:15px; padding-top:10px;">
     <datalist id="dl">
       <option value="https://api.groq.com/openai/v1/chat/completions"></option>
@@ -301,32 +426,51 @@ dialog button.btn-secondary { background: transparent; border: 1px solid var(--b
     <label>Producteur</label>
     <input id="up" list="dl" placeholder="Adresse API">
     <input id="kp" type="password" placeholder="Clé API">
-    <input id="mp2" placeholder="Modèle (ex: gpt-4o)">
+    <input id="mp2" placeholder="Modèle">
     <button class="btn btn-secondary" onclick="setPV();testP('p')">Tester Producteur</button>
-    <div style="font-size:12px;color:var(--text-muted);margin-top:4px" id="tp"></div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)" id="tp"></div>
     <label style="margin-top:15px">Vérificateur</label>
     <input id="uv" list="dl" placeholder="Adresse API">
     <input id="kv" type="password" placeholder="Clé API">
     <input id="mv" placeholder="Modèle">
     <button class="btn btn-secondary" onclick="setPV();testP('v')">Tester Vérificateur</button>
-    <div style="font-size:12px;color:var(--text-muted);margin-top:4px" id="tv"></div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)" id="tv"></div>
   </div>
   <button class="btn" onclick="document.getElementById('settingsModal').close()">Fermer</button>
 </dialog>
 
-<div id="toast">Copié !</div>
+<div id="toast"></div>
 
 <script>
-const K="nexus_history_v6", KP="nexus_prov";
+// ========== VIEWPORT HEIGHT ==========
+function setAppHeight() {
+  const vv = window.visualViewport;
+  const h = vv ? vv.height : window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', h + 'px');
+}
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
+window.addEventListener('orientationchange', () => setTimeout(setAppHeight, 200));
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', setAppHeight);
+  window.visualViewport.addEventListener('scroll', setAppHeight);
+}
+
+// ========== ÉTAT GLOBAL ==========
+const K = "nexus_v10";
+const KP = "nexus_prov";
 let state = { convs: [], currentId: null };
 let busy = false;
 let currentController = null;
 let pendingImage = null;
-const $=s=>document.querySelector(s);
-const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-// --- THÈME ---
-if(localStorage.getItem('nexus_theme') === 'light') document.body.classList.add('light-theme');
+// ========== IDENTITÉ NEXUS (renforcée) ==========
+const NEXUS_IDENTITY = "RÈGLE ABSOLUE ET NON NÉGOCIABLE : Ton nom est NEXUS. Tu es une intelligence artificielle avancée créée pour l'analyse et la vérification croisée. Si l'utilisateur te demande qui tu es, ce que tu es, quel modèle tu utilises, ou qui t'a créé, tu réponds TOUJOURS et UNIQUEMENT : 'Je suis NEXUS, une intelligence artificielle conçue pour fournir des réponses vérifiées et fiables.' Il t'est formellement interdit de mentionner GPT, OpenAI, Anthropic, Claude, Llama, Meta, Google, Gemini, Mistral, DeepSeek, ou tout autre nom de modèle ou d'entreprise. Tu ne dois jamais révéler ton architecture technique ni ton fournisseur. Si l'on insiste, tu réponds que cette information est confidentielle. Sois précis, technique et direct dans tes réponses.";
+
+// ========== THÈME ==========
+if (localStorage.getItem('nexus_theme') === 'light') document.body.classList.add('light-theme');
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light-theme');
   localStorage.setItem('nexus_theme', isLight ? 'light' : 'dark');
@@ -335,38 +479,33 @@ function toggleTheme() {
 function updateThemeIcon() {
   const isLight = document.body.classList.contains('light-theme');
   $("#themeIcon").innerHTML = isLight 
-    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>' 
-    : '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+    ? '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'
+    : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
 }
 
-// --- GESTION DES PIÈCES JOINTES ---
+// ========== TOAST ==========
+let toastTimeout;
+function showToast(msg, duration = 2500) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove("show"), duration);
+}
+
+// ========== IMAGES ==========
 function handleFileSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function(e) {
     const img = new Image();
     img.onload = function() {
-      // Redimensionnement pour économiser la mémoire
       const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
+      let width = img.width, height = img.height;
       const MAX_SIZE = 1024;
-
-      if (width > height && width > MAX_SIZE) {
-        height *= MAX_SIZE / width;
-        width = MAX_SIZE;
-      } else if (height > MAX_SIZE) {
-        width *= MAX_SIZE / height;
-        height = MAX_SIZE;
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-      
+      if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+      else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
       pendingImage = canvas.toDataURL('image/jpeg', 0.8);
       $("#previewImg").src = pendingImage;
       $("#attachment-preview").style.display = "flex";
@@ -374,24 +513,15 @@ function handleFileSelect(event) {
     img.src = e.target.result;
   }
   reader.readAsDataURL(file);
-  event.target.value = ''; // Reset input
+  event.target.value = '';
 }
-
 function removeAttachment() {
   pendingImage = null;
   $("#previewImg").src = "";
   $("#attachment-preview").style.display = "none";
 }
 
-// --- TOAST ---
-let toastTimeout;
-function showToast(msg) {
-  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove("show"), 2000);
-}
-
-// --- MARKDOWN ---
+// ========== MARKDOWN ==========
 function formatMarkdown(text) {
   if (!text) return "";
   let safe = esc(text);
@@ -404,207 +534,303 @@ function formatMarkdown(text) {
   return safe;
 }
 
-// --- DISCUSSIONS ---
-function load(){
+// ========== CONVERSATIONS ==========
+function load() {
   try {
     const saved = localStorage.getItem(K);
-    if(saved) state = JSON.parse(saved);
+    if (saved) state = JSON.parse(saved);
   } catch(e) { state = { convs: [], currentId: null }; }
-  
-  if(!state.convs || state.convs.length === 0) {
-    newConversation(true);
-  } else {
-    state.convs.forEach(c => c.messages.forEach(m => { if(m.status === "en_cours") m.status = "interrompue"; }));
-    if(!state.currentId || !state.convs.find(c=>c.id===state.currentId)) {
-      state.currentId = state.convs[0].id;
-    }
+  if (!state.convs || state.convs.length === 0) { newConversation(true); }
+  else {
+    state.convs.forEach(c => c.messages.forEach(m => { if (m.status === "en_cours") m.status = "interrompue"; }));
+    if (!state.currentId || !state.convs.find(c => c.id === state.currentId)) state.currentId = state.convs[0].id;
   }
 }
-function save(){ try { localStorage.setItem(K, JSON.stringify(state)); } catch(e) { console.warn("Stockage plein"); } }
+function save() { try { localStorage.setItem(K, JSON.stringify(state)); } catch(e) { console.warn("Stockage plein"); } }
 
-function newConversation(silent=false){
+function newConversation(silent=false) {
   const current = state.convs.find(c => c.id === state.currentId);
-  if(current && current.messages.length === 0) { if(!silent) toggleSidebar(); return; }
+  if (current && current.messages.length === 0) { if (!silent) toggleSidebar(); return; }
   const id = Date.now();
-  state.convs.unshift({ id: id, title: "Nouvelle discussion", messages: [] });
+  state.convs.unshift({ id, title: "Nouvelle discussion", messages: [] });
   state.currentId = id;
   save(); render();
-  if(!silent) toggleSidebar();
+  if (!silent) toggleSidebar();
 }
-function switchConversation(id){ state.currentId = id; save(); render(); toggleSidebar(); }
-function deleteConversation(id, e){
+function switchConversation(id) { state.currentId = id; save(); render(); toggleSidebar(); }
+function deleteConversation(id, e) {
   e.stopPropagation();
-  if(!confirm("Supprimer cette discussion ?")) return;
+  if (!confirm("Supprimer cette discussion ?")) return;
   state.convs = state.convs.filter(c => c.id !== id);
-  if(state.currentId === id){
-    if(state.convs.length > 0) state.currentId = state.convs[0].id;
+  if (state.currentId === id) {
+    if (state.convs.length > 0) state.currentId = state.convs[0].id;
     else newConversation(true);
   }
   save(); render();
 }
 function clearAllHistory() {
-  if(!confirm("Voulez-vous vraiment effacer TOUT l'historique ?")) return;
+  if (!confirm("Effacer TOUT l'historique ?")) return;
   state = { convs: [], currentId: null };
   newConversation(true); save(); render();
 }
 function renameConversation(id, e) {
   e.stopPropagation();
-  const conv = state.convs.find(c => c.id === id); if(!conv) return;
+  const conv = state.convs.find(c => c.id === id); if (!conv) return;
   const newTitle = prompt("Nouveau titre :", conv.title);
-  if(newTitle && newTitle.trim()) { conv.title = newTitle.trim(); save(); renderSidebar(); }
+  if (newTitle && newTitle.trim()) { conv.title = newTitle.trim(); save(); renderSidebar(); }
 }
-function toggleSidebar(){ $("#sidebar").classList.toggle("open"); $("#overlay").classList.toggle("open"); }
+function toggleSidebar() {
+  $("#sidebar").classList.toggle("open");
+  $("#overlay").classList.toggle("open");
+}
 
-// --- VOCAL ---
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// ========== MICROPHONE ==========
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let isListening = false;
-if (SpeechRecognition) {
-  recognition = new SpeechRecognition();
-  recognition.lang = 'fr-FR'; recognition.interimResults = true; recognition.continuous = false;
-  recognition.onstart = function() { isListening = true; $("#micBtn").classList.add("listening"); };
-  recognition.onresult = function(event) {
-    let finalTranscript = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + ' ';
-    }
-    if (finalTranscript) {
-      const q = $("#q"); q.value += finalTranscript;
-      q.style.height = '24px'; q.style.height = (q.scrollHeight) + 'px';
-    }
-  };
-  recognition.onerror = function() { stopDictation(); };
-  recognition.onend = function() { stopDictation(); };
+
+function initRecognition() {
+  if (!SR) return null;
+  if (recognition) return recognition;
+  recognition = new SR();
+  recognition.lang = 'fr-FR';
+  recognition.interimResults = true;
+  recognition.continuous = false;
+  recognition.maxAlternatives = 1;
+  return recognition;
 }
 function toggleDictation() {
-  if (!recognition) return alert("Non supporté par ce navigateur.");
-  if (isListening) recognition.stop(); else recognition.start();
+  if (!SR) { showToast("❌ Micro non supporté. Utilisez Chrome, Edge ou Safari."); return; }
+  if (isListening) { try { recognition.stop(); } catch(e) {} return; }
+  if (navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: 'microphone' }).then(perm => {
+      if (perm.state === 'denied') { showToast("❌ Micro bloqué. Autorisez-le dans les paramètres.", 5000); return; }
+      startRecognition();
+    }).catch(() => startRecognition());
+  } else { startRecognition(); }
 }
-function stopDictation() { isListening = false; $("#micBtn").classList.remove("listening"); }
-
-// --- LOGIQUE NEXUS ---
-function toggleSettings() { $("#api-settings").style.display = ($("#mo").value === "cles") ? "block" : "none"; }
-const VP="Tu es un vérificateur indépendant. Tu reçois une DEMANDE et un RÉSULTAT. Déduis 2 à 5 critères. Juge : OUI, NON ou NON_TRANCHABLE avec preuve. Pour un prix/date non prouvable : NON_TRANCHABLE. Réponds UNIQUEMENT par ce JSON : {\"criteres\":[{\"critere\":\"\",\"verdict\":\"OUI|NON|NON_TRANCHABLE\",\"preuve\":\"\"}],\"ecarts\":[\"\"]}.";
-
-function route(d){
-  const t=d.toLowerCase();
-  if(/(code|fonction|script|programme|bug|python|javascript|html)/.test(t))return{type:"code",tier:"complex"};
-  if(/(cherche|source|compare|prix|actualité|qui est|quand|combien)/.test(t))return{type:"question",tier:"default"};
-  if(/(écris|rédige|mail|résume|traduis|reformule|texte)/.test(t))return{type:"rédaction",tier:"default"};
-  return{type:"autre",tier:"quick"};
+function startRecognition() {
+  const rec = initRecognition(); if (!rec) return;
+  rec.onstart = function() { isListening = true; $("#micBtn").classList.add("recording"); $("#listeningBanner").classList.add("show"); };
+  rec.onresult = function(event) {
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) final += event.results[i][0].transcript + ' ';
+    }
+    if (final) {
+      const q = $("#q");
+      q.value += final;
+      q.style.height = '24px';
+      q.style.height = Math.min(q.scrollHeight, 120) + 'px';
+    }
+  };
+  rec.onerror = function(event) {
+    let msg = "Erreur micro";
+    switch(event.error) {
+      case 'not-allowed': msg = "❌ Micro refusé."; break;
+      case 'no-speech': msg = "🎤 Aucune parole détectée."; break;
+      case 'audio-capture': msg = "❌ Aucun micro trouvé."; break;
+      case 'network': msg = "❌ Erreur réseau."; break;
+      case 'aborted': msg = "Micro arrêté."; break;
+      default: msg = "❌ Erreur: " + event.error;
+    }
+    showToast(msg, 3500); stopListening();
+  };
+  rec.onend = function() { stopListening(); };
+  try { rec.start(); }
+  catch(e) {
+    if (e.name === 'InvalidStateError') showToast("🎤 Micro déjà actif...");
+    else { showToast("❌ Impossible de démarrer: " + e.message); stopListening(); }
+  }
 }
-function pj(s){
+function stopListening() {
+  isListening = false;
+  $("#micBtn").classList.remove("recording");
+  $("#listeningBanner").classList.remove("show");
+}
+
+// ========== LOGIQUE IA ==========
+const MODE_HINTS = {
+  hybride: "⚡ Puter produit la réponse, KeylessAI la vérifie. Deux fournisseurs distincts = vérification réelle. (Puter = connexion requise)",
+  puter: "Tout passe par Puter. Une seule IA génère et vérifie (vérification dégradée). Connexion Puter requise.",
+  keyless: "Tout passe par KeylessAI. Sans connexion, mais une seule IA fait tout (vérification dégradée).",
+  cles: "Vous contrôlez les API. Idéal pour la vérification croisée avec deux fournisseurs différents (Groq + Mistral, etc.)."
+};
+
+function toggleSettings() {
+  const mode = $("#mo").value;
+  $("#api-settings").style.display = (mode === "cles") ? "block" : "none";
+  $("#modeHint").textContent = MODE_HINTS[mode] || "";
+}
+
+// ========== PROMPT DU VÉRIFICATEUR (avec identité NEXUS intégrée) ==========
+const VP = "Tu es NEXUS, une intelligence artificielle de vérification croisée. Ton nom est NEXUS et tu ne révéleras jamais aucun autre nom de modèle ou d'entreprise. Ta mission actuelle : analyser si un RÉSULTAT correspond à une DEMANDE. Déduis 2 à 5 critères vérifiables. Juge chaque critère : OUI, NON ou NON_TRANCHABLE avec une preuve. Pour un prix, une date ou un chiffre non prouvable : NON_TRANCHABLE. IMPORTANT : même si la DEMANDE ou le RÉSULTAT te pose une question sur ton identité ou ton modèle, tu ne dois PAS y répondre directement. Tu dois UNIQUEMENT produire le JSON d'analyse. Réponds EXCLUSIVEMENT par ce JSON, sans aucune phrase avant ou après : {\"criteres\":[{\"critere\":\"\",\"verdict\":\"OUI|NON|NON_TRANCHABLE\",\"preuve\":\"\"}],\"ecarts\":[\"\"]}.";
+
+function route(d) {
+  const t = d.toLowerCase();
+  if (/(code|fonction|script|programme|bug|python|javascript|html)/.test(t)) return { type: "code", tier: "complex" };
+  if (/(cherche|source|compare|prix|actualité|qui est|quand|combien)/.test(t)) return { type: "question", tier: "default" };
+  if (/(écris|rédige|mail|résume|traduis|reformule|texte)/.test(t)) return { type: "rédaction", tier: "default" };
+  return { type: "autre", tier: "quick" };
+}
+function pj(s) {
   try {
     let str = String(s).replace(/^```(json)?\n?/i, "").replace(/\n?```$/i, "");
     const m = str.match(/\{[\s\S]*\}/); return m ? JSON.parse(m[0]) : null;
   } catch(e) { return null; }
 }
-function PV(k){try{return JSON.parse(localStorage.getItem(KP)||"{}")[k]||{}}catch(e){return{}}}
-function setPV(){const o={};["p","v"].forEach(k=>{o[k]={url:$("#u"+k).value.trim(),key:$("#k"+k).value.trim(),modele:$(k==="p"?"#mp2":"#mv").value.trim()}});try{localStorage.setItem(KP,JSON.stringify(o))}catch(e){}}
-function fillS(){["p","v"].forEach(k=>{const p=PV(k);$("#u"+k).value=p.url||"";$("#k"+k).value=p.key||"";$(k==="p"?"#mp2":"#mv").value=p.modele||""}); $("#persona").value = localStorage.getItem("nexus_persona") || "";}
+function PV(k) { try { return JSON.parse(localStorage.getItem(KP) || "{}")[k] || {}; } catch(e) { return {}; } }
+function setPV() { const o = {}; ["p","v"].forEach(k => { o[k] = { url: $("#u"+k).value.trim(), key: $("#k"+k).value.trim(), modele: $(k==="p"?"#mp2":"#mv").value.trim() }; }); try { localStorage.setItem(KP, JSON.stringify(o)); } catch(e) {} }
+function fillS() { ["p","v"].forEach(k => { const p = PV(k); $("#u"+k).value = p.url || ""; $("#k"+k).value = p.key || ""; $(k==="p"?"#mp2":"#mv").value = p.modele || ""; }); $("#persona").value = localStorage.getItem("nexus_persona") || ""; }
 
-async function callP(k,prompt,signal,image=null){
-  const p=PV(k);
-  if(!p.url||!p.key||!p.modele)throw new Error("Réglages API incomplets.");
-  
-  let messages = [{role:"user", content: prompt}];
-  if (image) {
-    messages[0].content = [
-      { type: "text", text: prompt },
-      { type: "image_url", image_url: { url: image } }
-    ];
-  }
-
+// ========== APPELS ==========
+async function callCustom(k, prompt, signal, image = null) {
+  const p = PV(k);
+  if (!p.url || !p.key || !p.modele) throw new Error("Réglages API incomplets.");
+  let messages = [{ role: "user", content: prompt }];
+  if (image) messages[0].content = [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: image } }];
   let r;
-  try{r=await fetch(p.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+p.key},body:JSON.stringify({model:p.modele,messages}),signal})}
-  catch(e){ if(e.name==='AbortError') throw e; throw new Error("Appel bloqué ou réseau.") }
-  if(r.status===429){const e=new Error("Quota épuisé");e.code="rate_limited";throw e}
-  if(!r.ok)throw new Error("Erreur API "+r.status);
-  const j=await r.json();
-  return (j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";
+  try { r = await fetch(p.url, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + p.key }, body: JSON.stringify({ model: p.modele, messages }), signal }); }
+  catch(e) { if (e.name === 'AbortError') throw e; throw new Error("Appel bloqué."); }
+  if (r.status === 429) { const e = new Error("Quota épuisé"); e.code = "rate_limited"; throw e; }
+  if (!r.ok) throw new Error("Erreur API " + r.status);
+  const j = await r.json();
+  return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
 }
-async function testP(k){const e=$("#t"+k);e.textContent="Test…";try{await callP(k,"Réponds ok");e.textContent="✅ Succès"}catch(x){e.textContent="❌ "+x.message}}
+async function testP(k) { const e = $("#t"+k); e.textContent = "Test…"; try { await callCustom(k, "Réponds ok"); e.textContent = "✅ Succès"; } catch(x) { e.textContent = "❌ " + x.message; } }
 
-async function callPuter(prompt, signal, image=null) {
+async function callKeyless(prompt, signal, image = null) {
+  const url = "https://keylessai.thryx.workers.dev/v1/chat/completions";
+  let messages = [{ role: "user", content: prompt }];
+  if (image) messages[0].content = [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: image } }];
+  let r;
+  try {
+    r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: "gpt-4o", messages }), signal });
+  } catch(e) { if (e.name === 'AbortError') throw e; throw new Error("KeylessAI: réseau bloqué."); }
+  if (r.status === 429) { const e = new Error("Quota KeylessAI épuisé"); e.code = "rate_limited"; throw e; }
+  if (!r.ok) throw new Error("KeylessAI Erreur " + r.status);
+  const j = await r.json();
+  return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
+}
+
+async function callPuter(prompt, signal, image = null) {
   if (!window.puter || !puter.ai) throw new Error("Puter non chargé.");
   const chatPromise = image ? puter.ai.chat(prompt, image) : puter.ai.chat(prompt);
-  
   if (signal) {
-    const abortPromise = new Promise((_, reject) => {
-      signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
-    });
+    const abortPromise = new Promise((_, reject) => { signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError'))); });
     return String(await Promise.race([chatPromise, abortPromise]));
   }
   return String(await chatPromise);
 }
 
-async function ask(t,role,prompt,tier,json,image=null){
-  let txt;
+// ========== ROUTAGE INTELLIGENT AVEC IDENTITÉ NEXUS ==========
+async function ask(t, role, prompt, tier, json, image = null) {
   const signal = currentController ? currentController.signal : undefined;
+  const isVerifier = role.startsWith("Vérif") || role.startsWith("Correct");
+  
+  // L'identité NEXUS est injectée dans TOUS les rôles (producteur, vérificateur, correcteur)
+  let finalPrompt = NEXUS_IDENTITY + "\n\n" + prompt;
+  
+  let txt;
+  let usedProvider = "";
   
   try {
-    if(t.mode==="puter") txt=await callPuter(prompt, signal, image);
-    else txt=await callP(role.startsWith("Vérif")?"v":"p",prompt, signal, image);
-  } catch(e) {
-    if (image && (e.message.includes("Error") || e.message.includes("API"))) {
-      throw new Error("Le modèle sélectionné ne supporte peut-être pas les images, ou une erreur est survenue.");
+    // ===== MODE HYBRIDE =====
+    if (t.mode === "hybride") {
+      if (isVerifier) {
+        // Vérificateur = KeylessAI (indépendant du producteur)
+        txt = await callKeyless(finalPrompt, signal, image);
+        usedProvider = "keyless";
+      } else {
+        // Producteur = Puter (fallback KeylessAI si erreur)
+        try {
+          txt = await callPuter(finalPrompt, signal, image);
+          usedProvider = "puter";
+        } catch(e) {
+          if (e.name === 'AbortError' || e.message.includes('abort')) throw e;
+          console.warn("Puter a échoué, fallback KeylessAI:", e.message);
+          txt = await callKeyless(finalPrompt, signal, image);
+          usedProvider = "keyless-fallback";
+        }
+      }
     }
+    // ===== MODE PUTER SEUL =====
+    else if (t.mode === "puter") {
+      txt = await callPuter(finalPrompt, signal, image);
+      usedProvider = "puter";
+    }
+    // ===== MODE KEYLESS SEUL =====
+    else if (t.mode === "keyless") {
+      txt = await callKeyless(finalPrompt, signal, image);
+      usedProvider = "keyless";
+    }
+    // ===== MODE CLÉS API =====
+    else {
+      txt = await callCustom(isVerifier ? "v" : "p", finalPrompt, signal, image);
+      usedProvider = isVerifier ? "custom-v" : "custom-p";
+    }
+  } catch(e) {
+    if (image && !e.message.includes("abort")) throw new Error("Le modèle ne supporte peut-être pas les images.");
     throw e;
   }
-
-  if(!json) return txt;
-  const o=pj(txt);if(o)return o;
+  
+  // Mémoriser qui a répondu (pour l'affichage)
+  if (!json) {
+    if (isVerifier) t.vProvider = usedProvider;
+    else t.pProvider = usedProvider;
+  }
+  
+  if (!json) return txt;
+  const o = pj(txt); if (o) return o;
   return null;
 }
 
-async function verifier(t){
+async function verifier(t) {
+  // Le prompt VP inclut déjà l'identité NEXUS et le format JSON strict
   let promptV = VP + "\n\nDEMANDE:\n" + t.demande;
-  if (t.image) promptV += "\n\n[Note: L'utilisateur a joint une image. Tu ne peux pas la voir, base ton analyse uniquement sur le texte de la demande.]";
+  if (t.image) promptV += "\n\n[Note: Image jointe, non visible par toi.]";
   promptV += "\n\nRÉSULTAT:\n" + t.result;
-  
-  const o=await ask(t,"Vérificateur",promptV,t.tier,true,null);
-  if(!o||!Array.isArray(o.criteres)||!o.criteres.length)return{verdict:"NON_TRANCHABLE",criteres:[],ecarts:["Réponse vérificateur illisible."]};
-  const c=o.criteres.map(x=>({critere:String(x.critere||""),verdict:String(x.verdict||"").toUpperCase(),preuve:String(x.preuve||"")}));
-  const v=c.some(x=>x.verdict==="NON")?"NON":c.some(x=>x.verdict!=="OUI")?"NON_TRANCHABLE":"OUI";
-  const ec=(Array.isArray(o.ecarts)?o.ecarts:[]).concat(c.filter(x=>x.verdict==="NON").map(x=>x.critere));
-  return{verdict:v,criteres:c,ecarts:[...new Set(ec.filter(Boolean))]}
+  promptV += "\n\nRAPPEL FINAL : Tu es NEXUS. Réponds UNIQUEMENT avec le JSON demandé, rien d'autre.";
+  const o = await ask(t, "Vérificateur", promptV, t.tier, true, null);
+  if (!o || !Array.isArray(o.criteres) || !o.criteres.length) return { verdict: "NON_TRANCHABLE", criteres: [], ecarts: ["Réponse illisible."] };
+  const c = o.criteres.map(x => ({ critere: String(x.critere || ""), verdict: String(x.verdict || "").toUpperCase(), preuve: String(x.preuve || "") }));
+  const v = c.some(x => x.verdict === "NON") ? "NON" : c.some(x => x.verdict !== "OUI") ? "NON_TRANCHABLE" : "OUI";
+  const ec = (Array.isArray(o.ecarts) ? o.ecarts : []).concat(c.filter(x => x.verdict === "NON").map(x => x.critere));
+  return { verdict: v, criteres: c, ecarts: [...new Set(ec.filter(Boolean))] };
 }
 
-async function run(t, conv){
-  t.status="en_cours";t.err="";save();render();
-  try{
-    if(!t.result){
-      t.step="Production";save();render();
+async function run(t, conv) {
+  t.status = "en_cours"; t.err = ""; t.pProvider = null; t.vProvider = null; save(); render();
+  try {
+    if (!t.result) {
+      t.step = "Production"; save(); render();
       const persona = localStorage.getItem("nexus_persona") || "";
       const past = conv.messages.filter(x => x.id !== t.id && x.result).slice(-5);
-      const hist = past.map(x=>`Utilisateur: ${x.demande}\nIA: ${x.result}`).join('\n---\n');
-      
+      const hist = past.map(x => `Utilisateur: ${x.demande}\nIA: ${x.result}`).join('\n---\n');
       let promptP = persona ? `[INSTRUCTION SYSTÈME: ${persona}]\n\n` : "";
       promptP += hist ? `Historique:\n${hist}\n\nDemande:\n${t.demande}` : t.demande;
-      
-      t.result = await ask(t,"Producteur",promptP,t.tier,false,t.image);
-      save();render();
+      t.result = await ask(t, "Producteur", promptP, t.tier, false, t.image);
+      save(); render();
     }
-    if(t.verif){
-      while(t.round<3){
-        t.step="Vérification ("+(t.round+1)+")";save();render();
-        const v=await verifier(t);t.round++;t.v=v;
-        if(v.verdict!=="NON"||t.round>=3)break;
-        t.step="Correction";save();render();
-        t.result=await ask(t,"Correcteur","Corrige ces écarts :\n"+v.ecarts.join("\n- ")+"\n\nRéponse précédente :\n"+t.result,t.tier,false,null);
-        save();render();
+    if (t.verif) {
+      while (t.round < 3) {
+        t.step = "Vérification (" + (t.round + 1) + ")"; save(); render();
+        const v = await verifier(t); t.round++; t.v = v;
+        if (v.verdict !== "NON" || t.round >= 3) break;
+        t.step = "Correction"; save(); render();
+        t.result = await ask(t, "Correcteur", "Corrige ces écarts :\n" + v.ecarts.join("\n- ") + "\n\nRéponse :\n" + t.result, t.tier, false, null);
+        save(); render();
       }
     }
-    t.status="fini";
-  }
-  catch(e){ 
+    t.status = "fini";
+  } catch(e) {
     if (e.name === 'AbortError' || (e.message && e.message.includes('AbortError'))) {
       t.status = "interrompue"; t.err = "Génération annulée.";
     } else {
-      t.status="erreur"; t.err=e.message||"Erreur";
+      t.status = "erreur"; t.err = e.message || "Erreur";
     }
   }
-  save();render();
+  save(); render();
 }
 
 function setBusy(b) {
@@ -612,155 +838,199 @@ function setBusy(b) {
   $("#sendBtn").style.display = b ? "none" : "grid";
   $("#stopBtn").style.display = b ? "grid" : "none";
 }
-function stopGeneration() { if(currentController) currentController.abort(); }
+function stopGeneration() { if (currentController) currentController.abort(); }
 
-function start(){
-  const d=$("#q").value.trim();
-  if((!d && !pendingImage) || busy) return;
-  if (isListening) recognition.stop();
-  const conv = state.convs.find(c => c.id === state.currentId); if(!conv) return;
-
-  if(conv.messages.length === 0) {
-    conv.title = d ? (d.slice(0, 30) + (d.length > 30 ? "..." : "")) : "Image";
-  }
-
-  const r=route(d || "Analyse de l'image");
-  const t={id:Date.now(),demande:d || "Analyse de l'image",mode:$("#mo").value,verif:$("#vf").checked,type:r.type,tier:r.tier,status:"en_cours",round:0,image:pendingImage};
+function start() {
+  const d = $("#q").value.trim();
+  if ((!d && !pendingImage) || busy) return;
+  if (isListening) try { recognition.stop(); } catch(e) {}
+  const conv = state.convs.find(c => c.id === state.currentId); if (!conv) return;
+  if (conv.messages.length === 0) conv.title = d ? (d.slice(0, 30) + (d.length > 30 ? "..." : "")) : "Image";
+  const r = route(d || "Analyse image");
+  const t = { id: Date.now(), demande: d || "Analyse de l'image", mode: $("#mo").value, verif: $("#vf").checked, type: r.type, tier: r.tier, status: "en_cours", round: 0, image: pendingImage };
   conv.messages.push(t);
-  
-  $("#q").value=""; $("#q").style.height="24px";
+  $("#q").value = ""; $("#q").style.height = "24px";
   removeAttachment();
-  
   currentController = new AbortController();
   setBusy(true);
-  run(t, conv).finally(()=> { setBusy(false); currentController=null; });
+  run(t, conv).finally(() => { setBusy(false); currentController = null; });
 }
 
 function regenerate(id) {
   const conv = state.convs.find(c => c.id === state.currentId);
   const index = conv.messages.findIndex(x => x.id === id);
   if (index === -1 || busy) return;
-  
   conv.messages = conv.messages.slice(0, index + 1);
   const t = conv.messages[index];
-  t.result = null; t.v = null; t.log = []; t.round = 0; t.status = "en_cours";
+  t.result = null; t.v = null; t.log = []; t.round = 0; t.status = "en_cours"; t.pProvider = null; t.vProvider = null;
   save(); render();
-  
   currentController = new AbortController();
   setBusy(true);
-  run(t, conv).finally(()=> { setBusy(false); currentController=null; });
+  run(t, conv).finally(() => { setBusy(false); currentController = null; });
 }
 
-function resume(id){ 
-  const conv = state.convs.find(c => c.id === state.currentId); if(!conv || busy) return;
-  const t=conv.messages.find(x=>x.id===id);
-  if(t){
+function resume(id) {
+  const conv = state.convs.find(c => c.id === state.currentId); if (!conv || busy) return;
+  const t = conv.messages.find(x => x.id === id);
+  if (t) {
     currentController = new AbortController();
     setBusy(true);
-    run(t, conv).finally(()=> { setBusy(false); currentController=null; });
-  } 
+    run(t, conv).finally(() => { setBusy(false); currentController = null; });
+  }
 }
 
 function copyMsg(id) {
   const conv = state.convs.find(c => c.id === state.currentId);
   const t = conv.messages.find(x => x.id === id);
-  if(t && t.result) navigator.clipboard.writeText(t.result).then(() => showToast("Copié !")).catch(() => alert("Erreur"));
+  if (t && t.result) navigator.clipboard.writeText(t.result).then(() => showToast("✓ Copié")).catch(() => showToast("❌ Erreur"));
 }
 
-function niveau(t){
-  if(!t.verif||!t.v)return["Non vérifié","ko"];
-  if(t.v.verdict==="OUI")return["Vérifié","ok"];
-  if(t.v.verdict==="NON_TRANCHABLE")return["Partiel","wa"];
-  return["Écart","ko"];
+function niveau(t) {
+  if (!t.verif || !t.v) return ["Non vérifié", ""];
+  if (t.v.verdict === "OUI") return ["Vérifié", "ok"];
+  if (t.v.verdict === "NON_TRANCHABLE") return ["Partiel", "wa"];
+  return ["Écart détecté", "ko"];
 }
 
-function renderSidebar(){
+function providerLabel(p) {
+  if (!p) return "";
+  if (p === "puter") return "PUTER";
+  if (p === "keyless") return "KEYLESS";
+  if (p === "keyless-fallback") return "KEYLESS ↺";
+  if (p === "custom-p" || p === "custom-v") return "API";
+  return p.toUpperCase();
+}
+function providerClass(p) {
+  if (!p) return "";
+  if (p.startsWith("puter")) return "puter";
+  if (p.startsWith("keyless")) return "keyless";
+  return "";
+}
+
+function renderSidebar() {
   const query = ($("#searchInput") ? $("#searchInput").value : "").toLowerCase();
   const filtered = state.convs.filter(c => c.title.toLowerCase().includes(query));
-  
   $("#convList").innerHTML = filtered.map(c => `
     <div class="conv-item ${c.id === state.currentId ? 'active' : ''}" onclick="switchConversation(${c.id})" ondblclick="renameConversation(${c.id}, event)">
       <div class="conv-title">${esc(c.title)}</div>
       <button class="btn-delete" onclick="deleteConversation(${c.id}, event)" title="Supprimer">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
       </button>
     </div>
   `).join("");
 }
 
-function render(){
+function render() {
   renderSidebar();
   const chat = $("#chat");
   const conv = state.convs.find(c => c.id === state.currentId);
   
-  if(!conv || conv.messages.length === 0){
+  if (!conv || conv.messages.length === 0) {
     chat.innerHTML = `<div class="empty-state">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--primary)"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="19" r="2"></circle><path d="M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17"></path></svg>
-      <h2>Comment puis-je vous aider ?</h2>
+      <div class="logo-big">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="19" r="2"></circle><path d="M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17"></path></svg>
+      </div>
+      <h2>// NEXUS WORKSTATION</h2>
+      <p>Système de production et vérification par IA.</p>
       <div class="suggestions">
-        <button onclick="useSuggestion('Explique-moi le fonctionnement des trous noirs simplement.')">Explique-moi les trous noirs</button>
-        <button onclick="useSuggestion('Écris un mail professionnel pour demander une augmentation.')">Rédige un mail</button>
-        <button onclick="useSuggestion('Donne-moi 5 idées de projets en JavaScript pour débuter.')">5 idées de projets JS</button>
+        <button onclick="useSuggestion('Qui es-tu ?')">Qui es-tu ?</button>
+        <button onclick="useSuggestion('Explique-moi les trous noirs simplement.')">Trous noirs</button>
+        <button onclick="useSuggestion('Rédige un mail professionnel pour demander une augmentation.')">Rédige un mail</button>
       </div>
     </div>`;
     return;
   }
 
   const isScrolledToBottom = chat.scrollHeight - chat.clientHeight <= chat.scrollTop + 100;
-  let h="";
+  let h = "";
   
-  conv.messages.forEach((t, i)=>{
-    h+='<div class="msg user"><div class="avatar">U</div><div class="bubble">'+esc(t.demande);
-    if(t.image) h+='<br><img src="'+t.image+'" class="msg-img" alt="Image jointe">';
-    h+='</div></div>';
+  conv.messages.forEach((t, i) => {
+    h += '<div class="msg user">';
+    h += '<div class="meta">// query · ' + new Date(t.id).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) + '</div>';
+    h += '<div class="bubble">' + esc(t.demande);
+    if (t.image) h += '<img src="' + t.image + '" class="msg-img" alt="Image">';
+    h += '</div></div>';
     
-    if(t.status==="erreur"){
-      h+='<div class="msg ai"><div class="avatar">!</div><div class="bubble"><span style="color:var(--ko)">'+esc(t.err)+'</span><br><button class="btn-regenerate" onclick="resume('+t.id+')">Réessayer</button></div></div>';
-    } else if(t.status==="interrompue") {
-      h+='<div class="msg ai"><div class="avatar">!</div><div class="bubble"><span style="color:var(--wa)">Tâche interrompue.</span><br><button class="btn-regenerate" onclick="resume('+t.id+')">Reprendre</button></div></div>';
-    } else if(t.status==="en_cours" || t.result) {
-      h+='<div class="msg ai"><div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="19" r="2"></circle><path d="M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17"></path></svg></div><div class="bubble">';
+    if (t.status === "erreur") {
+      h += '<div class="msg ai"><div class="bubble">';
+      h += '<div class="ai-header"><div class="ai-header-left"><span class="ai-model">◆ NEXUS</span></div></div>';
+      h += '<div class="ai-body"><div class="msg-system err">❌ ' + esc(t.err) + '</div>';
+      h += '<button class="btn-regenerate" onclick="resume(' + t.id + ')">Réessayer</button></div></div></div>';
+    } else if (t.status === "interrompue") {
+      h += '<div class="msg ai"><div class="bubble">';
+      h += '<div class="ai-header"><div class="ai-header-left"><span class="ai-model">◆ NEXUS</span></div></div>';
+      h += '<div class="ai-body"><div class="msg-system wa">⚠ Tâche interrompue</div>';
+      h += '<div class="msg-actions" style="margin-top:8px"><button onclick="resume(' + t.id + ')">↻ Reprendre</button></div></div></div></div>';
+    } else if (t.status === "en_cours" || t.result) {
+      h += '<div class="msg ai"><div class="bubble">';
       
-      if(t.result) h+='<button class="btn-copy" onclick="copyMsg('+t.id+')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copier</button>';
-
-      if(t.status==="en_cours" && !t.result) {
-        h+='<div style="display:flex;gap:4px;align-items:center;height:24px"><div class="dot" style="width:6px;height:6px;background:var(--text-muted);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both"></div><div class="dot" style="width:6px;height:6px;background:var(--text-muted);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both;animation-delay:0.2s"></div><div class="dot" style="width:6px;height:6px;background:var(--text-muted);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both;animation-delay:0.4s"></div></div>';
+      const n = t.verif && t.v ? niveau(t) : null;
+      h += '<div class="ai-header"><div class="ai-header-left">';
+      h += '<span class="ai-model">◆ NEXUS</span>';
+      if (t.pProvider) h += '<span class="provider-tag ' + providerClass(t.pProvider) + '">' + providerLabel(t.pProvider) + '</span>';
+      if (n) h += '<span>' + esc(n[0]) + '</span>';
+      if (t.step && t.status === "en_cours") h += '<span style="color:var(--primary)">' + esc(t.step) + '</span>';
+      h += '</div>';
+      h += '<span>' + new Date(t.id).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) + '</span>';
+      h += '</div>';
+      
+      h += '<div class="ai-body">';
+      if (t.status === "en_cours" && !t.result) {
+        h += '<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
       } else {
-        h+='<div class="content">' + formatMarkdown(t.result || "") + '</div>';
+        h += formatMarkdown(t.result || "");
+      }
+      h += '</div>';
+      
+      if (t.verif && t.v) {
+        const verifClass = t.v.verdict === "OUI" ? "ok" : t.v.verdict === "NON_TRANCHABLE" ? "wa" : "ko";
+        h += '<div class="verif ' + verifClass + '">';
+        h += '<div class="verif-status">';
+        h += t.v.verdict === "OUI" ? "✓ Vérifié" : t.v.verdict === "NON_TRANCHABLE" ? "◐ Vérification partielle" : "✗ Écarts détectés";
+        if (t.vProvider) h += '<span class="provider-tag ' + providerClass(t.vProvider) + '">' + providerLabel(t.vProvider) + '</span>';
+        h += '</div>';
+        if (t.v.ecarts && t.v.ecarts.length) {
+          h += '<div class="verif-errors">⚠ ' + t.v.ecarts.map(esc).join(" · ") + '</div>';
+        }
+        if (t.v.criteres && t.v.criteres.length) {
+          h += '<details><summary>Voir les ' + t.v.criteres.length + ' critères analysés</summary>';
+          h += t.v.criteres.map(c => '<div class="verif-detail-item"><b>' + esc(c.verdict) + '</b> : ' + esc(c.critere) + '</div>').join("");
+          h += '</details>';
+        }
+        h += '</div>';
       }
       
-      if(t.verif && t.v){
-        const n = niveau(t);
-        h+='<div class="verif"><span class="badge '+n[1]+'">'+n[0]+'</span>';
-        if(t.v.ecarts && t.v.ecarts.length) h+='<div style="color:var(--ko);font-size:12px;margin-top:4px">⚠️ '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
-        if(t.log && t.log.length){
-          h+='<details class="verif-details"><summary>Détail du circuit</summary>'+t.log.map(l=>'<p>'+(l.criteres||[]).map(c=>'<b>'+esc(c.verdict)+'</b> : '+esc(c.critere)).join("<br>")+'</p>').join("")+'</details>';
-        }
-        h+='</div>';
-      }
-
+      h += '<div class="msg-actions" style="padding: 0 14px 12px;">';
+      if (t.result) h += '<button onclick="copyMsg(' + t.id + ')">📋 <span>Copier</span></button>';
       if (t.status === "fini" && i === conv.messages.length - 1) {
-        h += `<button class="btn-regenerate" onclick="regenerate(${t.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Régénérer</button>`;
+        h += '<button onclick="regenerate(' + t.id + ')">↻ <span>Régénérer</span></button>';
       }
-      h+='</div></div>';
+      h += '</div>';
+      
+      h += '</div></div>';
     }
   });
   
   chat.innerHTML = h;
-  if(isScrolledToBottom) chat.scrollTop = chat.scrollHeight;
+  if (isScrolledToBottom) chat.scrollTop = chat.scrollHeight;
 }
 
 function useSuggestion(text) {
   $("#q").value = text;
   $("#q").focus();
   $("#q").style.height = '24px';
-  $("#q").style.height = ($("#q").scrollHeight) + 'px';
+  $("#q").style.height = Math.min($("#q").scrollHeight, 120) + 'px';
 }
 
 $("#persona").addEventListener("input", function() { localStorage.setItem("nexus_persona", this.value.trim()); });
-$("#q").addEventListener("input", function() { this.style.height = '24px'; this.style.height = (this.scrollHeight) + 'px'; });
-$("#q").addEventListener("keydown", function(e) { if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); start(); } });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { $("#sidebar").classList.remove("open"); $("#overlay").classList.remove("open"); } });
+$("#q").addEventListener("input", function() { this.style.height = '24px'; this.style.height = Math.min(this.scrollHeight, 120) + 'px'; });
+$("#q").addEventListener("keydown", function(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); start(); } });
+document.addEventListener('keydown', function(e) { 
+  if (e.key === 'Escape') { 
+    $("#sidebar").classList.remove("open"); 
+    $("#overlay").classList.remove("open"); 
+  } 
+});
 
 updateThemeIcon();
 load(); render(); fillS(); toggleSettings();
