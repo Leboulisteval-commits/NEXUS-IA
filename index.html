@@ -1,187 +1,312 @@
-<script src="https://js.puter.com/v2/"></script>
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8">
+<html lang="fr">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NEXUS AI</title>
+<title>NEXUS AI — Vérification croisée par IA</title>
+<meta name="description" content="NEXUS AI : un producteur IA rédige, un vérificateur indépendant contrôle. Vérification croisée des réponses IA, mode clés API ou manuel.">
+<link rel="canonical" href="https://leboulisteval-commits.github.io/NEXUS-IA/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NEXUS AI — Vérification croisée par IA">
+<meta property="og:description" content="Un producteur IA rédige, un vérificateur indépendant contrôle.">
+<meta property="og:url" content="https://leboulisteval-commits.github.io/NEXUS-IA/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧠%3C/text%3E%3C/svg%3E">
+<script src="https://js.puter.com/v2/" defer></script>
 <style>
-:root{--bg:#f6f6f3;--cd:#fff;--tx:#1c1c1a;--mu:#6b6b64;--ac:#4a49d6;--bt:#fff;--ok:#17734a;--ko:#b3261e;--wa:#a35f00;--bd:#dedcd4;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;color-scheme:dark}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{--bg:#f6f6f3;--cd:#fff;--tx:#1c1c1a;--mu:#6b6b64;--ac:#4a49d6;--bt:#fff;--ok:#17734a;--ko:#b3261e;--wa:#a35f00;--bd:#dedcd4;--wn:#fff3cd;--wt:#664d03;--wb:#ffecb5;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;--wn:#3a2f14;--wt:#ffd98a;--wb:#5a4a20;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;--wn:#3a2f14;--wt:#ffd98a;--wb:#5a4a20;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,system-ui,"Segoe UI",sans-serif}
-main{max-width:720px;margin:0 auto;padding:14px 14px 40px}
+html{scroll-padding-top:1rem}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+header,main,footer{max-width:720px;margin:0 auto;padding-left:14px;padding-right:14px}
+header{padding-top:14px}
+main{padding-bottom:24px}
+footer{padding-bottom:40px;color:var(--mu);font-size:13px}
 h1{font-size:22px;margin:4px 0 2px}
 .c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
 .mu{color:var(--mu);font-size:14px}
 textarea,select,input{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:6px 0}
 textarea{min-height:90px;resize:vertical}
-button{font:inherit;background:var(--ac);color:var(--bt);border:0;border-radius:10px;padding:10px 14px;margin:4px 6px 4px 0}
+button{font:inherit;background:var(--ac);color:var(--bt);border:0;border-radius:10px;padding:10px 14px;margin:4px 6px 4px 0;cursor:pointer}
 button.s{background:var(--bd);color:var(--tx)}
+button:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 .bn{border-left:4px solid var(--wa);background:var(--bg);padding:10px;border-radius:8px;margin:8px 0}
 .bn.ok{border-color:var(--ok)}.bn.ko{border-color:var(--ko)}
+.warn{background:var(--wn);color:var(--wt);border:1px solid var(--wb);padding:10px 12px;border-radius:10px;margin:12px 0;font-size:14px}
 pre{white-space:pre-wrap;word-wrap:break-word;font:inherit;margin:8px 0}
 .res{background:var(--bg);padding:10px;border-radius:10px}
-.j{display:block;width:100%;text-align:left;background:var(--bg);color:var(--tx);border:1px solid var(--bd)}
-label{display:block;margin:6px 0}
-input[type="checkbox"]{width:auto;margin:0 8px 0 0}
-</style></head><body><main>
-<h1>NEXUS AI</h1>
-<div class="mu">Vous demandez. Le système choisit, fait produire, puis fait vérifier par une autre IA.</div>
+.j{display:block;width:100%;text-align:left;background:var(--bg);color:var(--tx);border:1px solid var(--bd);margin:4px 0}
+label{display:block;margin:8px 0 2px;font-size:14px;color:var(--mu)}
+label.chk{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:16px;margin:8px 0}
+label.chk input{width:auto;margin:0}
+summary{cursor:pointer;font-weight:600}
+#messages{height:220px;overflow-y:auto;border:1px solid var(--bd);background:var(--bg);border-radius:10px;padding:10px;margin:8px 0}
+.msg{margin:6px 0;word-wrap:break-word}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>NEXUS AI</h1>
+  <div class="mu">Vous demandez. Le système choisit, fait produire, puis fait vérifier par une autre IA.</div>
+</header>
+
+<main>
+
+<div class="warn" role="note">
+  ⚠️ <strong>Usage personnel uniquement.</strong> Les clés API sont stockées dans <em>ce navigateur</em> (localStorage). N’utilisez pas cette page sur un ordinateur partagé.
+</div>
+
 <section class="c">
-<textarea id="q" placeholder="Que voulez-vous demander ?"></textarea>
-<select id="mo"><option value="cles">Clés API (fournisseurs gratuits)</option><option value="manuel">Manuel (je colle entre mes IA gratuites)</option></select>
-<label><input type="checkbox" id="vf" checked> Faire vérifier par une autre IA</label>
-<button onclick="start()">Envoyer</button>
+  <label for="q">Votre demande</label>
+  <textarea id="q" placeholder="Que voulez-vous demander ?"></textarea>
+  <label for="mo">Mode</label>
+  <select id="mo">
+    <option value="cles">Clés API (fournisseurs gratuits)</option>
+    <option value="manuel">Manuel (je colle entre mes IA gratuites)</option>
+  </select>
+  <label class="chk"><input type="checkbox" id="vf" checked> Faire vérifier par une autre IA</label>
+  <button type="button" onclick="start()">Envoyer</button>
 </section>
-<details class="c"><summary>Réglages : mes IA (clés API)</summary>
-<p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur, jamais dans le fichier. Les adresses proposées sont à vérifier dans la documentation de chaque fournisseur.</p>
-<datalist id="dl"><option value="https://api.groq.com/openai/v1/chat/completions"><option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"><option value="https://api.mistral.ai/v1/chat/completions"><option value="https://openrouter.ai/api/v1/chat/completions"></datalist>
-<b>Producteur</b><input id="up" list="dl" placeholder="Adresse de l’API"><input id="kp" type="password" placeholder="Clé API"><input id="mp2" placeholder="Nom du modèle (voir la documentation)"><button class="s" onclick="setPV();testP('p')">Enregistrer et tester</button><div class="mu" id="tp"></div>
-<b>Vérificateur</b><input id="uv" list="dl" placeholder="Adresse de l’API"><input id="kv" type="password" placeholder="Clé API"><input id="mv" placeholder="Nom du modèle"><button class="s" onclick="setPV();testP('v')">Enregistrer et tester</button><div class="mu" id="tv"></div></details>
-<div id="out"></div>
-<section class="c"><b>Journal</b><div id="jr"></div></section>
-<details class="c"><summary>Limites à connaître</summary>
-<p class="mu">Certains fournisseurs refusent les appels depuis un navigateur : le bouton « tester » vous le dit. Les clés sont stockées dans ce navigateur : usage personnel seulement, sur votre propre téléphone. Ne mettez jamais une clé dans le fichier. « Conforme à la demande » ne veut pas dire « vrai » ; un prix, une date ou un stock sans source restent non tranchables.</p>
-<p class="mu">L’application ne travaille pas onglet fermé : rouvrez-la et touchez « Reprendre ». Aucune donnée sensible. Image, voix, vidéo et achat vérifié ne sont pas inclus.</p></details>
+
+<details class="c">
+  <summary>Démo rapide — discuter sans clé (Puter)</summary>
+  <p class="mu">Fonctionne sans configuration. À utiliser pour tester, pas pour la vérification croisée.</p>
+  <div id="messages" aria-live="polite"><div class="msg"><strong>NEXUS AI :</strong> Posez une question pour tester.</div></div>
+  <div style="display:flex;gap:8px;align-items:flex-start">
+    <label for="prompt" style="position:absolute;left:-9999px">Message</label>
+    <input type="text" id="prompt" placeholder="Écrivez votre message…" onkeydown="if(event.key==='Enter'){event.preventDefault();envoyerMessage()}">
+    <button type="button" onclick="envoyerMessage()">Envoyer</button>
+  </div>
+</details>
+
+<details class="c">
+  <summary>Réglages : mes IA (clés API)</summary>
+  <p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur, jamais dans le fichier. Vérifiez les adresses dans la documentation de chaque fournisseur.</p>
+  <datalist id="dl">
+    <option value="https://api.groq.com/openai/v1/chat/completions"></option>
+    <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
+    <option value="https://api.mistral.ai/v1/chat/completions"></option>
+    <option value="https://openrouter.ai/api/v1/chat/completions"></option>
+  </datalist>
+
+  <b>Producteur</b>
+  <label for="up">Adresse de l’API</label>
+  <input id="up" list="dl" placeholder="https://…">
+  <label for="kp">Clé API</label>
+  <input id="kp" type="password" placeholder="Clé API" autocomplete="off">
+  <label for="mp2">Nom du modèle</label>
+  <input id="mp2" placeholder="ex. llama-3.1-8b-instant" autocomplete="off">
+  <button type="button" class="s" onclick="setPV();testP('p')">Enregistrer et tester</button>
+  <div class="mu" id="tp" aria-live="polite"></div>
+
+  <b>Vérificateur</b>
+  <label for="uv">Adresse de l’API</label>
+  <input id="uv" list="dl" placeholder="https://…">
+  <label for="kv">Clé API</label>
+  <input id="kv" type="password" placeholder="Clé API" autocomplete="off">
+  <label for="mv">Nom du modèle</label>
+  <input id="mv" placeholder="ex. mistral-small-latest" autocomplete="off">
+  <button type="button" class="s" onclick="setPV();testP('v')">Enregistrer et tester</button>
+  <div class="mu" id="tv" aria-live="polite"></div>
+
+  <p><button type="button" class="s" onclick="clearKeys()">Effacer les clés enregistrées</button></p>
+</details>
+
+<div id="out" aria-live="polite"></div>
+
+<section class="c">
+  <b>Journal</b>
+  <div id="jr"></div>
+  <p><button type="button" class="s" onclick="clearJournal()">Effacer le journal</button></p>
+</section>
+
+<details class="c">
+  <summary>Limites à connaître</summary>
+  <p class="mu">Certains fournisseurs refusent les appels depuis un navigateur : le bouton « tester » vous le dit. Les clés sont stockées dans ce navigateur : usage personnel seulement. Ne mettez jamais une clé dans le fichier. « Conforme à la demande » ne veut pas dire « vrai » ; un prix, une date ou un stock sans source restent non tranchables.</p>
+  <p class="mu">L’application ne travaille pas onglet fermé : rouvrez-la et touchez « Reprendre ». Image, voix, vidéo et achat vérifié ne sont pas inclus.</p>
+</details>
+
 </main>
+
+<footer>NEXUS AI — projet personnel. Aucune donnée sensible collectée.</footer>
+
 <script>
-const K="nexus_v0",TL={quick:"rapide",default:"standard",complex:"avancé"};
-let T=[],cur=null,SM=null;
+const K="nexus_v0", KP="nexus_prov";
+let T=[],cur=null;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
 function save(){try{localStorage.setItem(K,JSON.stringify(T.slice(0,30),(k,v)=>k[0]==="_"?undefined:v))}catch(e){}}
 function load(){try{T=JSON.parse(localStorage.getItem(K)||"[]")}catch(e){T=[]}
- T.forEach(t=>{if(["en_cours","attente","manuel"].includes(t.status))t.status="interrompue"})}
+  T.forEach(t=>{if(["en_cours","attente","manuel"].includes(t.status))t.status="interrompue"})}
+
 const VP="Tu es un vérificateur indépendant. Tu reçois une DEMANDE d’utilisateur et un RÉSULTAT. Question unique : le résultat correspond-il à la demande ? 1) Déduis de la demande 2 à 5 critères vérifiables. 2) Juge chaque critère : OUI, NON ou NON_TRANCHABLE, avec une preuve (calcul refait, contradiction, test logique) ou « aucune ». 3) Pour un prix, une date, un chiffre ou une citation que tu ne peux pas prouver : NON_TRANCHABLE, jamais OUI. Réponds UNIQUEMENT par ce JSON : {\"criteres\":[{\"critere\":\"\",\"verdict\":\"OUI|NON|NON_TRANCHABLE\",\"preuve\":\"\"}],\"ecarts\":[\"\"]}. Aucune phrase hors JSON. Il est interdit d’écrire « c’est solide ».";
-/* ROUTEUR (promesse A) */
+
 function route(d){const t=d.toLowerCase();
- if(/(image|photo|dessin|logo|vidéo|video|voix|audio|musique|acheter|achat|commande|panier|stock)/.test(t))return{type:"non_supporte"};
- if(/(code|fonction|script|programme|bug|python|javascript|html)/.test(t))return{type:"code",tier:"complex",why:"tâche de code : palier avancé"};
- if(/(cherche|source|compare|prix|actualité|qui est|quand|combien)/.test(t))return{type:"question",tier:"default",why:"question factuelle : palier standard (sans accès web)"};
- if(/(écris|rédige|mail|résume|traduis|reformule|texte)/.test(t))return{type:"rédaction",tier:"default",why:"rédaction : palier standard"};
- return{type:"autre",tier:"quick",why:"demande simple : palier rapide"}}
+  if(/(image|photo|dessin|logo|vidéo|video|voix|audio|musique|acheter|achat|commande|panier|stock)/.test(t))return{type:"non_supporte"};
+  if(/(code|fonction|script|programme|bug|python|javascript|html)/.test(t))return{type:"code",tier:"complex",why:"tâche de code : palier avancé"};
+  if(/(cherche|source|compare|prix|actualité|qui est|quand|combien)/.test(t))return{type:"question",tier:"default",why:"question factuelle : palier standard (sans accès web)"};
+  if(/(écris|rédige|mail|résume|traduis|reformule|texte)/.test(t))return{type:"rédaction",tier:"default",why:"rédaction : palier standard"};
+  return{type:"autre",tier:"quick",why:"demande simple : palier rapide"}}
+
 function pj(s){try{const m=String(s).match(/\{[\s\S]*\}/);return m?JSON.parse(m[0]):null}catch(e){return null}}
-/* FOURNISSEURS (format « chat completions » commun) */
-function PV(k){try{return JSON.parse(localStorage.getItem("nexus_prov")||"{}")[k]||{}}catch(e){return{}}}
-function setPV(){const o={};["p","v"].forEach(k=>{o[k]={url:$("#u"+k).value.trim(),key:$("#k"+k).value.trim(),modele:$(k==="p"?"#mp2":"#mv").value.trim()}});try{localStorage.setItem("nexus_prov",JSON.stringify(o))}catch(e){}}
+
+function PV(k){try{return JSON.parse(localStorage.getItem(KP)||"{}")[k]||{}}catch(e){return{}}}
+function setPV(){const o={};["p","v"].forEach(k=>{o[k]={url:$("#u"+k).value.trim(),key:$("#k"+k).value.trim(),modele:$(k==="p"?"#mp2":"#mv").value.trim()}});try{localStorage.setItem(KP,JSON.stringify(o))}catch(e){}}
 function fillS(){["p","v"].forEach(k=>{const p=PV(k);$("#u"+k).value=p.url||"";$("#k"+k).value=p.key||"";$(k==="p"?"#mp2":"#mv").value=p.modele||""})}
-async function callP(k,prompt){const p=PV(k);if(!p.url||!p.key||!p.modele)throw new Error("Réglages incomplets : adresse, clé et modèle sont nécessaires.");
- let r;try{r=await fetch(p.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+p.key},body:JSON.stringify({model:p.modele,messages:[{role:"user",content:prompt}]})})}
- catch(e){throw new Error("Appel bloqué ou réseau coupé : ce fournisseur n’accepte peut-être pas les appels depuis un navigateur.")}
- if(r.status===429){const e=new Error("Quota épuisé");e.code="rate_limited";throw e}
- if(!r.ok)throw new Error("Erreur "+r.status+" : "+(await r.text()).slice(0,200));
- const j=await r.json();return(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||""}
+function clearKeys(){if(!confirm("Effacer les clés API enregistrées dans ce navigateur ?"))return;try{localStorage.removeItem(KP)}catch(e){}fillS();$("#tp").textContent="";$("#tv").textContent="";}
+function clearJournal(){if(!confirm("Effacer le journal des demandes ?"))return;T=[];cur=null;save();render();}
+
+async function callP(k,prompt){
+  const p=PV(k);
+  if(!p.url||!p.key||!p.modele)throw new Error("Réglages incomplets : adresse, clé et modèle sont nécessaires.");
+  let r;
+  try{r=await fetch(p.url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+p.key},body:JSON.stringify({model:p.modele,messages:[{role:"user",content:prompt}]})})}
+  catch(e){throw new Error("Appel bloqué ou réseau coupé : ce fournisseur n’accepte peut-être pas les appels depuis un navigateur.")}
+  if(r.status===429){const e=new Error("Quota épuisé");e.code="rate_limited";throw e}
+  if(!r.ok)throw new Error("Erreur "+r.status+" : "+(await r.text()).slice(0,200));
+  const j=await r.json();
+  return (j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";
+}
 async function testP(k){const e=$("#t"+k);e.textContent="Test en cours…";try{await callP(k,"Réponds uniquement : ok");e.textContent="Connexion réussie."}catch(x){e.textContent=x.message}}
-/* FILE D’ATTENTE : patience */
+
 function wait(t,role,n){const d=[60,300,900,3600][Math.min(n,3)];
- return new Promise(res=>{t.status="attente";t.att={role,fin:Date.now()+d*1000};
-  const iv=setInterval(()=>{const s=Math.max(0,Math.round((t.att.fin-Date.now())/1000));const e=$("#cd");if(e)e.textContent=s+" s";if(s<=0)done()},1000);
-  function done(){clearInterval(iv);t._skip=null;t.status="en_cours";render();res()}
-  t._skip=done;render();save()})}
+  return new Promise(res=>{
+    t.status="attente";t.att={role,fin:Date.now()+d*1000};
+    const iv=setInterval(()=>{const s=Math.max(0,Math.round((t.att.fin-Date.now())/1000));const e=$("#cd");if(e)e.textContent=s+" s";if(s<=0)done()},1000);
+    function done(){clearInterval(iv);t._skip=null;t.status="en_cours";render();res()}
+    t._skip=done;render();save()})}
 function manual(t,role,prompt){return new Promise(res=>{t.status="manuel";t._m={role,prompt,res};render()})}
+
 async function ask(t,role,prompt,tier,json){
- for(let n=0,k=0;;){let txt;
-  if(t.mode==="manuel")txt=await manual(t,role,prompt);
-  else{try{txt=await callP(role.startsWith("Vérif")?"v":"p",prompt)}
-   catch(e){if(e&&e.code==="rate_limited"){await wait(t,role,n++);continue}throw e}}
-  if(!json)return txt;
-  const o=pj(txt);if(o)return o;
-  if(k++>=1)return null;
-  prompt+="\n\nRappel : réponds UNIQUEMENT par le JSON demandé."}}
-/* VÉRIFICATEUR (promesse B) */
+  for(let n=0,k=0;;){
+    let txt;
+    if(t.mode==="manuel")txt=await manual(t,role,prompt);
+    else{
+      try{txt=await callP(role.startsWith("Vérif")?"v":"p",prompt)}
+      catch(e){if(e&&e.code==="rate_limited"){await wait(t,role,n++);continue}throw e}
+    }
+    if(!json)return txt;
+    const o=pj(txt);if(o)return o;
+    if(k++>=1)return null;
+    prompt+="\n\nRappel : réponds UNIQUEMENT par le JSON demandé.";
+  }
+}
+
 async function verifier(t){
- const vt={quick:"default",default:"complex",complex:"default"}[t.tier]||"default";
- const o=await ask(t,"Vérificateur",VP+"\n\nDEMANDE :\n"+t.demande+"\n\nRÉSULTAT :\n"+t.result,vt,true);
- if(!o||!Array.isArray(o.criteres)||!o.criteres.length)return{verdict:"NON_TRANCHABLE",criteres:[],ecarts:["Réponse du vérificateur illisible ou sans critères."]};
- const c=o.criteres.map(x=>({critere:String(x.critere||""),verdict:String(x.verdict||"").toUpperCase(),preuve:String(x.preuve||"")}));
- const v=c.some(x=>x.verdict==="NON")?"NON":c.some(x=>x.verdict!=="OUI")?"NON_TRANCHABLE":"OUI";
- const ec=(Array.isArray(o.ecarts)?o.ecarts:[]).concat(c.filter(x=>x.verdict==="NON").map(x=>x.critere));
- return{verdict:v,criteres:c,ecarts:[...new Set(ec.filter(Boolean))]}}
-/* BOUCLE : producteur, vérificateur, correction, nouvelle vérification (3 tours max) */
+  const vt={quick:"default",default:"complex",complex:"default"}[t.tier]||"default";
+  const o=await ask(t,"Vérificateur",VP+"\n\nDEMANDE :\n"+t.demande+"\n\nRÉSULTAT :\n"+t.result,vt,true);
+  if(!o||!Array.isArray(o.criteres)||!o.criteres.length)return{verdict:"NON_TRANCHABLE",criteres:[],ecarts:["Réponse du vérificateur illisible ou sans critères."]};
+  const c=o.criteres.map(x=>({critere:String(x.critere||""),verdict:String(x.verdict||"").toUpperCase(),preuve:String(x.preuve||"")}));
+  const v=c.some(x=>x.verdict==="NON")?"NON":c.some(x=>x.verdict!=="OUI")?"NON_TRANCHABLE":"OUI";
+  const ec=(Array.isArray(o.ecarts)?o.ecarts:[]).concat(c.filter(x=>x.verdict==="NON").map(x=>x.critere));
+  return{verdict:v,criteres:c,ecarts:[...new Set(ec.filter(Boolean))]}
+}
+
 async function run(t){
- t.status="en_cours";t.err="";render();
- try{
-  if(!t.result){t.step="Production";render();t.result=await ask(t,"Producteur",t.demande,t.tier,false);save()}
-  if(t.verif){
-   while(t.round<3){
-    t.step="Vérification (tour "+(t.round+1)+")";render();
-    const v=await verifier(t);t.round++;t.v=v;t.log.push({tour:t.round,verdict:v.verdict,criteres:v.criteres,ecarts:v.ecarts});save();
-    if(v.verdict!=="NON"||t.round>=3)break;
-    t.step="Correction";render();
-    t.result=await ask(t,"Correcteur (producteur)","Voici la demande de l’utilisateur, ton résultat précédent et les écarts relevés par un vérificateur indépendant. Corrige uniquement ces points et renvoie le texte complet corrigé.\n\nDEMANDE :\n"+t.demande+"\n\nRÉSULTAT :\n"+t.result+"\n\nÉCARTS :\n- "+v.ecarts.join("\n- "),t.tier,false);save()}}
-  t.status="fini"}
- catch(e){t.status="erreur";t.err=e&&e.code==="not_granted"?"Autorisation refusée : utilisez le mode manuel.":((e&&e.message)||"Erreur inconnue")}
- save();render()}
+  t.status="en_cours";t.err="";render();
+  try{
+    if(!t.result){t.step="Production";render();t.result=await ask(t,"Producteur",t.demande,t.tier,false);save()}
+    if(t.verif){
+      while(t.round<3){
+        t.step="Vérification (tour "+(t.round+1)+")";render();
+        const v=await verifier(t);t.round++;t.v=v;t.log.push({tour:t.round,verdict:v.verdict,criteres:v.criteres,ecarts:v.ecarts});save();
+        if(v.verdict!=="NON"||t.round>=3)break;
+        t.step="Correction";render();
+        t.result=await ask(t,"Correcteur (producteur)","Voici la demande de l’utilisateur, ton résultat précédent et les écarts relevés par un vérificateur indépendant. Corrige uniquement ces points et renvoie le texte complet corrigé.\n\nDEMANDE :\n"+t.demande+"\n\nRÉSULTAT :\n"+t.result+"\n\nÉCARTS :\n- "+v.ecarts.join("\n- "),t.tier,false);save()
+      }
+    }
+    t.status="fini";
+  }
+  catch(e){t.status="erreur";t.err=e&&e.code==="not_granted"?"Autorisation refusée : utilisez le mode manuel.":((e&&e.message)||"Erreur inconnue")}
+  save();render();
+}
+
 function start(){
- const d=$("#q").value.trim();if(!d)return;const r=route(d);
- const t={id:Date.now(),demande:d,mode:$("#mo").value,verif:$("#vf").checked,type:r.type,tier:r.tier,why:r.why,status:"en_cours",round:0,log:[]};
- T.unshift(t);cur=t;$("#q").value="";save();
- if(r.type==="non_supporte"){t.status="non_supporte";render();return}
- run(t)}
+  const d=$("#q").value.trim();if(!d)return;
+  const r=route(d);
+  const t={id:Date.now(),demande:d,mode:$("#mo").value,verif:$("#vf").checked,type:r.type,tier:r.tier,why:r.why,status:"en_cours",round:0,log:[]};
+  T.unshift(t);cur=t;$("#q").value="";save();
+  if(r.type==="non_supporte"){t.status="non_supporte";render();return}
+  run(t);
+}
+
 function niveau(t){const v=t.v;if(!t.verif||!v)return["Non vérifié","ko"];
- const sp=(v.criteres||[]).some(x=>x.verdict==="OUI"&&(!x.preuve||/aucune|non vérifiable/i.test(x.preuve)));
- if(v.verdict==="OUI")return sp?["OUI sans preuve","wa"]:["Vérifié (avec preuves)","ok"];
- if(v.verdict==="NON_TRANCHABLE")return["Partiellement vérifié : points non tranchables","wa"];
- return["Non résolu après "+t.round+" tour(s) : écarts restants","ko"]}
+  const sp=(v.criteres||[]).some(x=>x.verdict==="OUI"&&(!x.preuve||/aucune|non vérifiable/i.test(x.preuve)));
+  if(v.verdict==="OUI")return sp?["OUI sans preuve","wa"]:["Vérifié (avec preuves)","ok"];
+  if(v.verdict==="NON_TRANCHABLE")return["Partiellement vérifié : points non tranchables","wa"];
+  return["Non résolu après "+t.round+" tour(s) : écarts restants","ko"]}
+
 function skip(){if(cur&&cur._skip)cur._skip()}
 function resume(){if(cur)run(cur)}
 function openT(i){cur=T[i];render()}
 function copyP(){const e=$("#mp");try{navigator.clipboard.writeText(cur._m.prompt)}catch(x){e.select();document.execCommand("copy")}}
 function okM(){const v=$("#mr").value.trim();if(!v||!cur._m)return;const m=cur._m;cur._m=null;cur.status="en_cours";m.res(v);render()}
+
 function render(){
- 
- const t=cur;let h="";
- if(t){
-  h+='<section class="c"><div class="mu">'+esc(t.type)+(t.tier?" · "+(t.mode==="manuel"?"IA de votre choix":"modèle "+(PV("p").modele||"?")):"")+'</div><b>'+esc(t.demande)+'</b>';
-  if(t.why)h+='<div class="mu">Pourquoi : '+esc(t.why)+'</div>';
-  if(t.status==="non_supporte")h+='<div class="bn ko">Image, voix, vidéo et achat vérifié : non démontrables automatiquement à 0 € dans cette version.</div>';
-  if(t.status==="en_cours")h+='<div class="bn">'+esc(t.step||"En cours")+'…</div>';
-  if(t.status==="attente")h+='<div class="bn">En attente : quota épuisé ('+esc(t.att&&t.att.role)+'). Reprise dans <b id="cd"></b>. Rien n’est perdu.<br><button onclick="skip()">Réessayer maintenant</button></div>';
-  if(t.status==="manuel"&&t._m)h+='<div class="bn"><b>'+esc(t._m.role)+'</b><div class="mu">Copiez ce texte dans l’IA de votre choix (un fournisseur différent pour chaque rôle), puis collez sa réponse ci-dessous.</div><textarea id="mp" readonly>'+esc(t._m.prompt)+'</textarea><button class="s" onclick="copyP()">Copier</button><textarea id="mr" placeholder="Réponse de l’IA"></textarea><button onclick="okM()">Valider</button></div>';
-  if(t.status==="erreur")h+='<div class="bn ko">'+esc(t.err)+'<br><button onclick="resume()">Reprendre</button></div>';
-  if(t.status==="interrompue")h+='<div class="bn wa">Tâche interrompue.<br><button onclick="resume()">Reprendre</button></div>';
-  if(t.result&&(t.status==="fini"||t.status==="erreur"||t.status==="interrompue"))h+='<pre class="res">'+esc(t.result)+'</pre>';
-  if(t.status==="fini"&&t.verif){const n=niveau(t);
-   h+='<div class="bn '+n[1]+'"><b>'+esc(n[0])+'</b><div class="mu">Conforme à la demande ne veut pas dire vrai.</div></div>';
-   if(t.mode==="cles"&&PV("p").url===PV("v").url)h+='<div class="bn ko">Vérification dégradée : producteur et vérificateur utilisent la même adresse (même fournisseur).</div>';
-   if(t.v&&t.v.ecarts&&t.v.ecarts.length&&t.v.verdict!=="OUI")h+='<div class="bn wa">Écarts : '+t.v.ecarts.map(esc).join(" ; ")+'</div>'}
-  if(t.log&&t.log.length)h+='<details><summary>Détail du circuit ('+t.log.length+' tour(s))</summary>'+t.log.map(l=>'<p class="mu"><b>Tour '+l.tour+' : '+esc(l.verdict)+'</b><br>'+(l.criteres||[]).map(c=>esc(c.verdict)+' · '+esc(c.critere)+(c.preuve?' (preuve : '+esc(c.preuve)+')':'')).join("<br>")+'</p>').join("")+'</details>';
-  h+='</section>'}
- $("#out").innerHTML=h;
- $("#jr").innerHTML=T.length?T.map((x,i)=>'<button class="j" onclick="openT('+i+')">'+esc(new Date(x.id).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))+' · '+esc(x.status)+' · '+esc(x.demande.slice(0,60))+'</button>').join(""):'<div class="mu">Aucune demande pour l’instant.</div>'}
-load();render();
-fillS();
-</script></body></html>
-<div style="max-width: 600px; margin: 30px auto; background: #1e293b; color: white; padding: 20px; border-radius: 12px; font-family: sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-  <h3 style="margin-top: 0; color: #38bdf8;">Discuter avec NEXUS AI</h3>
-  <div id="messages" style="height: 220px; overflow-y: auto; border: 1px solid #334155; margin-bottom: 12px; padding: 10px; border-radius: 6px; background: #0f172a;"></div>
-  <div style="display: flex; gap: 8px;">
-    <input type="text" id="prompt" placeholder="Écris ton message..." style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;" />
-    <button onclick="envoyerMessage()" style="padding: 10px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Envoyer</button>
-  </div>
-</div>
-
-<script>
-  async function envoyerMessage() {
-    const input = document.getElementById("prompt");
-    const messagesDiv = document.getElementById("messages");
-    const texte = input.value.trim();
-    if (!texte) return;
-
-    messagesDiv.innerHTML += `<div style="margin: 8px 0; color: #94a3b8;"><strong>Toi :</strong> ${texte}</div>`;
-    input.value = "";
-
-    const loadingId = "loading-" + Date.now();
-    messagesDiv.innerHTML += `<div id="${loadingId}" style="margin: 8px 0; color: #38bdf8;"><em>NEXUS AI réfléchit...</em></div>`;
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    try {
-      const reponse = await puter.ai.chat(texte);
-      document.getElementById(loadingId).innerHTML = `<div style="margin: 8px 0; color: #a7f3d0;"><strong>NEXUS AI :</strong> ${reponse}</div>`;
-    } catch (erreur) {
-      document.getElementById(loadingId).innerHTML = `<div style="margin: 8px 0; color: #f87171;"><strong>Erreur :</strong> Impossible de contacter l'IA.</div>`;
+  const t=cur;let h="";
+  if(t){
+    h+='<section class="c"><div class="mu">'+esc(t.type)+(t.tier?" · "+(t.mode==="manuel"?"IA de votre choix":"modèle "+(PV("p").modele||"?")):"")+'</div><b>'+esc(t.demande)+'</b>';
+    if(t.why)h+='<div class="mu">Pourquoi : '+esc(t.why)+'</div>';
+    if(t.status==="non_supporte")h+='<div class="bn ko">Image, voix, vidéo et achat vérifié : non démontrables automatiquement à 0 € dans cette version.</div>';
+    if(t.status==="en_cours")h+='<div class="bn">'+esc(t.step||"En cours")+'…</div>';
+    if(t.status==="attente")h+='<div class="bn">En attente : quota épuisé ('+esc(t.att&&t.att.role)+'). Reprise dans <b id="cd"></b>. Rien n’est perdu.<br><button type="button" onclick="skip()">Réessayer maintenant</button></div>';
+    if(t.status==="manuel"&&t._m)h+='<div class="bn"><b>'+esc(t._m.role)+'</b><div class="mu">Copiez ce texte dans l’IA de votre choix (un fournisseur différent pour chaque rôle), puis collez sa réponse ci-dessous.</div><textarea id="mp" readonly>'+esc(t._m.prompt)+'</textarea><button type="button" class="s" onclick="copyP()">Copier</button><label for="mr">Réponse de l’IA</label><textarea id="mr" placeholder="Réponse de l’IA"></textarea><button type="button" onclick="okM()">Valider</button></div>';
+    if(t.status==="erreur")h+='<div class="bn ko">'+esc(t.err)+'<br><button type="button" onclick="resume()">Reprendre</button></div>';
+    if(t.status==="interrompue")h+='<div class="bn wa">Tâche interrompue.<br><button type="button" onclick="resume()">Reprendre</button></div>';
+    if(t.result&&(t.status==="fini"||t.status==="erreur"||t.status==="interrompue"))h+='<pre class="res">'+esc(t.result)+'</pre>';
+    if(t.status==="fini"&&t.verif){
+      const n=niveau(t);
+      h+='<div class="bn '+n[1]+'"><b>'+esc(n[0])+'</b><div class="mu">Conforme à la demande ne veut pas dire vrai.</div></div>';
+      if(t.mode==="cles"&&PV("p").url===PV("v").url)h+='<div class="bn ko">Vérification dégradée : producteur et vérificateur utilisent la même adresse (même fournisseur).</div>';
+      if(t.v&&t.v.ecarts&&t.v.ecarts.length&&t.v.verdict!=="OUI")h+='<div class="bn wa">Écarts : '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
     }
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    if(t.log&&t.log.length)h+='<details><summary>Détail du circuit ('+t.log.length+' tour(s))</summary>'+t.log.map(l=>'<p class="mu"><b>Tour '+l.tour+' : '+esc(l.verdict)+'</b><br>'+(l.criteres||[]).map(c=>esc(c.verdict)+' · '+esc(c.critere)+(c.preuve?' (preuve : '+esc(c.preuve)+')':'')).join("<br>")+'</p>').join("")+'</details>';
+    h+='</section>';
   }
+  $("#out").innerHTML=h;
+  $("#jr").innerHTML=T.length
+    ? T.map((x,i)=>'<button type="button" class="j" onclick="openT('+i+')">'+esc(new Date(x.id).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))+' · '+esc(x.status)+' · '+esc(x.demande.slice(0,60))+'</button>').join("")
+    : '<div class="mu">Aucune demande pour l’instant.</div>';
+}
+
+/* Démo Puter — sans clé, sans injection HTML */
+function addMsg(who,txt,id){
+  const box=$("#messages");
+  const d=document.createElement("div");d.className="msg";
+  if(id)d.id=id;
+  const b=document.createElement("strong");b.textContent=who+" : ";
+  d.appendChild(b);d.appendChild(document.createTextNode(txt));
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+}
+function setMsg(id,who,txt){
+  const d=document.getElementById(id);if(!d)return;
+  d.textContent="";
+  const b=document.createElement("strong");b.textContent=who+" : ";
+  d.appendChild(b);d.appendChild(document.createTextNode(txt));
+}
+async function envoyerMessage(){
+  const input=$("#prompt");
+  const texte=input.value.trim();if(!texte)return;
+  input.value="";
+  addMsg("Toi",texte);
+  const id="l"+Date.now();
+  addMsg("NEXUS AI","réfléchit…",id);
+  try{
+    if(!window.puter||!puter.ai)throw new Error("no-puter");
+    const r=await puter.ai.chat(texte);
+    setMsg(id,"NEXUS AI",String(r));
+  }catch(e){
+    setMsg(id,"Erreur","Impossible de contacter l’IA de démonstration. Réessayez plus tard.");
+  }
+}
+
+load();render();fillS();
 </script>
+</body>
+</html>
