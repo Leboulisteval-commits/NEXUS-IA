@@ -3,97 +3,143 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NEXUS AI — Vérification croisée par IA</title>
+<title>NEXUS AI — Vérification croisée</title>
 <meta name="description" content="NEXUS AI : un producteur IA rédige, un vérificateur indépendant contrôle.">
-<link rel="canonical" href="https://leboulisteval-commits.github.io/NEXUS-IA/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧠%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'%3E%3C/circle%3E%3Ccircle cx='19' cy='5' r='2'%3E%3C/circle%3E%3Ccircle cx='5' cy='19' r='2'%3E%3C/circle%3E%3Cpath d='M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17'%3E%3C/path%3E%3C/svg%3E">
 <script src="https://js.puter.com/v2/" defer></script>
 <style>
-:root{--bg:#f6f6f3;--cd:#fff;--tx:#1c1c1a;--mu:#6b6b64;--ac:#4a49d6;--bt:#fff;--ok:#17734a;--ko:#b3261e;--wa:#a35f00;--bd:#dedcd4;--wn:#fff3cd;--wt:#664d03;--wb:#ffecb5;color-scheme:light}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;--wn:#3a2f14;--wt:#ffd98a;--wb:#5a4a20;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#141413;--cd:#1e1e1c;--tx:#ecece7;--mu:#a2a29a;--ac:#9a99ff;--bt:#141413;--ok:#4cc38a;--ko:#ff8a80;--wa:#f0b04a;--bd:#34342f;--wn:#3a2f14;--wt:#ffd98a;--wb:#5a4a20;color-scheme:dark}
-*{box-sizing:border-box}
-html{scroll-padding-top:1rem}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
-header{background:var(--bg);text-align:center;padding:10px;border-bottom:1px solid var(--bd);flex-shrink:0;z-index:10}
-header h1{font-size:18px;margin:0}
-header .mu{font-size:12px}
-main{flex:1;overflow-y:auto;padding:14px;scroll-behavior:smooth;display:flex;flex-direction:column;gap:12px}
-.msg-user{align-self:flex-end;background:var(--ac);color:var(--bt);padding:10px 14px;border-radius:14px 14px 0 14px;max-width:85%;white-space:pre-wrap}
-.msg-ai{align-self:flex-start;background:var(--cd);border:1px solid var(--bd);padding:12px;border-radius:14px 14px 14px 0;max-width:90%;width:100%}
-.msg-ai pre{white-space:pre-wrap;margin:0;font:inherit}
-.verif-box{margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd);font-size:13px}
-.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:11px;margin-bottom:4px}
-.badge.ok{background:#e6f4ea;color:#17734a}.badge.wa{background:#fef7e0;color:#a35f00}.badge.ko{background:#fce8e6;color:#b3261e}
-@media(prefers-color-scheme:dark){.badge.ok{background:#1e3a2f;color:#4cc38a}.badge.wa{background:#3a2f14;color:#f0b04a}.badge.ko{background:#3a1a1a;color:#ff8a80}}
-.input-area{background:var(--bg);border-top:1px solid var(--bd);padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));flex-shrink:0;display:flex;flex-direction:column;gap:8px}
-.input-row{display:flex;gap:8px;align-items:flex-end}
-textarea{flex:1;font:inherit;color:var(--tx);background:var(--cd);border:1px solid var(--bd);border-radius:20px;padding:10px 14px;min-height:44px;max-height:120px;resize:none;margin:0;overflow-y:auto}
-button{font:inherit;background:var(--ac);color:var(--bt);border:0;border-radius:20px;padding:10px 16px;cursor:pointer;height:44px;font-weight:bold}
-button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-button.s{background:var(--bd);color:var(--tx);border-radius:10px;height:auto;padding:8px 12px;font-weight:normal;font-size:14px}
-details.c{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:0}
-summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--mu)}
-label{display:block;margin:8px 0 2px;font-size:13px;color:var(--mu)}
-label.chk{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:14px;margin:4px 0}
-label.chk input{width:auto;margin:0}
-input,select{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px;margin-bottom:6px}
-.bn{border-left:3px solid var(--wa);background:var(--bg);padding:8px;border-radius:4px;margin:6px 0;font-size:13px}
-.bn.ko{border-color:var(--ko)}
-h3{margin:12px 0 6px;font-size:14px;color:var(--mu)}
+:root {
+  --bg: #09090b; --surface: rgba(24, 24, 27, 0.6); --surface-hover: rgba(39, 39, 42, 0.8);
+  --border: rgba(255, 255, 255, 0.1); --text: #f4f4f5; --text-muted: #a1a1aa;
+  --primary: #6366f1; --primary-hover: #4f46e5; --user-bg: #27272a;
+  --ok: #10b981; --wa: #f59e0b; --ko: #ef4444; --glass: rgba(255, 255, 255, 0.05);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background-color: var(--bg); color: var(--text);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100vh; height: 100dvh; display: flex; flex-direction: column;
+  overflow: hidden; position: relative;
+}
+.bg-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; }
+.blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: float 20s infinite alternate; }
+.blob-1 { background: #6366f1; width: 300px; height: 300px; top: -50px; left: -50px; }
+.blob-2 { background: #8b5cf6; width: 250px; height: 250px; bottom: 10%; right: -50px; animation-delay: -5s; }
+.blob-3 { background: #0ea5e9; width: 200px; height: 200px; top: 40%; left: 30%; animation-delay: -10s; }
+@keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); z-index: 10; }
+.logo-group { display: flex; align-items: center; gap: 10px; }
+.logo-group svg { width: 28px; height: 28px; color: var(--primary); }
+header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+header h1 span { color: var(--primary); }
+.icon-btn { background: var(--glass); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: all 0.2s; }
+.icon-btn:hover { background: var(--surface-hover); transform: rotate(90deg); }
+
+main { flex: 1; overflow-y: auto; padding: 20px 20px 100px 20px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
+main::-webkit-scrollbar { width: 6px; }
+main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+.msg { display: flex; gap: 12px; max-width: 90%; animation: fadeIn 0.3s ease; }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.msg.ai { align-self: flex-start; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; font-weight: bold; font-size: 14px; }
+.msg.user .avatar { background: var(--primary); color: white; }
+.msg.ai .avatar { background: var(--user-bg); border: 1px solid var(--border); }
+.msg.ai .avatar svg { width: 16px; height: 16px; color: var(--primary); }
+.bubble { padding: 12px 16px; border-radius: 16px; font-size: 15px; white-space: pre-wrap; line-height: 1.6; word-break: break-word; }
+.msg.user .bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+.msg.ai .bubble { background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(10px); border-bottom-left-radius: 4px; width: 100%; }
+
+.verif { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 13px; color: var(--text-muted); }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; margin-bottom: 6px; }
+.badge.ok { background: rgba(16, 185, 129, 0.15); color: var(--ok); }
+.badge.wa { background: rgba(245, 158, 11, 0.15); color: var(--wa); }
+.badge.ko { background: rgba(239, 68, 68, 0.15); color: var(--ko); }
+.verif-details { margin-top: 8px; font-size: 12px; }
+.verif-details summary { cursor: pointer; color: var(--primary); outline: none; }
+.verif-details p { margin-top: 4px; padding-left: 8px; border-left: 2px solid var(--border); }
+
+.input-wrapper { position: fixed; bottom: 0; left: 0; width: 100%; padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg) 60%, transparent); z-index: 10; }
+.input-box { display: flex; gap: 8px; background: var(--user-bg); border: 1px solid var(--border); border-radius: 24px; padding: 6px 6px 6px 16px; align-items: flex-end; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: border-color 0.2s; }
+.input-box:focus-within { border-color: var(--primary); }
+textarea { flex: 1; background: transparent; border: none; color: var(--text); font: inherit; resize: none; min-height: 24px; max-height: 120px; padding: 8px 0; outline: none; }
+button.send { background: var(--primary); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+button.send:hover { background: var(--primary-hover); }
+button.send:active { transform: scale(0.95); }
+
+dialog { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 16px; padding: 20px; max-width: 400px; width: 90%; backdrop-filter: blur(20px); margin: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+dialog h2 { font-size: 18px; margin-bottom: 15px; }
+dialog label { display: block; font-size: 13px; color: var(--text-muted); margin: 10px 0 4px; }
+dialog input, dialog select { width: 100%; background: var(--user-bg); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 8px; font: inherit; margin-bottom: 8px; }
+dialog button.btn { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+dialog button.btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); margin-top: 8px; }
 </style>
 </head>
 <body>
 
+<div class="bg-blobs">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+</div>
+
 <header>
-  <h1>NEXUS AI</h1>
-  <div class="mu">Vérification croisée</div>
+  <div class="logo-group">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="19" r="2"></circle><path d="M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17"></path>
+    </svg>
+    <h1>NEXUS <span>AI</span></h1>
+  </div>
+  <button class="icon-btn" onclick="document.getElementById('settingsModal').showModal()" title="Configuration">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+  </button>
 </header>
 
-<main id="chat">
-  <!-- Les messages s'afficheront ici -->
-</main>
+<main id="chat"></main>
 
-<div class="input-area">
-  <details class="c">
-    <summary>⚙️ Configuration (Mode & Réglages)</summary>
-    <div style="margin-top:8px">
-      <label for="mo">Mode de fonctionnement</label>
-      <select id="mo" onchange="toggleSettings()">
-        <option value="puter">Puter AI (Sans clé)</option>
-        <option value="cles">Clés API</option>
-        <option value="manuel">Manuel</option>
-      </select>
-      <label class="chk"><input type="checkbox" id="vf" checked> Faire vérifier par une autre IA</label>
-    </div>
-    
-    <div id="api-settings" style="display:none; border-top:1px solid var(--bd); margin-top:10px;">
-      <datalist id="dl">
-        <option value="https://api.groq.com/openai/v1/chat/completions"></option>
-        <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
-        <option value="https://api.mistral.ai/v1/chat/completions"></option>
-      </datalist>
-      <h3>Producteur</h3>
-      <input id="up" list="dl" placeholder="Adresse API">
-      <input id="kp" type="password" placeholder="Clé API">
-      <input id="mp2" placeholder="Modèle (ex: llama-3.1-8b-instant)">
-      <button type="button" class="s" onclick="setPV();testP('p')">Tester Producteur</button>
-      <div class="mu" id="tp"></div>
-
-      <h3>Vérificateur</h3>
-      <input id="uv" list="dl" placeholder="Adresse API">
-      <input id="kv" type="password" placeholder="Clé API">
-      <input id="mv" placeholder="Modèle">
-      <button type="button" class="s" onclick="setPV();testP('v')">Tester Vérificateur</button>
-      <div class="mu" id="tv"></div>
-    </div>
-  </details>
-
-  <div class="input-row">
+<div class="input-wrapper">
+  <div class="input-box">
     <textarea id="q" placeholder="Posez votre question..." rows="1"></textarea>
-    <button type="button" onclick="start()">Envoyer</button>
+    <button class="send" onclick="start()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
   </div>
 </div>
+
+<dialog id="settingsModal">
+  <h2>⚙️ Configuration</h2>
+  <label for="mo">Mode de fonctionnement</label>
+  <select id="mo" onchange="toggleSettings()">
+    <option value="puter">Puter AI (Sans clé)</option>
+    <option value="cles">Clés API (Fournisseurs)</option>
+    <option value="manuel">Manuel</option>
+  </select>
+  <label style="display:flex;align-items:center;gap:8px;margin-top:15px;">
+    <input type="checkbox" id="vf" checked style="width:auto;margin:0;"> Activer la vérification croisée
+  </label>
+  <div id="api-settings" style="display:none; border-top:1px solid var(--border); margin-top:15px; padding-top:10px;">
+    <datalist id="dl">
+      <option value="https://api.groq.com/openai/v1/chat/completions"></option>
+      <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
+      <option value="https://api.mistral.ai/v1/chat/completions"></option>
+    </datalist>
+    <label>Producteur</label>
+    <input id="up" list="dl" placeholder="Adresse API">
+    <input id="kp" type="password" placeholder="Clé API">
+    <input id="mp2" placeholder="Modèle (ex: llama-3.1-8b-instant)">
+    <button class="btn btn-secondary" onclick="setPV();testP('p')">Tester Producteur</button>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:4px" id="tp"></div>
+    <label style="margin-top:15px">Vérificateur</label>
+    <input id="uv" list="dl" placeholder="Adresse API">
+    <input id="kv" type="password" placeholder="Clé API">
+    <input id="mv" placeholder="Modèle">
+    <button class="btn btn-secondary" onclick="setPV();testP('v')">Tester Vérificateur</button>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:4px" id="tv"></div>
+  </div>
+  <button class="btn" onclick="document.getElementById('settingsModal').close()">Fermer</button>
+</dialog>
 
 <script>
 const K="nexus_chat_v1", KP="nexus_prov";
@@ -101,26 +147,11 @@ let T=[], busy=false;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-function toggleSettings() {
-  $("#api-settings").style.display = ($("#mo").value === "cles") ? "block" : "none";
-}
+function toggleSettings() { $("#api-settings").style.display = ($("#mo").value === "cles") ? "block" : "none"; }
+function save(){ try{ localStorage.setItem(K, JSON.stringify(T.slice(-50), (k,v)=>k[0]==="_"?undefined:v)); }catch(e){} }
+function load(){ try{T=JSON.parse(localStorage.getItem(K)||"[]")}catch(e){T=[]} T.forEach(t=>{ if(["en_cours","attente","manuel"].includes(t.status)) t.status="interrompue"; }); }
 
-// --- SAUVEGARDE ET CHARGEMENT ---
-function save(){
-  try{
-    // On garde les 50 derniers messages pour la mémoire
-    localStorage.setItem(K, JSON.stringify(T.slice(-50), (k,v)=>k[0]==="_"?undefined:v));
-  }catch(e){}
-}
-function load(){
-  try{T=JSON.parse(localStorage.getItem(K)||"[]")}catch(e){T=[]}
-  T.forEach(t=>{
-    if(["en_cours","attente","manuel"].includes(t.status)) t.status="interrompue";
-  });
-}
-
-// --- PROMPTS ---
-const VP="Tu es un vérificateur indépendant. Tu reçois l'HISTORIQUE d'une conversation, une DEMANDE et un RÉSULTAT. Question unique : le résultat correspond-il à la demande ? 1) Déduis 2 à 5 critères. 2) Juge : OUI, NON ou NON_TRANCHABLE avec preuve. 3) Pour un prix/date non prouvable : NON_TRANCHABLE. Réponds UNIQUEMENT par ce JSON : {\"criteres\":[{\"critere\":\"\",\"verdict\":\"OUI|NON|NON_TRANCHABLE\",\"preuve\":\"\"}],\"ecarts\":[\"\"]}. Aucune phrase hors JSON.";
+const VP="Tu es un vérificateur indépendant. Tu reçois une DEMANDE et un RÉSULTAT. Déduis 2 à 5 critères. Juge : OUI, NON ou NON_TRANCHABLE avec preuve. Pour un prix/date non prouvable : NON_TRANCHABLE. Réponds UNIQUEMENT par ce JSON : {\"criteres\":[{\"critere\":\"\",\"verdict\":\"OUI|NON|NON_TRANCHABLE\",\"preuve\":\"\"}],\"ecarts\":[\"\"]}.";
 
 function route(d){
   const t=d.toLowerCase();
@@ -132,8 +163,6 @@ function route(d){
 }
 
 function pj(s){try{const m=String(s).match(/\{[\s\S]*\}/);return m?JSON.parse(m[0]):null}catch(e){return null}}
-
-// --- API & PUTER ---
 function PV(k){try{return JSON.parse(localStorage.getItem(KP)||"{}")[k]||{}}catch(e){return{}}}
 function setPV(){const o={};["p","v"].forEach(k=>{o[k]={url:$("#u"+k).value.trim(),key:$("#k"+k).value.trim(),modele:$(k==="p"?"#mp2":"#mv").value.trim()}});try{localStorage.setItem(KP,JSON.stringify(o))}catch(e){}}
 function fillS(){["p","v"].forEach(k=>{const p=PV(k);$("#u"+k).value=p.url||"";$("#k"+k).value=p.key||"";$(k==="p"?"#mp2":"#mv").value=p.modele||""})}
@@ -157,7 +186,6 @@ async function callPuter(prompt) {
   return String(r);
 }
 
-// --- LOGIQUE DE CONVERSATION ---
 function manual(t,role,prompt){return new Promise(res=>{t.status="manuel";t._m={role,prompt,res};save();render()})}
 
 async function ask(t,role,prompt,tier,json){
@@ -168,12 +196,11 @@ async function ask(t,role,prompt,tier,json){
 
   if(!json) return txt;
   const o=pj(txt);if(o)return o;
-  const o2=pj(await (t.mode==="puter"?callPuter(prompt+"\nRappel: JSON uniquement."):callP(role.startsWith("Vérif")?"v":"p",prompt+"\nRappel: JSON uniquement.")));
-  return o2;
+  return null;
 }
 
 async function verifier(t){
-  const o=await ask(t,"Vérificateur",VP+"\n\nHISTORIQUE:\n"+t.hist+"\n\nDEMANDE:\n"+t.demande+"\n\nRÉSULTAT:\n"+t.result,t.tier,true);
+  const o=await ask(t,"Vérificateur",VP+"\n\nDEMANDE:\n"+t.demande+"\n\nRÉSULTAT:\n"+t.result,t.tier,true);
   if(!o||!Array.isArray(o.criteres)||!o.criteres.length)return{verdict:"NON_TRANCHABLE",criteres:[],ecarts:["Réponse vérificateur illisible."]};
   const c=o.criteres.map(x=>({critere:String(x.critere||""),verdict:String(x.verdict||"").toUpperCase(),preuve:String(x.preuve||"")}));
   const v=c.some(x=>x.verdict==="NON")?"NON":c.some(x=>x.verdict!=="OUI")?"NON_TRANCHABLE":"OUI";
@@ -186,8 +213,7 @@ async function run(t){
   try{
     if(!t.result){
       t.step="Production";
-      // Construction du prompt avec mémoire (historique)
-      let promptP = t.hist ? `Voici l'historique de notre conversation :\n${t.hist}\n\nNouvelle demande :\n${t.demande}` : t.demande;
+      let promptP = t.hist ? `Historique:\n${t.hist}\n\nDemande:\n${t.demande}` : t.demande;
       t.result = await ask(t,"Producteur",promptP,t.tier,false);
       save();render();
     }
@@ -207,20 +233,14 @@ async function run(t){
   save();render();
 }
 
-// --- INTERFACE ---
 function start(){
   const d=$("#q").value.trim();if(!d || busy)return;
   const r=route(d);
-  
-  // Récupération de l'historique pour la mémoire (les 5 derniers échanges réussis)
   const hist = T.filter(x=>x.id && x.result).slice(-5).map(x=>`Utilisateur: ${x.demande}\nIA: ${x.result}`).join('\n---\n');
-
   const t={id:Date.now(),demande:d,mode:$("#mo").value,verif:$("#vf").checked,type:r.type,tier:r.tier,status:"en_cours",round:0,hist:hist};
   T.push(t);
-  $("#q").value=""; $("#q").style.height="44px";
-  
+  $("#q").value=""; $("#q").style.height="24px";
   if(r.type==="non_supporte"){t.status="non_supporte";save();render();return}
-  
   busy=true;
   run(t).finally(()=>{busy=false;});
 }
@@ -228,92 +248,67 @@ function start(){
 function niveau(t){
   if(!t.verif||!t.v)return["Non vérifié","ko"];
   if(t.v.verdict==="OUI")return["Vérifié","ok"];
-  if(t.v.verdict==="NON_TRANCHABLE")return["Partiellement vérifié","wa"];
-  return["Écarts détectés","ko"];
+  if(t.v.verdict==="NON_TRANCHABLE")return["Partiel","wa"];
+  return["Écart","ko"];
 }
 
-function resume(id){
-  const t=T.find(x=>x.id===id);if(t){busy=true;run(t).finally(()=>busy=false);}
-}
+function resume(id){ const t=T.find(x=>x.id===id);if(t){busy=true;run(t).finally(()=>busy=false);} }
 
-function skip(id){
-  const t=T.find(x=>x.id===id);if(t&&t._skip)t._skip();
-}
-
-function okM(id){
-  const t=T.find(x=>x.id===id);const v=prompt("Collez la réponse de l'IA :");
-  if(!v||!t._m)return;const m=t._m;t._m=null;t.status="en_cours";m.res(v);
-}
-
-function copyP(id){
-  const t=T.find(x=>x.id===id);
-  if(t&&t._m) navigator.clipboard.writeText(t._m.prompt);
+// Correction du mode manuel ici
+function submitManual(id) {
+  const t = T.find(x => x.id === id);
+  const el = document.getElementById('manual-input-' + id);
+  if (!t || !t._m || !el || !el.value.trim()) return;
+  const val = el.value.trim();
+  const m = t._m;
+  t._m = null;
+  t.status = "en_cours";
+  m.res(val);
 }
 
 function render(){
   const chat = $("#chat");
-  // On garde le scroll en bas si on y était déjà
-  const isScrolledToBottom = chat.scrollHeight - chat.clientHeight <= chat.scrollTop + 50;
-
+  const isScrolledToBottom = chat.scrollHeight - chat.clientHeight <= chat.scrollTop + 100;
   let h="";
   T.forEach(t=>{
-    // Bulle Utilisateur
-    h+='<div class="msg-user">'+esc(t.demande)+'</div>';
+    h+='<div class="msg user"><div class="avatar">U</div><div class="bubble">'+esc(t.demande)+'</div></div>';
     
-    // Bulle IA
     if(t.status==="non_supporte"){
-      h+='<div class="msg-ai"><div class="bn ko">Désolé, les images, vidéos et achats ne sont pas supportés.</div></div>';
+      h+='<div class="msg ai"><div class="avatar">!</div><div class="bubble" style="color:var(--ko)">Désolé, les images, vidéos et achats ne sont pas supportés.</div></div>';
     } else if(t.status==="manuel" && t._m){
-      h+='<div class="msg-ai"><b>'+esc(t._m.role)+'</b><br><span class="mu" style="font-size:12px">Copiez ce texte dans l\'IA, puis collez sa réponse.</span>';
-      h+='<textarea readonly style="width:100%;height:80px;margin:8px 0;font-size:12px">'+esc(t._m.prompt)+'</textarea>';
-      h+='<button class="s" onclick="copyP('+t.id+')">Copier</button> ';
-      h+='<button class="s" onclick="okM('+t.id+')">Coller la réponse</button></div>';
+      h+='<div class="msg ai"><div class="avatar">M</div><div class="bubble">';
+      h+='<b>'+esc(t._m.role)+'</b><br><span style="font-size:12px;color:var(--text-muted)">Copiez ce texte dans l\'IA, puis collez sa réponse.</span>';
+      h+='<textarea readonly style="width:100%;height:80px;margin:8px 0;font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text)">'+esc(t._m.prompt)+'</textarea>';
+      h+='<textarea id="manual-input-'+t.id+'" placeholder="Collez la réponse ici..." style="width:100%;height:60px;margin-bottom:8px;font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text)"></textarea>';
+      h+='<button class="icon-btn" style="width:auto;border-radius:8px;padding:0 10px;height:32px;font-size:12px" onclick="submitManual('+t.id+')">Valider la réponse</button></div></div>';
     } else if(t.status==="erreur"){
-      h+='<div class="msg-ai"><div class="bn ko">'+esc(t.err)+'</div><button class="s" onclick="resume('+t.id+')">Réessayer</button></div>';
-    } else if(t.status==="interrompue"){
-      h+='<div class="msg-ai"><div class="bn">Tâche interrompue.</div><button class="s" onclick="resume('+t.id+')">Reprendre</button></div>';
-    } else if(t.status==="attente"){
-      h+='<div class="msg-ai"><div class="bn">Quota épuisé. Reprise dans <b id="cd-'+t.id+'"></b>.</div><button class="s" onclick="skip('+t.id+')">Forcer</button></div>';
+      h+='<div class="msg ai"><div class="avatar">!</div><div class="bubble"><span style="color:var(--ko)">'+esc(t.err)+'</span><br><button class="icon-btn" style="width:auto;border-radius:8px;padding:0 10px;height:32px;font-size:12px;margin-top:8px" onclick="resume('+t.id+')">Réessayer</button></div></div>';
     } else if(t.status==="en_cours" || t.result) {
-      // Affichage de la réponse (même si en cours, on montre la partie déjà générée)
-      h+='<div class="msg-ai"><pre>'+esc(t.result || "Réflexion en cours...")+'</pre>';
-      
-      // Bloc de vérification (caché si pas fini ou pas demandé)
+      h+='<div class="msg ai"><div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="19" r="2"></circle><path d="M14.5 10.5L17.5 7M9.5 13.5L6.5 17M9.5 10.5L6.5 7M14.5 13.5L17.5 17"></path></svg></div><div class="bubble">';
+      if(t.status==="en_cours" && !t.result) {
+        h+='<div style="display:flex;gap:4px;align-items:center;height:24px"><div class="dot" style="width:6px;height:6px;background:var(--text-muted);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both"></div><div class="dot" style="width:6px;height:6px;background:var(--text-muted);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both;animation-delay:0.2s"></div><div class="dot" style="width:6px;height:6px;background:var(--text-muted);border-radius:50%;animation:bounce 1.4s infinite ease-in-out both;animation-delay:0.4s"></div></div>';
+      } else {
+        h+='<pre>'+esc(t.result || "")+'</pre>';
+      }
       if(t.verif && t.v){
         const n = niveau(t);
-        h+='<div class="verif-box">';
-        h+='<span class="badge '+n[1]+'">'+n[0]+'</span>';
-        if(t.v.ecarts && t.v.ecarts.length) h+='<div class="mu" style="font-size:12px;color:var(--ko)">⚠️ '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
-        
-        // Détail des preuves (rétractable)
+        h+='<div class="verif"><span class="badge '+n[1]+'">'+n[0]+'</span>';
+        if(t.v.ecarts && t.v.ecarts.length) h+='<div style="color:var(--ko);font-size:12px;margin-top:4px">⚠️ '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
         if(t.log && t.log.length){
-          h+='<details style="margin-top:4px"><summary style="font-size:12px">Voir le détail</summary>';
-          h+=t.log.map(l=>'<div style="margin-top:4px">'+(l.criteres||[]).map(c=>'<span class="mu">'+esc(c.verdict)+' : </span>'+esc(c.critere)+'</div>').join("")+'</details>';
+          h+='<details class="verif-details"><summary>Détail du circuit</summary>'+t.log.map(l=>'<p>'+(l.criteres||[]).map(c=>'<b>'+esc(c.verdict)+'</b> : '+esc(c.critere)).join("<br>")+'</p>').join("")+'</details>';
         }
         h+='</div>';
       }
-      h+='</div>';
+      h+='</div></div>';
     }
   });
-  
   chat.innerHTML = h;
-  
   if(isScrolledToBottom) chat.scrollTop = chat.scrollHeight;
 }
 
-// Auto-resize du textarea
-$("#q").addEventListener("input", function() {
-  this.style.height = '44px';
-  this.style.height = (this.scrollHeight) + 'px';
-});
-$("#q").addEventListener("keydown", function(e) {
-  if(e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    start();
-  }
-});
+$("#q").addEventListener("input", function() { this.style.height = '24px'; this.style.height = (this.scrollHeight) + 'px'; });
+$("#q").addEventListener("keydown", function(e) { if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); start(); } });
 
-// Init
 load(); render(); fillS(); toggleSettings();
 </script>
 </body>
