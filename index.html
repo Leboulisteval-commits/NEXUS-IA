@@ -21,6 +21,7 @@ body.light{--bg:#f4f4f7;--surface:#ffffff;--surface-2:#eceef2;--border:rgba(0,0,
 html,body{
   height:100%;
   height:var(--app-height,100dvh);
+  max-height:var(--app-height,100dvh);
   overflow:hidden;
   background:var(--bg);
   color:var(--text);
@@ -33,12 +34,16 @@ html,body{
 }
 body{
   position:fixed;
-  inset:0;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
   display:flex;
   flex-direction:column;
   padding-top:env(safe-area-inset-top);
   padding-left:env(safe-area-inset-left);
   padding-right:env(safe-area-inset-right);
+  transition: none;
 }
 body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.25;pointer-events:none;z-index:0}
 header{height:56px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 12px;position:relative;z-index:10;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
@@ -119,7 +124,7 @@ summary{cursor:pointer;font-family:var(--font-mono);font-size:11px;letter-spacin
   outline:none;
   color:var(--text);
   font-family:var(--font-sans);
-  font-size:16px; /* important: ≥16px pour éviter le zoom iOS */
+  font-size:16px;
   line-height:1.4;
   resize:none;
   min-height:24px;
@@ -185,7 +190,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <button class="icon-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
 <div class="logo" onclick="newConversation()"><div class="logo-dot">N</div><span>NEXUS&nbsp;AI</span></div>
 <div class="header-spacer"></div>
-<span class="badge-verif" id="modeBadge">HYBRIDE</span>
+<span class="badge-verif" id="modeBadge">PUTER</span>
 <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Thème">🌙</button>
 <button class="icon-btn" onclick="openSettings()" aria-label="Réglages">⚙️</button>
 </header>
@@ -193,11 +198,11 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <main>
 <div id="chat"></div>
 <div id="suggestions">
-<button class="sugg" onclick="useSuggestion('Qui es-tu ?')">Qui es-tu ?</button>
 <button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button>
 <button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')">Poème sur la mer</button>
 <button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button>
 <button class="sugg" onclick="useSuggestion('Aide-moi à réviser pour un examen')">Réviser</button>
+<button class="sugg" onclick="useSuggestion('Écris une fonction JavaScript pour trier un tableau')">Code JS</button>
 </div>
 <div id="inputArea">
 <div id="attachmentPreview"><img id="previewImg" src="" alt=""><span class="file-name">Image jointe</span><button onclick="removeAttachment()">✕</button></div>
@@ -209,7 +214,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <button class="input-btn send" id="sendBtn" onclick="start()">➤</button>
 <button class="input-btn stop" id="stopBtn" onclick="stopGeneration()" style="display:none" aria-label="Stop">■</button>
 </div>
-<div class="hint" id="modeHint">HYBRIDE : PUTER produit • KEYLESS vérifie</div>
+<div class="hint" id="modeHint">PUTER : modèle gratuit via Puter</div>
 </div>
 </main>
 
@@ -223,18 +228,16 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div id="overlay" onclick="closeSidebar()"></div>
 
 <dialog id="settingsModal">
-<div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
+<div class="modal-head"><b>RÉGLAGES</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
 <div class="modal-body">
 <div class="field"><label>Mode de fonctionnement</label>
 <select id="mo" onchange="toggleSettings();saveModeVerif()">
-<option value="hybride">Hybride (Puter + Keyless)</option>
-<option value="puter">Puter seul</option>
-<option value="keyless">Keyless seul</option>
+<option value="puter">Puter (recommandé)</option>
 <option value="cles">Mes clés API</option>
 </select>
 <small id="modeHintDetail"></small></div>
 <div class="check-row"><input type="checkbox" id="vf" checked onchange="saveModeVerif()"><div><b>Vérification croisée</b><br><small>Un 2e modèle vérifie chaque réponse et la corrige si besoin (max 3 tours).</small></div></div>
-<div class="field"><label>Persona / Instructions pour NEXUS</label><textarea id="persona" placeholder="Ex : Tu es un prof bienveillant qui explique simplement..."></textarea></div>
+<div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
 <div id="api-settings" style="display:none">
 <div class="field"><label>🔑 Producteur (P) - URL API</label><input id="up" list="dl" placeholder="https://api.groq.com/openai/v1/chat/completions"><datalist id="dl"><option value="https://api.groq.com/openai/v1/chat/completions"></option><option value="https://api.mistral.ai/v1/chat/completions"></option><option value="https://openrouter.ai/api/v1/chat/completions"></option></datalist></div>
 <div class="field"><label>Clé API Producteur</label><input id="kp" type="password" placeholder="sk-..."></div>
@@ -253,7 +256,6 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div id="toast"></div>
 
 <script>
-const NEXUS_IDENTITY = "Tu es NEXUS, une intelligence artificielle développée par Valentin Marie. Quand on te demande qui tu es, qui t'a créé, qui est ton créateur ou quelle est ton identité, tu réponds TOUJOURS et UNIQUEMENT : \"Je suis NEXUS, créé par Valentin Marie.\" Tu ne mentionnes jamais d'autre nom, entreprise ou modèle. Tu es NEXUS, point final.";
 const VP = `Tu es un VÉRIFICATEUR. Tu n'inventes rien.
 Consignes :
 - Tu compares la RÉPONSE à la DEMANDE.
@@ -266,9 +268,7 @@ Règles de verdict :
 Renvoie EXCLUSIVEMENT ce JSON, sans aucune phrase avant ou après :
 {"verdict":"OUI|NON|NON_TRANCHABLE","criteres":["..."],"ecarts":["..."],"suggestion":"..."}`;
 const MODE_HINTS = {
-  hybride: "HYBRIDE : PUTER produit • KEYLESS vérifie",
-  puter: "PUTER seul : 1 seul modèle, sans vérification croisée",
-  keyless: "KEYLESS seul : 1 seul modèle, sans vérification croisée",
+  puter: "PUTER : modèle gratuit via Puter",
   cles: "MES CLÉS : P produit • V vérifie"
 };
 const K = "nexus_v10";
@@ -303,35 +303,39 @@ function formatMarkdown(text){
 
 function setAppHeight(){
   const vv = window.visualViewport;
-  const h = vv ? vv.height : window.innerHeight;
+  const h = vv ? Math.round(vv.height) : window.innerHeight;
   document.documentElement.style.setProperty('--app-height', h + 'px');
-  // Keep input area visible when keyboard is open (especially iOS)
-  if(vv){
-    document.documentElement.style.setProperty('--vv-top', vv.offsetTop + 'px');
+  if(vv && vv.offsetTop > 0){
+    document.body.style.top = vv.offsetTop + 'px';
+  } else {
+    document.body.style.top = '0px';
   }
 }
 function onViewportChange(){
   setAppHeight();
-  // When keyboard opens/closes, keep chat scrolled if we were near bottom
   const chat = $("#chat");
-  if(chat && chat.scrollHeight - chat.clientHeight - chat.scrollTop < 120){
-    requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
-  }
+  if(!chat) return;
+  requestAnimationFrame(() => {
+    chat.scrollTop = chat.scrollHeight;
+  });
 }
 window.addEventListener('resize', onViewportChange);
 if(window.visualViewport){
   window.visualViewport.addEventListener('resize', onViewportChange);
   window.visualViewport.addEventListener('scroll', onViewportChange);
 }
+window.addEventListener('orientationchange', () => {
+  setTimeout(onViewportChange, 150);
+  setTimeout(onViewportChange, 400);
+});
 setAppHeight();
-// Re-apply after a short delay (some mobile browsers report wrong height on first paint)
-setTimeout(setAppHeight, 100);
-setTimeout(setAppHeight, 400);
+setTimeout(setAppHeight, 80);
+setTimeout(setAppHeight, 300);
+setTimeout(setAppHeight, 700);
 
 function updateThemeIcon(){ $("#themeBtn").textContent = document.body.classList.contains('light') ? '☀️' : '🌙'; }
 function updateThemeColor(){
   const light = document.body.classList.contains('light');
-  // Met à jour la couleur de la barre de statut (PWA / écran d'accueil)
   let meta = document.querySelector('meta[name="theme-color"]:not([media])');
   if(!meta){
     meta = document.createElement('meta');
@@ -515,13 +519,12 @@ async function toggleDictation(){
   startRecognition();
 }
 
-const MODE_HINTS_DETAIL = MODE_HINTS;
 function toggleSettings(){
   const mode = $("#mo").value;
   $("#api-settings").style.display = (mode === "cles") ? "block" : "none";
   $("#modeHint").textContent = MODE_HINTS[mode] || "";
   $("#modeHintDetail").textContent = MODE_HINTS[mode] || "";
-  $("#modeBadge").textContent = mode.toUpperCase();
+  $("#modeBadge").textContent = mode === "cles" ? "CLÉS API" : "PUTER";
 }
 function saveModeVerif(){
   try{
@@ -531,8 +534,10 @@ function saveModeVerif(){
 }
 function loadModeVerif(){
   try{
-    const m = localStorage.getItem("nexus_mode");
-    if(m) $("#mo").value = m;
+    let m = localStorage.getItem("nexus_mode");
+    if(m === "hybride" || m === "keyless" || !m) m = "puter";
+    if(m !== "puter" && m !== "cles") m = "puter";
+    $("#mo").value = m;
     $("#vf").checked = localStorage.getItem("nexus_verif") !== "0";
   }catch(e){}
 }
@@ -578,36 +583,39 @@ function fillS(){
 
 async function callCustom(k, prompt, signal, image = null){
   const p = PV(k);
-  if(!p.url || !p.key || !p.modele) throw new Error("Clé API " + (k === "p" ? "Producteur" : "Vérificateur") + " incomplète. Ouvre les réglages.");
-  const messages = [{ role: "user", content: prompt }];
-  if(image) messages[0].content = [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: image } }];
-  let r;
-  try{
-    r = await fetch(p.url, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + p.key }, body: JSON.stringify({ model: p.modele, messages }), signal });
-  }catch(e){ if(e.name === 'AbortError') throw e; throw new Error("Appel bloqué (CORS / réseau)."); }
-  if(!r.ok){
-    let detail = "";
-    try{ const txt = await r.text(); try{ const ej = JSON.parse(txt); detail = (ej.error && ej.error.message) || ej.message || txt; }catch(_){ detail = txt; } }catch(_){}
-    if(r.status === 429){ const err = new Error("Quota épuisé" + (detail ? " : " + String(detail).slice(0,200) : "")); err.code = "rate_limited"; throw err; }
-    throw new Error("Erreur API " + r.status + (detail ? " : " + String(detail).slice(0,200) : ""));
+  if(!p.url || !p.key || !p.modele) {
+    throw new Error("Configuration " + (k === "p" ? "Producteur" : "Vérificateur") + " incomplète. Ouvre les Réglages et remplis URL + clé + modèle.");
   }
-  const j = await r.json();
-  const c = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
-  if(!c) throw new Error("Réponse API vide.");
-  return c;
-}
-async function callKeyless(prompt, signal, image = null){
   const messages = [{ role: "user", content: prompt }];
   if(image) messages[0].content = [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: image } }];
   let r;
   try{
-    r = await fetch("https://chatgpt.malekdev.workers.dev/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: "gpt-4o", messages }), signal });
-  }catch(e){ if(e.name === 'AbortError') throw e; throw new Error("Appel bloqué (CORS / réseau)."); }
+    r = await fetch(p.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + p.key },
+      body: JSON.stringify({ model: p.modele, messages }),
+      signal
+    });
+  }catch(e){
+    if(e.name === 'AbortError') throw e;
+    throw new Error("Impossible de joindre l'API (réseau ou CORS). Vérifie l'URL.");
+  }
   if(!r.ok){
     let detail = "";
-    try{ const txt = await r.text(); try{ const ej = JSON.parse(txt); detail = (ej.error && ej.error.message) || ej.message || txt; }catch(_){ detail = txt; } }catch(_){}
-    if(r.status === 429){ const err = new Error("Quota épuisé" + (detail ? " : " + String(detail).slice(0,200) : "")); err.code = "rate_limited"; throw err; }
-    throw new Error("Erreur API " + r.status + (detail ? " : " + String(detail).slice(0,200) : ""));
+    try{
+      const txt = await r.text();
+      try{
+        const ej = JSON.parse(txt);
+        detail = (ej.error && (ej.error.message || ej.error)) || ej.message || txt;
+      }catch(_){ detail = txt; }
+    }catch(_){}
+    if(r.status === 401 || r.status === 403) throw new Error("Clé API refusée (401/403). Vérifie ta clé.");
+    if(r.status === 429){
+      const err = new Error("Quota ou rate-limit atteint" + (detail ? " : " + String(detail).slice(0,180) : ""));
+      err.code = "rate_limited";
+      throw err;
+    }
+    throw new Error("Erreur API " + r.status + (detail ? " : " + String(detail).slice(0,180) : ""));
   }
   const j = await r.json();
   const c = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
@@ -626,11 +634,16 @@ function extractPuterText(res){
   throw new Error("Réponse Puter illisible.");
 }
 async function callPuter(prompt, signal, image = null){
-  if(!window.puter || !puter.ai) throw new Error("Puter non chargé. Recharge la page.");
+  if(!window.puter || !puter.ai) throw new Error("Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.");
   if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
   const chatPromise = (async () => {
-    const res = image ? await puter.ai.chat(prompt, image) : await puter.ai.chat(prompt);
-    return extractPuterText(res);
+    try{
+      const res = image ? await puter.ai.chat(prompt, image) : await puter.ai.chat(prompt);
+      return extractPuterText(res);
+    }catch(e){
+      if(e.name === 'AbortError') throw e;
+      throw new Error("Erreur Puter : " + (e.message || "échec de génération"));
+    }
   })();
   if(!signal) return chatPromise;
   let onAbort;
@@ -645,27 +658,20 @@ async function callPuter(prompt, signal, image = null){
 async function ask(t, role, prompt, tier, json, image = null){
   const signal = currentController ? currentController.signal : undefined;
   const isVerifier = role.startsWith("Vérif");
-  const isProducerSide = !isVerifier;
-  // Ne jamais injecter l'identité quand on attend du JSON, sinon elle casse le JSON
-  const finalPrompt = json ? prompt : NEXUS_IDENTITY + "\n\n" + prompt;
+  const finalPrompt = prompt;
   let txt, usedProvider;
-  if(t.mode === "hybride"){
-    if(isVerifier){ txt = await callKeyless(finalPrompt, signal, image); usedProvider = "keyless"; }
-    else{
-      try{ txt = await callPuter(finalPrompt, signal, image); usedProvider = "puter"; }
-      catch(e){
-        if(e.name === 'AbortError' || (e.message && e.message.toLowerCase().includes('abort'))) throw e;
-        txt = await callKeyless(finalPrompt, signal, image); usedProvider = "keyless-fallback";
-      }
-    }
-  } else if(t.mode === "puter"){ txt = await callPuter(finalPrompt, signal, image); usedProvider = "puter"; }
-  else if(t.mode === "keyless"){ txt = await callKeyless(finalPrompt, signal, image); usedProvider = "keyless"; }
-  else{
+
+  if(t.mode === "puter"){
+    txt = await callPuter(finalPrompt, signal, image);
+    usedProvider = "puter";
+  } else {
     txt = await callCustom(isVerifier ? "v" : "p", finalPrompt, signal, image);
     usedProvider = isVerifier ? "custom-v" : "custom-p";
   }
+
   if(isVerifier) t.vProvider = usedProvider;
   else t.pProvider = usedProvider;
+
   if(json){
     const o = pj(txt);
     return o;
@@ -690,6 +696,10 @@ function setBusy(b){
   $("#sendBtn").style.display = b ? "none" : "grid";
   $("#stopBtn").style.display = b ? "grid" : "none";
   $("#q").disabled = b;
+  document.querySelectorAll('.sugg').forEach(btn => {
+    btn.style.pointerEvents = b ? 'none' : '';
+    btn.style.opacity = b ? '0.5' : '';
+  });
 }
 function stopGeneration(){
   if(currentController){ try{ currentController.abort(); }catch(e){} }
@@ -750,23 +760,50 @@ function start(){
   if(busy) return;
   const conv = currentConv();
   if(!conv) return;
+
+  const d = $("#q").value.trim();
+  if(!d && !pendingImage){
+    showToast("Écris une demande ou joins une image.");
+    return;
+  }
+
+  setBusy(true);
+
   saveAllProviders();
   saveModeVerif();
-  const d = $("#q").value.trim();
-  if(!d && !pendingImage){ showToast("Écris une demande ou joins une image."); return; }
+
   if(isListening){ try{ recognition.stop(); }catch(e){} }
+
   const r = route(d || "Analyse image");
-  const t = { id: genId(), demande: d || "Analyse cette image.", image: pendingImage, result: null, v: null, round: 0, mode: $("#mo").value, verif: $("#vf").checked, tier: r.tier, status: "en_cours", step: "", err: "", pProvider: null, vProvider: null };
+  const t = {
+    id: genId(),
+    demande: d || "Analyse cette image.",
+    image: pendingImage,
+    result: null,
+    v: null,
+    round: 0,
+    mode: $("#mo").value,
+    verif: $("#vf").checked,
+    tier: r.tier,
+    status: "en_cours",
+    step: "",
+    err: "",
+    pProvider: null,
+    vProvider: null
+  };
+
   conv.messages.push(t);
   if(conv.messages.length === 1){
     conv.title = (d ? d.slice(0, 48) : "Image") + (d && d.length > 48 ? "..." : "");
   }
+
   $("#q").value = "";
   $("#q").style.height = '24px';
   removeAttachment();
-  // Ranger le clavier après envoi
   $("#q").blur();
-  save(); render();
+
+  save();
+  render();
   run(t);
 }
 function regenerate(id){
@@ -812,8 +849,6 @@ function niveau(v){
 }
 function providerLabel(p){
   if(p === "puter") return "PUTER";
-  if(p === "keyless") return "KEYLESS";
-  if(p === "keyless-fallback") return "KEYLESS ↺";
   if(p === "custom-p") return "API P";
   if(p === "custom-v") return "API V";
   return "";
@@ -828,7 +863,6 @@ function render(){
   const chat = $("#chat");
   const suggestions = $("#suggestions");
   renderSidebar();
-  // Masquer les suggestions une fois qu'il y a des messages (plus de place pour le chat)
   if(suggestions){
     if(!conv || conv.messages.length === 0){
       suggestions.classList.remove('hidden');
@@ -837,7 +871,7 @@ function render(){
     }
   }
   if(!conv || conv.messages.length === 0){
-    chat.innerHTML = '<div class="empty"><div class="logo-dot">N</div><h2>Bonjour, je suis NEXUS.</h2><p>Pose une question, joins une image, ou demande une vérification.<br>En mode Hybride, un second modèle vérifie chaque réponse.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion(\'Qui es-tu ?\')">Qui es-tu ?</button><button class="sugg" onclick="useSuggestion(\'Vérifie ce fait : Paris est la capitale de la France\')">Vérifie un fait</button></div></div>';
+    chat.innerHTML = '<div class="empty"><div class="logo-dot">N</div><h2>Bonjour.</h2><p>Pose une question, joins une image, ou demande une vérification.<br>La vérification croisée peut être activée dans les réglages.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion(\'Explique la relativité simplement\')">Relativité simple</button><button class="sugg" onclick="useSuggestion(\'Vérifie ce fait : Paris est la capitale de la France\')">Vérifie un fait</button></div></div>';
     return;
   }
   const isScrolledToBottom = chat.scrollHeight - chat.clientHeight <= chat.scrollTop + 100;
@@ -880,25 +914,34 @@ function render(){
 }
 function useSuggestion(txt){
   if(busy) return;
-  // Remplir + envoyer automatiquement SANS activer le clavier
   $("#q").value = txt;
   $("#q").blur();
   start();
 }
 
 $("#q").addEventListener("keydown", e => {
-  if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); start(); }
+  if(e.key === "Enter" && !e.shiftKey){
+    e.preventDefault();
+    e.stopPropagation();
+    start();
+  }
 });
-// Quand le clavier s'ouvre, s'assurer que la zone de saisie reste visible
+$("#q").addEventListener("keypress", e => {
+  if(e.key === "Enter" && !e.shiftKey){
+    e.preventDefault();
+    start();
+  }
+});
+
 $("#q").addEventListener("focus", () => {
-  setTimeout(() => {
-    setAppHeight();
-    const chat = $("#chat");
-    if(chat) chat.scrollTop = chat.scrollHeight;
-  }, 300);
+  setTimeout(onViewportChange, 50);
+  setTimeout(onViewportChange, 250);
+  setTimeout(onViewportChange, 500);
 });
 $("#q").addEventListener("blur", () => {
-  setTimeout(setAppHeight, 100);
+  document.body.style.top = '0px';
+  setTimeout(onViewportChange, 100);
+  setTimeout(onViewportChange, 300);
 });
 $("#persona").addEventListener("input", e => { try{ localStorage.setItem("nexus_persona", e.target.value); }catch(_){} });
 ["up","kp","mp2"].forEach(id => document.getElementById(id).addEventListener("input", () => saveProvider("p")));
