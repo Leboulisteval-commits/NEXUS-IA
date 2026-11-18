@@ -285,7 +285,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 }
 </style>
 <meta name="theme-color" content="#0a0a10"></head>
-<body style="top: 0px;">
+<body style="top: 0px;" class="">
 
 <header>
 <button class="icon-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
@@ -297,8 +297,8 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 </header>
 
 <main>
-<div id="chat"><div class="msg user"><div class="bubble">Vérifie ce fait : Paris est la capitale de la France</div><div class="msg-meta">23:23</div></div><div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI</div><div class="ai-body"><div class="msg-system err">⚠ Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.</div><div class="msg-actions"><button class="btn-regenerate" onclick="regenerate(1795040633025)">↻ Réessayer</button></div></div></div></div></div>
-<div id="suggestions" class="hidden">
+<div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Bonjour.</h2><p>Pose une question, joins une image ou un document,<br>ou demande une vérification croisée.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
+<div id="suggestions" class="">
 <button class="sugg" onclick="useSuggestion('Explique la relativité simplement')" style="">Relativité simple</button>
 <button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')" style="">Poème sur la mer</button>
 <button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')" style="">Vérifie un fait</button>
@@ -323,7 +323,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795040607989)"><span class="conv-del" onclick="deleteConversation(1795040607989,event)">✕</span><div class="conv-title">Vérifie ce fait : Paris est la capitale de la Fr...</div><div class="conv-meta"><span>1 msg</span><span>18 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795041135411)"><span class="conv-del" onclick="deleteConversation(1795041135411,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>18 nov.</span></div></div><div class="conv " onclick="switchConversation(1795041113543)"><span class="conv-del" onclick="deleteConversation(1795041113543,event)">✕</span><div class="conv-title">Écris un poème sur la mer</div><div class="conv-meta"><span>1 msg</span><span>18 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()" class=""></div>
@@ -798,6 +798,24 @@ async function callPuter(prompt, signal, image = null){
       return extractPuterText(res);
     }catch(e){
       if(e.name === 'AbortError') throw e;
+      // CORRIGÉ : avant, callPuter() jetait juste l'erreur crédits sans jamais basculer.
+      // C'est POURTANT le chemin que prend ton chat principal (ask() -> callPuter()).
+      // Maintenant, sur erreur crédits / quota / limite, on bascule sur Kilo puis Pollinations, comme callPuterProducteur().
+      if(nexusEstErreurCredits(e)){
+        try{
+          const msgs = [{ role: 'user', content: String(prompt || '') }];
+          const secours = await nexusSecoursKilo(msgs);
+          return secours;
+        }catch(eKilo){
+          try{
+            const msgs = [{ role: 'user', content: String(prompt || '') }];
+            const secours = await nexusSecoursPollinations(msgs);
+            return secours;
+          }catch(ePoll){
+            // Les deux secours échouent : on retombe sur l'erreur Puter traduite, comme avant.
+          }
+        }
+      }
       throw new Error(nexusTraduireErreur(e.message || "échec de génération"));
     }
   })();
@@ -1196,8 +1214,10 @@ async function nexusSecoursPollinations(messages){
 }
 
 function nexusEstErreurCredits(e){
-  const s = String((e && e.message) || e || '').toLowerCase();
-  return /doesn'?t have enough credits|not enough credits|insufficient_funds|out of credits|no credits left|credit.*exhausted|billing/.test(s);
+  // CORRIGÉ : avant, ce test était trop strict et ratait beaucoup de messages Puter (ex : "402", "quota exceeded", "daily limit", message traduit en français).
+  // Maintenant on teste le message brut + l'objet entier, en anglais ET en français.
+  const s = String((e && e.message) || e || '').toLowerCase() + ' ' + String(e || '').toLowerCase();
+  return /credit|crédit|insufficient|quota|billing|payment|402|429|rate.?limit|too many|limit|exceeded|balance|out of|ran out|no more|daily|free tier|usage|plus assez|n.?a plus|plus de/.test(s);
 }
 
 async function callPuterProducteur(messages, signal, image = null){
