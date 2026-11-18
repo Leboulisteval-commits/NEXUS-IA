@@ -44,8 +44,6 @@ label{display:block;margin:8px 0 2px;font-size:14px;color:var(--mu)}
 label.chk{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:16px;margin:8px 0}
 label.chk input{width:auto;margin:0}
 summary{cursor:pointer;font-weight:600}
-#messages{height:220px;overflow-y:auto;border:1px solid var(--bd);background:var(--bg);border-radius:10px;padding:10px;margin:8px 0}
-.msg{margin:6px 0;word-wrap:break-word}
 </style>
 </head>
 <body>
@@ -64,29 +62,21 @@ summary{cursor:pointer;font-weight:600}
 <section class="c">
   <label for="q">Votre demande</label>
   <textarea id="q" placeholder="Que voulez-vous demander ?"></textarea>
+  
   <label for="mo">Mode</label>
   <select id="mo">
+    <option value="puter">Puter AI (Sans clé, recommandé)</option>
     <option value="cles">Clés API (fournisseurs gratuits)</option>
     <option value="manuel">Manuel (je colle entre mes IA gratuites)</option>
   </select>
+  
   <label class="chk"><input type="checkbox" id="vf" checked> Faire vérifier par une autre IA</label>
   <button type="button" onclick="start()">Envoyer</button>
 </section>
 
 <details class="c">
-  <summary>Démo rapide — discuter sans clé (Puter)</summary>
-  <p class="mu">Fonctionne sans configuration. À utiliser pour tester, pas pour la vérification croisée.</p>
-  <div id="messages" aria-live="polite"><div class="msg"><strong>NEXUS AI :</strong> Posez une question pour tester.</div></div>
-  <div style="display:flex;gap:8px;align-items:flex-start">
-    <label for="prompt" style="position:absolute;left:-9999px">Message</label>
-    <input type="text" id="prompt" placeholder="Écrivez votre message…" onkeydown="if(event.key==='Enter'){event.preventDefault();envoyerMessage()}">
-    <button type="button" onclick="envoyerMessage()">Envoyer</button>
-  </div>
-</details>
-
-<details class="c">
   <summary>Réglages : mes IA (clés API)</summary>
-  <p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur, jamais dans le fichier. Vérifiez les adresses dans la documentation de chaque fournisseur.</p>
+  <p class="mu">Choisissez deux fournisseurs différents. Les clés restent dans ce navigateur, jamais dans le fichier. (Non nécessaire si vous utilisez Puter).</p>
   <datalist id="dl">
     <option value="https://api.groq.com/openai/v1/chat/completions"></option>
     <option value="https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"></option>
@@ -175,6 +165,16 @@ async function callP(k,prompt){
 }
 async function testP(k){const e=$("#t"+k);e.textContent="Test en cours…";try{await callP(k,"Réponds uniquement : ok");e.textContent="Connexion réussie."}catch(x){e.textContent=x.message}}
 
+async function callPuter(prompt) {
+  if (!window.puter || !puter.ai) throw new Error("Puter n'est pas chargé. Vérifiez votre connexion.");
+  try {
+    const r = await puter.ai.chat(prompt);
+    return String(r);
+  } catch(e) {
+    throw new Error("Puter a refusé la connexion. Réessayez plus tard.");
+  }
+}
+
 function wait(t,role,n){const d=[60,300,900,3600][Math.min(n,3)];
   return new Promise(res=>{
     t.status="attente";t.att={role,fin:Date.now()+d*1000};
@@ -186,8 +186,11 @@ function manual(t,role,prompt){return new Promise(res=>{t.status="manuel";t._m={
 async function ask(t,role,prompt,tier,json){
   for(let n=0,k=0;;){
     let txt;
-    if(t.mode==="manuel")txt=await manual(t,role,prompt);
-    else{
+    if(t.mode==="puter"){
+      txt=await callPuter(prompt);
+    }else if(t.mode==="manuel"){
+      txt=await manual(t,role,prompt);
+    }else{
       try{txt=await callP(role.startsWith("Vérif")?"v":"p",prompt)}
       catch(e){if(e&&e.code==="rate_limited"){await wait(t,role,n++);continue}throw e}
     }
@@ -251,7 +254,7 @@ function okM(){const v=$("#mr").value.trim();if(!v||!cur._m)return;const m=cur._
 function render(){
   const t=cur;let h="";
   if(t){
-    h+='<section class="c"><div class="mu">'+esc(t.type)+(t.tier?" · "+(t.mode==="manuel"?"IA de votre choix":"modèle "+(PV("p").modele||"?")):"")+'</div><b>'+esc(t.demande)+'</b>';
+    h+='<section class="c"><div class="mu">'+esc(t.type)+(t.tier?" · "+(t.mode==="manuel"?"IA de votre choix":t.mode==="puter"?"Puter AI":"modèle "+(PV("p").modele||"?")):"")+'</div><b>'+esc(t.demande)+'</b>';
     if(t.why)h+='<div class="mu">Pourquoi : '+esc(t.why)+'</div>';
     if(t.status==="non_supporte")h+='<div class="bn ko">Image, voix, vidéo et achat vérifié : non démontrables automatiquement à 0 € dans cette version.</div>';
     if(t.status==="en_cours")h+='<div class="bn">'+esc(t.step||"En cours")+'…</div>';
@@ -263,6 +266,7 @@ function render(){
     if(t.status==="fini"&&t.verif){
       const n=niveau(t);
       h+='<div class="bn '+n[1]+'"><b>'+esc(n[0])+'</b><div class="mu">Conforme à la demande ne veut pas dire vrai.</div></div>';
+      if(t.mode==="puter")h+='<div class="bn ko">Vérification dégradée : en mode Puter, le même fournisseur sert pour les deux rôles.</div>';
       if(t.mode==="cles"&&PV("p").url===PV("v").url)h+='<div class="bn ko">Vérification dégradée : producteur et vérificateur utilisent la même adresse (même fournisseur).</div>';
       if(t.v&&t.v.ecarts&&t.v.ecarts.length&&t.v.verdict!=="OUI")h+='<div class="bn wa">Écarts : '+t.v.ecarts.map(esc).join(" ; ")+'</div>';
     }
@@ -273,37 +277,6 @@ function render(){
   $("#jr").innerHTML=T.length
     ? T.map((x,i)=>'<button type="button" class="j" onclick="openT('+i+')">'+esc(new Date(x.id).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}))+' · '+esc(x.status)+' · '+esc(x.demande.slice(0,60))+'</button>').join("")
     : '<div class="mu">Aucune demande pour l’instant.</div>';
-}
-
-/* Démo Puter — sans clé, sans injection HTML */
-function addMsg(who,txt,id){
-  const box=$("#messages");
-  const d=document.createElement("div");d.className="msg";
-  if(id)d.id=id;
-  const b=document.createElement("strong");b.textContent=who+" : ";
-  d.appendChild(b);d.appendChild(document.createTextNode(txt));
-  box.appendChild(d);box.scrollTop=box.scrollHeight;
-}
-function setMsg(id,who,txt){
-  const d=document.getElementById(id);if(!d)return;
-  d.textContent="";
-  const b=document.createElement("strong");b.textContent=who+" : ";
-  d.appendChild(b);d.appendChild(document.createTextNode(txt));
-}
-async function envoyerMessage(){
-  const input=$("#prompt");
-  const texte=input.value.trim();if(!texte)return;
-  input.value="";
-  addMsg("Toi",texte);
-  const id="l"+Date.now();
-  addMsg("NEXUS AI","réfléchit…",id);
-  try{
-    if(!window.puter||!puter.ai)throw new Error("no-puter");
-    const r=await puter.ai.chat(texte);
-    setMsg(id,"NEXUS AI",String(r));
-  }catch(e){
-    setMsg(id,"Erreur","Impossible de contacter l’IA de démonstration. Réessayez plus tard.");
-  }
 }
 
 load();render();fillS();
