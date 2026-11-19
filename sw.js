@@ -1,53 +1,5 @@
-const CACHE_NAME = 'nexus-ai-v1';
-const APP_SHELL = ['./','./index.html','./manifest.json'];
-
-self.addEventListener('install',(event)=>{
-  event.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(APP_SHELL).catch(()=>{})));
-  self.skipWaiting();
-});
-
-self.addEventListener('activate',(event)=>{
-  event.waitUntil(
-    caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k))))
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch',(event)=>{
-  const { request } = event;
-  if(request.method!=='GET') return;
-  const url = new URL(request.url);
-
-  // Ne jamais cacher les appels API
-  if(
-    url.hostname.includes('api.') ||
-    url.hostname.includes('generativelanguage') ||
-    url.hostname.includes('openrouter') ||
-    url.hostname.includes('groq') ||
-    url.hostname.includes('pollinations') ||
-    url.hostname.includes('puter') ||
-    url.hostname.includes('kilocode')
-  ) return;
-
-  // Cache-first pour l'app shell
-  if(APP_SHELL.some(p=>url.pathname.endsWith(p) || url.pathname==='/')){
-    event.respondWith(
-      caches.match(request).then(cached=>cached || fetch(request).then(res=>{
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(c=>c.put(request,clone));
-        return res;
-      }).catch(()=>caches.match('./index.html')))
-    );
-    return;
-  }
-
-  event.respondWith(
-    fetch(request).then(res=>{
-      if(res.ok && url.origin===location.origin){
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(c=>c.put(request,clone));
-      }
-      return res;
-    }).catch(()=>caches.match(request))
-  );
-});
+const C='nexus-ai-v3',S=['./','./index.html','./manifest.json','./icon-180.png'];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(S)).catch(()=>{}));self.skipWaiting()});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim()});
+self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin)return;
+e.respondWith(fetch(r).then(x=>{if(x.ok){const y=x.clone();caches.open(C).then(c=>c.put(r,y))}return x}).catch(()=>caches.match(r).then(m=>m||caches.match('./index.html'))))});
