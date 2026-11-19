@@ -1,778 +1,161 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <meta name="theme-color" content="#0a0a0f">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="NEXUS AI">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial' font-size='52' font-weight='bold' fill='white' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
-  <title>NEXUS AI</title>
-  <style>
-    /* Le CSS est strictement identique à la v2 pour le moment */
-    :root{--bg:#08080c;--bg-2:#101018;--bg-3:#181824;--bg-4:#222233;--border:rgba(255,255,255,0.08);--text:#f0f0f5;--text-dim:#9a9ab0;--accent:#6366f1;--accent-2:#a855f7;--success:#10b981;--error:#ef4444;--warning:#f59e0b;--radius:20px;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px)}
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;padding:0;height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:16px;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
-    input,textarea,.selectable{-webkit-user-select:text;user-select:text}
-    #app{height:100dvh;display:flex;flex-direction:column;padding-left:var(--safe-left);padding-right:var(--safe-right);position:relative;z-index:1}
-    #app::before{content:'';position:absolute;top:-20%;left:-20%;width:140%;height:140%;background:radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15) 0%, transparent 40%),radial-gradient(circle at 80% 70%, rgba(168,85,247,0.15) 0%, transparent 40%);z-index:-1;pointer-events:none}
-    #topbar{display:flex;align-items:center;gap:12px;padding:calc(var(--safe-top) + 12px) 16px 12px;background:rgba(16,16,24,0.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
-    .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;box-shadow:0 4px 20px rgba(99,102,241,0.4);flex-shrink:0}
-    .brand{display:flex;flex-direction:column;min-width:0}
-    .brand h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-0.3px}
-    .brand .status{font-size:11.5px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:2px}
-    .dot{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);transition:all 0.3s}
-    .dot.offline{background:var(--error);box-shadow:0 0 8px var(--error)}
-    .dot.warning{background:var(--warning);box-shadow:0 0 8px var(--warning)}
-    .spacer{flex:1}
-    .icon-btn{width:40px;height:40px;border-radius:50%;background:var(--bg-3);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0;transition:background 0.2s}
-    .icon-btn:active{background:var(--bg-4)}
-    #content{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column;min-height:0}
-    .view{display:none;flex-direction:column;height:100%;min-height:0}
-    .view.active{display:flex}
-    #messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 24px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
-    .msg{display:flex;gap:10px;width:100%;animation:fadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-    .msg.user{flex-direction:row-reverse}
-    .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
-    .msg.user .avatar{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white}
-    .msg.ai .avatar{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white}
-    .msg-content{display:flex;flex-direction:column;max-width:85%;min-width:0;}
-    .bubble{padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.5;word-wrap:break-word;overflow-wrap:break-word;user-select:text;white-space:pre-wrap;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
-    .msg.user .bubble{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border-bottom-right-radius:4px}
-    .msg.ai .bubble{background:rgba(26,26,36,0.8);backdrop-filter:blur(10px);border:1px solid var(--border);border-bottom-left-radius:4px}
-    .bubble pre{background:rgba(0,0,0,0.4);padding:12px;border-radius:10px;overflow-x:auto;font-size:13px;margin:10px 0;border:1px solid var(--border);white-space:pre}
-    .bubble code{font-family:'SF Mono',Menlo,Consolas,monospace;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:6px;font-size:13.5px}
-    .bubble pre code{background:transparent;padding:0}
-    .bubble a{color:#93c5fd;text-decoration:none;border-bottom:1px solid rgba(147,197,253,0.4)}
-    .bubble strong{font-weight:700;color:white}
-    .meta{font-size:11px;color:var(--text-dim);margin-top:6px;padding:0 4px;display:flex;align-items:center;gap:6px}
-    .msg.user .meta{justify-content:flex-end}
-    .copy-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;padding:2px 6px;border-radius:6px;transition:all 0.2s;display:flex;align-items:center;gap:4px}
-    .copy-btn:hover{background:var(--bg-4);color:var(--text)}
-    .copy-btn.copied{color:var(--success)}
-    .typing{display:inline-flex;gap:4px;align-items:center;padding:4px 0}
-    .typing span{width:6px;height:6px;background:var(--text-dim);border-radius:50%;animation:bounce 1.2s infinite}
-    .typing span:nth-child(2){animation-delay:.15s}
-    .typing span:nth-child(3){animation-delay:.3s}
-    @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
-    #input-bar{padding:12px 16px;background:rgba(16,16,24,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);flex-shrink:0;z-index:10}
-    #input-bar.hidden{display:none}
-    .input-wrap{display:flex;align-items:flex-end;gap:10px;background:var(--bg-3);border:1px solid var(--border);border-radius:24px;padding:6px 6px 6px 18px;transition:border-color 0.2s, box-shadow 0.2s}
-    .input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px rgba(99,102,241,0.2)}
-    #user-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:15px;font-family:inherit;line-height:1.4;padding:10px 0;resize:none;max-height:120px;min-height:24px}
-    #user-input::placeholder{color:var(--text-dim)}
-    #send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;box-shadow:0 4px 12px rgba(99,102,241,0.3)}
-    #send-btn:disabled{opacity:0.4;box-shadow:none}
-    #send-btn:active:not(:disabled){transform:scale(0.92)}
-    #bottom-nav{display:flex;background:rgba(16,16,24,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding-bottom:var(--safe-bottom);flex-shrink:0;z-index:10}
-    .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px 10px;background:none;border:none;color:var(--text-dim);font-size:11px;font-family:inherit;cursor:pointer;font-weight:600;transition:color 0.2s}
-    .nav-btn .ico{font-size:22px;line-height:1;transition:transform 0.2s}
-    .nav-btn.active{color:var(--accent)}
-    .nav-btn.active .ico{transform:translateY(-2px)}
-    .nav-btn:active{opacity:0.7}
-    .scroll-view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;padding-bottom:32px}
-    .card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,0.2)}
-    .card h2{font-size:15px;margin:0 0 10px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
-    .card .sub{font-size:12.5px;color:var(--text-dim);margin:-6px 0 14px;line-height:1.4}
-    .field{margin-bottom:14px}
-    .field label{display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;font-weight:500}
-    .field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:all 0.2s;-webkit-user-select:text;user-select:text}
-    .field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(99,102,241,0.2)}
-    .btn{width:100%;padding:14px 16px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;box-shadow:0 4px 15px rgba(99,102,241,0.3)}
-    .btn:active:not(:disabled){transform:scale(0.98)}
-    .btn:disabled{opacity:0.5;cursor:not-allowed;box-shadow:none}
-    .btn.secondary{background:var(--bg-3);border:1px solid var(--border);color:var(--text);box-shadow:none}
-    .btn.danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--error);box-shadow:none}
-    .provider-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;transition:transform 0.2s}
-    .provider-card .p-icon{width:44px;height:44px;border-radius:12px;background:var(--bg-3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-    .provider-card .p-info{flex:1;min-width:0}
-    .provider-card .p-name{font-size:15px;font-weight:600;margin-bottom:4px}
-    .provider-card .p-status{font-size:12px;color:var(--text-dim);word-break:break-word}
-    .p-badge{padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;flex-shrink:0;letter-spacing:0.5px}
-    .p-badge.ok{background:rgba(16,185,129,0.15);color:var(--success)}
-    .p-badge.ko{background:rgba(239,68,68,0.15);color:var(--error)}
-    .p-badge.pending{background:rgba(245,158,11,0.15);color:var(--warning)}
-    .p-badge.idle{background:var(--bg-3);color:var(--text-dim)}
-    .toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:rgba(34,34,51,0.95);backdrop-filter:blur(10px);color:var(--text);padding:14px 24px;border-radius:16px;font-size:14px;border:1px solid var(--border);opacity:0;pointer-events:none;transition:all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);z-index:1000;max-width:90vw;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.5);font-weight:500}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.error{border-color:var(--error);color:#fca5a5}
-    .toast.success{border-color:var(--success);color:#6ee7b7}
-    .welcome{text-align:center;padding:40px 20px;color:var(--text-dim);animation:fadeIn 0.5s ease}
-    .welcome .big-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent-2));margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:white;box-shadow:0 10px 40px rgba(99,102,241,0.5)}
-    .welcome h2{color:var(--text);font-size:22px;margin:0 0 10px;font-weight:700}
-    .welcome p{font-size:14.5px;line-height:1.5;margin:0}
-    .suggestions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;justify-content:center}
-    .suggestion{padding:10px 18px;background:var(--bg-3);border:1px solid var(--border);border-radius:24px;color:var(--text);font-size:13.5px;cursor:pointer;font-weight:500;transition:all 0.2s}
-    .suggestion:active{background:var(--bg-4);transform:scale(0.96)}
-    .hint{font-size:12px;color:var(--text-dim);line-height:1.4;margin-top:8px}
-    .link{color:var(--accent);text-decoration:none;font-weight:500}
-    .link:hover{text-decoration:underline}
-  </style>
-</head>
-<body>
-  <div id="app">
-    <header id="topbar">
-      <div class="logo">N</div>
-      <div class="brand">
-        <h1>NEXUS AI</h1>
-        <div class="status">
-          <span class="dot" id="status-dot"></span>
-          <span id="status-text">Initialisation...</span>
-        </div>
-      </div>
-      <div class="spacer"></div>
-      <button class="icon-btn" id="btn-new" title="Nouvelle conversation">＋</button>
-    </header>
-
-    <main id="content">
-      <section class="view active" id="view-chat">
-        <div id="messages"></div>
-      </section>
-
-      <section class="view" id="view-settings">
-        <div class="scroll-view">
-          <div class="card">
-            <h2>🔐 Puter</h2>
-            <p class="sub">Connectez-vous pour utiliser les modèles IA gratuits de Puter (sans clé API).</p>
-            <div id="puter-status" class="hint" style="margin-bottom:12px">Non connecté</div>
-            <button class="btn secondary" id="btn-puter-login">Se connecter à Puter</button>
-            <button class="btn secondary" id="btn-puter-logout" style="margin-top:8px;display:none">Se déconnecter</button>
-          </div>
-
-          <div class="card">
-            <h2>⚡ Groq</h2>
-            <p class="sub">API rapide et gratuite (Llama 3). <a class="link" href="https://console.groq.com/keys" target="_blank" rel="noopener">Obtenir une clé</a></p>
-            <div class="field">
-              <label>Clé API Groq</label>
-              <input type="password" id="key-groq" placeholder="gsk_..." autocomplete="off">
-            </div>
-          </div>
-
-          <div class="card">
-            <h2>🔀 OpenRouter</h2>
-            <p class="sub">Modèles variés, certains gratuits. <a class="link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">Obtenir une clé</a></p>
-            <div class="field">
-              <label>Clé API OpenRouter</label>
-              <input type="password" id="key-openrouter" placeholder="sk-or-..." autocomplete="off">
-            </div>
-          </div>
-
-          <div class="card">
-            <h2>💎 Google Gemini</h2>
-            <p class="sub">Gratuit avec quota généreux. <a class="link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Obtenir une clé</a></p>
-            <div class="field">
-              <label>Clé API Gemini</label>
-              <input type="password" id="key-gemini" placeholder="AIza..." autocomplete="off">
-            </div>
-          </div>
-
-          <div class="card">
-            <h2>🚀 Kilo Code</h2>
-            <p class="sub">Laissez la clé vide pour utiliser le mode <strong>Gratuit / Anonyme</strong>. Sinon, mettez votre clé.</p>
-            <div class="field">
-              <label>Clé API Kilo (Optionnel)</label>
-              <input type="password" id="key-kilo" placeholder="Laissez vide pour le mode gratuit..." autocomplete="off">
-            </div>
-            <div class="field">
-              <label>URL de base (API)</label>
-              <input type="url" id="base-kilo" placeholder="https://api.kilocode.ai/v1" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="card">
-            <h2>🌸 Pollinations</h2>
-            <p class="sub">Fallback gratuit et illimité (sans clé).</p>
-            <div class="field">
-              <label style="display:flex;align-items:center;gap:10px">
-                <input type="checkbox" id="toggle-pollinations" checked style="width:auto;transform:scale(1.2)">
-                Activer Pollinations
-              </label>
-            </div>
-          </div>
-
-          <div class="card">
-            <h2>🗑️ Données</h2>
-            <button class="btn danger" id="btn-reset">Effacer toutes les données locales</button>
-          </div>
-
-          <p class="hint" style="text-align:center;margin:24px 0">NEXUS AI · v2.1 · Smart Router Edition</p>
-        </div>
-      </section>
-
-      <section class="view" id="view-test">
-        <div class="scroll-view">
-          <div class="card">
-            <h2>🧪 Test des fournisseurs</h2>
-            <p class="sub">Vérifie que chaque fournisseur est correctement configuré et répond en direct.</p>
-            <button class="btn" id="btn-run-test">▶ Lancer le test complet</button>
-          </div>
-          <div id="test-results"></div>
-        </div>
-      </section>
-    </main>
-
-    <div id="input-bar">
-      <div class="input-wrap">
-        <textarea id="user-input" rows="1" placeholder="Demandez à NEXUS..." enterkeyhint="send" autocomplete="off" autocorrect="on" spellcheck="true"></textarea>
-        <button id="send-btn" aria-label="Envoyer">➤</button>
-      </div>
-    </div>
-
-    <nav id="bottom-nav">
-      <button class="nav-btn active" data-view="chat"><span class="ico">💬</span><span>Chat</span></button>
-      <button class="nav-btn" data-view="test"><span class="ico">🧪</span><span>Test</span></button>
-      <button class="nav-btn" data-view="settings"><span class="ico">⚙️</span><span>Réglages</span></button>
-    </nav>
-  </div>
-
-  <div class="toast" id="toast"></div>
-  <script src="https://js.puter.com/v2/"></script>
-  <script>
-  const PROVIDERS = {
-    groq:{name:'Groq',icon:'⚡',endpoint:'https://api.groq.com/openai/v1/chat/completions',needKey:true},
-    openrouter:{name:'OpenRouter',icon:'🔀',endpoint:'https://openrouter.ai/api/v1/chat/completions',needKey:true},
-    gemini:{name:'Google Gemini',icon:'💎',endpoint:'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent',needKey:true},
-    puter:{name:'Puter',icon:'🖥️',needKey:false},
-    kilo:{name:'Kilo',icon:'🚀',endpoint:'https://api.kilocode.ai/v1/chat/completions',needKey:false},
-    pollinations:{name:'Pollinations',icon:'🌸',endpoint:'https://text.pollinations.ai/openai',needKey:false}
-  };
-  const SYSTEM_PROMPT = `Tu es NEXUS, un assistant IA utile, précis et concis. Réponds en français par défaut, sauf si l'utilisateur écrit dans une autre langue. Utilise du Markdown pour structurer (gras, listes, blocs de code). Sois direct et va à l'essentiel.`;
-
-  const state = { conversation: [], isSending: false, testResults: {} };
-  const store = {
-    get(k,def){ try{const v=localStorage.getItem('nexus_'+k);return v!==null?JSON.parse(v):def}catch{return def} },
-    set(k,v){ try{localStorage.setItem('nexus_'+k,JSON.stringify(v))}catch{} }
-  };
-  function getKeys(){
-    return {
-      groq: store.get('key_groq',''),
-      openrouter: store.get('key_openrouter',''),
-      gemini: store.get('key_gemini',''),
-      kilo: store.get('key_kilo',''),
-      kiloBase: store.get('base_kilo','https://api.kilocode.ai/v1'),
-      pollinations: store.get('pollinations_on',true)
-    };
-  }
-
-  const $ = s => document.querySelector(s);
-  const messagesEl = $('#messages');
-  const inputEl = $('#user-input');
-  const sendBtn = $('#send-btn');
-  const inputBar = $('#input-bar');
-
-  let toastTimer;
-  function toast(msg,type=''){
-    const el = $('#toast');
-    el.textContent = msg; el.className = 'toast show '+type;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=>el.classList.remove('show'),3000);
-  }
-
-  function copyToClipboard(text, btn) {
-    if (!navigator.clipboard) {
-      const ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta);
-    } else {
-      navigator.clipboard.writeText(text);
-    }
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '✅ Copié !';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.innerHTML = originalText; btn.classList.remove('copied'); }, 2000);
-  }
-
-  function renderMarkdown(text){
-    if(!text) return '';
-    let h = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    h = h.replace(/```(\w*)\n?([\s\S]*?)```/g,(m,l,c)=>`<pre><code>${c.replace(/\n$/,'')}</code></pre>`);
-    h = h.replace(/`([^`\n]+)`/g,'<code>$1</code>');
-    h = h.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-    h = h.replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>');
-    h = h.replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
-    const parts = h.split(/(<pre>[\s\S]*?<\/pre>)/g);
-    return parts.map(p=>p.startsWith('<pre>')?p:p.replace(/\n/g,'<br>')).join('');
-  }
-
-  // Normalisation douce du texte
-  function normalizeText(text) {
-    return text.toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Enlève les accents
-      .replace(/[^\w\s\+\-\*\/\(\)\.\,\?\!\:\;\=]/g, '') // Garde la ponctuation utile
-      .replace(/\s+/g, ' ').trim();
-  }
-
-  // Modules locaux
-  function tryLocalResponse(originalText){
-    const t = normalizeText(originalText);
-    const raw = originalText.trim();
-
-    // Dés
-    const matchDe = t.match(/^(?:lance|jet|jette|roule)\s+(?:un|1|le)?\s*(?:de|des|dé|dés)\s*(?:a|de)?\s*(\d+)?/);
-    if (matchDe) {
-      const faces = parseInt(matchDe[1]) || 6;
-      const result = Math.floor(Math.random() * faces) + 1;
-      return `🎲 J'ai lancé un dé à **${faces} faces** : **${result}** !`;
-    }
-
-    // Pile ou face
-    if (/(pile ou face|piece|pièce)/.test(t) && t.length < 25) {
-      return `🪙 **${Math.random() > 0.5 ? 'Pile' : 'Face'}** !`;
-    }
-
-    // Mot de passe
-    const matchMdp = t.match(/(?:genere|crée|creer|donne)[\s\w]*(?:mot de passe|mdp)[\s\w]*(?:de\s*)?(\d+)?/);
-    if (matchMdp) {
-      const length = Math.min(Math.max(parseInt(matchMdp[1]) || 16, 8), 64);
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-      let pwd = "";
-      for (let i = 0; i < length; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
-      return `🔐 Voici un mot de passe de **${length} caractères** :\n\n\`${pwd}\`\n\n*(Cliquez sur Copier ou sélectionnez-le)*`;
-    }
-
-    // Dates futures
-    const matchDateFutur = t.match(/dans\s+(\d+)\s+(jour|jours|semaine|semaines|mois|an|ans)/);
-    if (matchDateFutur) {
-      const n = parseInt(matchDateFutur[1]);
-      const unit = matchDateFutur[2];
-      const d = new Date();
-      if (unit.includes('jour')) d.setDate(d.getDate() + n);
-      else if (unit.includes('semaine')) d.setDate(d.getDate() + (n * 7));
-      else if (unit.includes('mois')) d.setMonth(d.getMonth() + n);
-      else if (unit.includes('an')) d.setFullYear(d.getFullYear() + n);
-      
-      const dateStr = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-      return `📅 Dans ${n} ${unit}, nous serons le **${dateStr}**.`;
-    }
-
-    // Salutations
-    if(/^(bonjour|salut|hello|hi|hey|yo|coucou|bonsoir|cc|slt|hola)\b/.test(t) && t.length<40){
-      return "Bonjour ! Je suis NEXUS 👋 Posez-moi une question, je choisirai la meilleure IA pour vous répondre.";
-    }
-    if(/^(merci|thanks|thank you|thx|ok merci|super|genial|parfait|nickel)\b/.test(t) && t.length<40){
-      return "Avec plaisir ! N'hésitez pas si vous avez d'autres questions. 😊";
-    }
-    if(/(qui es[- ]tu|qui est[- ]tu|ton nom|c'est quoi nexus|presente[- ]toi|t'es qui)/.test(t)){
-      return "Je suis **NEXUS**, un assistant multi-IA. Je route intelligemment vos demandes vers la meilleure IA disponible (Groq, OpenRouter, Gemini, Puter, Kilo, Pollinations) — en privilégiant les options gratuites et adaptées.";
-    }
-    if(/(que (peux|sais)[- ]tu faire|tes? (capacites|fonctions)|aide|help|commandes)/.test(t) && t.length<80){
-      return "Voici ce que je peux faire :\n\n- 💬 **Discuter** et répondre à des questions\n- 🧮 **Calculer** des expressions simples\n- 🕐 **Donner** l'heure et la date\n- 🎲 **Lancer** des dés ou faire Pile ou Face\n- 🔐 **Générer** des mots de passe\n- 🔀 **Router** vers la meilleure IA selon le besoin\n- 🧪 **Tester** vos connexions API\n\nConfigurez vos clés dans ⚙️ Réglages.";
-    }
-    if(/(quelle heure|what time|l'heure|heure actuelle)/.test(t)){
-      const n = new Date();
-      return `Il est **${n.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}** (${n.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}).`;
-    }
-    if(/(quel(le)? (jour|date)|date d'aujourd'hui|on est (le|quel))/i.test(t)){
-      const n = new Date();
-      return `Nous sommes le **${n.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}**.`;
-    }
-    
-    // Maths
-    if(/^[\d\s\+\-\*\/\(\)\.]+[=\?]?$/.test(t) && /[\d]/.test(t) && /[\+\-\*\/]/.test(t)){
-      try{
-        const expr = raw.replace(/[=\?]/g,'').trim();
-        if(/^[\d\s\+\-\*\/\(\)\.]+$/.test(expr)){
-          const val = Function('"use strict"; return ('+expr+')')();
-          if(typeof val==='number' && isFinite(val)) return `**${expr} = ${val}**`;
-        }
-      }catch{}
-    }
-    return null;
-  }
-
-  // Nouveau Routeur Intelligent (Scoring)
-  function analyzeIntent(text) {
-    const t = normalizeText(text);
-    const scores = { code: 0, creative: 0, translation: 0, long_context: 0, general: 1 }; // general = 1 par défaut
-    
-    // Mots clés -> Score
-    const kw = {
-      code: ['code','programme','fonction','function','debug','erreur','script','js','javascript','python','html','css','sql','api','bug','compile','developpe','class','algorithme'],
-      creative: ['raconte','histoire','poeme','poesie','creatif','ecris','invente','imagine','scenario','chanson','paroles','fiction'],
-      translation: ['tradui','traduis','translate','traduction','anglais','espagnol','allemand','italien','chinois','japonais'],
-      long_context: ['resume','resumer','summarize','synthese','analyse ce texte','corrige ce texte','long']
-    };
-
-    for (const [type, words] of Object.entries(kw)) {
-      if (words.some(w => t.includes(w))) scores[type] += 2;
-    }
-
-    if (text.length > 500) scores.long_context += 3;
-    if (/(\d+\s*[\+\-\*\/]\s*\d+)/.test(t)) scores.general += 1;
-
-    // Trouver l'intention dominante
-    let bestIntent = 'general';
-    let bestScore = -1;
-    for (const [intent, score] of Object.entries(scores)) {
-      if (score > bestScore) { bestScore = score; bestIntent = intent; }
-    }
-    return bestIntent;
-  }
-
-  function routeQuery(text) {
-    const intent = analyzeIntent(text);
-    
-    // Matrice de compatibilité (Fournisseur : Score pour chaque intention)
-    const providerScores = {
-      groq:        { code: 5, creative: 1, translation: 2, long_context: 1, general: 3 },
-      openrouter:  { code: 4, creative: 5, translation: 3, long_context: 4, general: 3 },
-      gemini:      { code: 3, creative: 3, translation: 5, long_context: 5, general: 3 },
-      kila:        { code: 4, creative: 2, translation: 2, long_context: 2, general: 2 }, // Kilo (alias kila pour éviter conflit)
-      puter:       { code: 3, creative: 3, translation: 3, long_context: 3, general: 3 },
-      pollinations:{ code: 2, creative: 2, translation: 2, long_context: 2, general: 4 }  // Fallback gratuit
-    };
-
-    const availProviders = Object.keys(PROVIDERS).filter(id => isProviderAvailable(id === 'kilo' ? 'kilo' : id));
-    
-    if (availProviders.length === 0) return { provider: null, reason: 'Aucun fournisseur disponible' };
-
-    let bestProvider = availProviders[0];
-    let highestScore = -1;
-
-    for (const p of availProviders) {
-      // Gestion spéciale pour Kilo
-      const scoreKey = p === 'kilo' ? 'kila' : p;
-      const score = (providerScores[scoreKey] && providerScores[scoreKey][intent]) || 1;
-      
-      if (score > highestScore) {
-        highestScore = score;
-        bestProvider = p;
-      }
-    }
-
-    return { provider: bestProvider, reason: `Intent: ${intent}` };
-  }
-
-  // Gestion des commandes Slash
-  function parseSlashCommand(text) {
-    const match = text.match(/^\/(groq|gemini|openrouter|kilo|puter|pollinations)\s+([\s\S]+)/i);
-    if (match) return { provider: match[1].toLowerCase(), text: match[2].trim() };
-    return null;
-  }
-
-  function isProviderAvailable(id){
-    const k = getKeys();
-    if(id==='groq') return !!k.groq;
-    if(id==='openrouter') return !!k.openrouter;
-    if(id==='gemini') return !!k.gemini;
-    if(id==='kilo') return true;
-    if(id==='pollinations') return k.pollinations !== false;
-    if(id==='puter') return typeof puter!=='undefined' && puter.auth && puter.auth.isSignedIn && puter.auth.isSignedIn();
-    return false;
-  }
-
-  async function callGroq(messages,key){
-    const res = await fetch(PROVIDERS.groq.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages,temperature:0.7,max_tokens:2048})});
-    if(!res.ok) throw new Error('Groq '+res.status+': '+(await res.text()).slice(0,200));
-    const d = await res.json(); return d.choices?.[0]?.message?.content || '';
-  }
-
-  async function callOpenRouter(messages,key){
-    const res = await fetch(PROVIDERS.openrouter.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':location.origin||'https://nexus-ai.app','X-Title':'NEXUS AI'},body:JSON.stringify({model:'meta-llama/llama-3.3-70b-instruct:free',messages,temperature:0.7})});
-    if(!res.ok) throw new Error('OpenRouter '+res.status+': '+(await res.text()).slice(0,200));
-    const d = await res.json(); return d.choices?.[0]?.message?.content || '';
-  }
-
-  async function callGemini(messages,key){
-    const contents = []; let system = null;
-    for(const m of messages){ if(m.role==='system'){system=m.content;continue} contents.push({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}); }
-    const body = {contents,generationConfig:{temperature:0.7,maxOutputTokens:2048}};
-    if(system) body.systemInstruction = {parts:[{text:system}]};
-    const url = PROVIDERS.gemini.endpoint.replace('{model}','gemini-2.0-flash-exp')+'?key='+encodeURIComponent(key);
-    const res = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(!res.ok) throw new Error('Gemini '+res.status+': '+(await res.text()).slice(0,200));
-    const d = await res.json(); return d.candidates?.[0]?.content?.parts?.map(p=>p.text).join('') || '';
-  }
-
-  async function callPuter(messages){
-    if(typeof puter==='undefined' || !puter.ai) throw new Error('SDK Puter non chargé');
-    if(!puter.auth.isSignedIn()) throw new Error('Non connecté à Puter');
-    const system = messages.find(m=>m.role==='system'); const chat = messages.filter(m=>m.role!=='system');
-    const opts = {model:'gpt-4o-mini'}; if(system) opts.systemPrompt = system.content;
-    let resp = chat.length===1 ? await puter.ai.chat(chat[0].content,opts) : await puter.ai.chat(chat,opts);
-    if(typeof resp==='string') return resp;
-    if(resp?.message?.content) return resp.message.content;
-    if(resp?.text) return resp.text;
-    return String(resp);
-  }
-
-  async function callKilo(messages,key){
-    const k = getKeys(); const base = (k.kiloBase||'https://api.kilocode.ai/v1').replace(/\/$/,'');
-    const finalKey = key.trim() === '' ? 'anonymous' : key;
-    const res = await fetch(base+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+finalKey},body:JSON.stringify({model:'kilo-default',messages,temperature:0.7})});
-    if(!res.ok) throw new Error('Kilo '+res.status+': '+(await res.text()).slice(0,200));
-    const d = await res.json(); return d.choices?.[0]?.message?.content || '';
-  }
-
-  async function callPollinations(messages){
-    const res = await fetch(PROVIDERS.pollinations.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'openai',messages,temperature:0.7})});
-    if(!res.ok) throw new Error('Pollinations '+res.status);
-    const d = await res.json(); return d.choices?.[0]?.message?.content || '';
-  }
-
-  async function dispatch(provider,messages){
-    const k = getKeys();
-    switch(provider){
-      case 'groq': return callGroq(messages,k.groq);
-      case 'openrouter': return callOpenRouter(messages,k.openrouter);
-      case 'gemini': return callGemini(messages,k.gemini);
-      case 'puter': return callPuter(messages);
-      case 'kilo': return callKilo(messages,k.kilo);
-      case 'pollinations': return callPollinations(messages);
-      default: throw new Error('Fournisseur inconnu: '+provider);
-    }
-  }
-
-  async function dispatchWithFallback(primary,messages){
-    const allProviders = ['groq','openrouter','gemini','kilo','pollinations','puter'];
-    const order = [primary,...allProviders.filter(p=>p!==primary)];
-    let lastErr = null;
-    for(const p of order){
-      if(!isProviderAvailable(p)) continue;
-      try{
-        const out = await dispatch(p,messages);
-        if(out && out.trim()) return {provider:p,content:out};
-      }catch(e){ lastErr = e; console.warn('[NEXUS] '+p+' failed:',e.message) }
-    }
-    throw lastErr || new Error("Aucun fournisseur n'a pu répondre");
-  }
-
-  function renderMessages(){
-    if(state.conversation.length===0){
-      messagesEl.innerHTML = `
-        <div class="welcome">
-          <div class="big-logo">N</div>
-          <h2>NEXUS AI</h2>
-          <p>Votre assistant multi-IA intelligent.<br>Je choisis automatiquement la meilleure IA pour chaque demande.</p>
-          <div class="suggestions">
-            <button class="suggestion" data-q="Bonjour !">👋 Bonjour</button>
-            <button class="suggestion" data-q="/groq Écris-moi une fonction JavaScript pour inverser une chaîne">⚡ Forcer Groq</button>
-            <button class="suggestion" data-q="Raconte-moi une courte histoire sur l'espace">✨ Créatif</button>
-            <button class="suggestion" data-q="Lance un dé à 20 faces">🎲 Lancer de dé</button>
-          </div>
-        </div>`;
-      messagesEl.querySelectorAll('.suggestion').forEach(b=>{ b.addEventListener('click',()=>{ inputEl.value=b.dataset.q; send() }); });
-      return;
-    }
-    messagesEl.innerHTML = '';
-    for(const m of state.conversation) appendMessageEl(m.role,m.content,m.provider);
-    scrollBottom();
-  }
-
-  function appendMessageEl(role,content,provider){
-    const wrap = document.createElement('div'); wrap.className = 'msg '+(role==='user'?'user':'ai');
-    const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = role==='user'?'👤':'✦';
-    const col = document.createElement('div'); col.className = 'msg-content';
-    const bubble = document.createElement('div'); bubble.className = 'bubble selectable';
-    if(role==='assistant') { bubble.innerHTML = renderMarkdown(content); } else { bubble.textContent = content; }
-    col.appendChild(bubble);
-    if(role==='assistant'){
-      const meta = document.createElement('div'); meta.className = 'meta';
-      const label = provider==='local'?'Nexus · local':(PROVIDERS[provider]?.name||provider||'Nexus');
-      const ico = provider==='local'?'🧠':(PROVIDERS[provider]?.icon||'✦');
-      const metaText = document.createElement('span'); metaText.textContent = ico+' '+label;
-      const copyBtn = document.createElement('button'); copyBtn.className = 'copy-btn'; copyBtn.innerHTML = '📋 Copier';
-      copyBtn.onclick = () => copyToClipboard(content, copyBtn);
-      meta.appendChild(metaText); meta.appendChild(copyBtn); col.appendChild(meta);
-    }
-    wrap.appendChild(avatar); wrap.appendChild(col); messagesEl.appendChild(wrap);
-  }
-
-  function scrollBottom(){ requestAnimationFrame(()=>{ messagesEl.scrollTop = messagesEl.scrollHeight }) }
-
-  function appendTyping(){
-    const wrap = document.createElement('div'); wrap.className = 'msg ai'; wrap.id = 'typing-msg';
-    wrap.innerHTML = `<div class="avatar">✦</div><div class="msg-content"><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
-    messagesEl.appendChild(wrap); scrollBottom();
-  }
-  function removeTyping(){ const e = document.getElementById('typing-msg'); if(e) e.remove() }
-
-  async function send(){
-    if(state.isSending) return;
-    let text = inputEl.value.trim();
-    if(!text) return;
-
-    state.isSending = true; sendBtn.disabled = true; inputEl.value = ''; inputEl.style.height = 'auto';
-    state.conversation.push({role:'user',content:text});
-    renderMessages();
-
-    // 1. Commandes Slash (Forcer une IA)
-    const slashCmd = parseSlashCommand(text);
-    let route;
-
-    if (slashCmd) {
-      if (!isProviderAvailable(slashCmd.provider)) {
-        const errMsg = `⚠️ Le fournisseur **${slashCmd.provider}** n'est pas configuré ou disponible.`;
-        state.conversation.push({role:'assistant',content:errMsg,provider:'local'});
-        renderMessages(); saveConversation(); state.isSending = false; sendBtn.disabled = false; updateStatus('Configuration requise', 'warning');
-        return;
-      }
-      route = { provider: slashCmd.provider, reason: 'Commande forcée' };
-      text = slashCmd.text; // On retire le /commande pour l'envoi
-      updateStatus(`Forcé : ${PROVIDERS[slashCmd.provider]?.name || slashCmd.provider}`);
-    } else {
-      // 2. Modules Locaux
-      const local = tryLocalResponse(text);
-      if(local){
-        await sleep(300);
-        state.conversation.push({role:'assistant',content:local,provider:'local'});
-        renderMessages(); saveConversation(); state.isSending = false; sendBtn.disabled = false; updateStatus('Prêt');
-        return;
-      }
-
-      // 3. Routeur Intelligent (Score)
-      route = routeQuery(text);
-      updateStatus(route.provider?`Routé vers ${PROVIDERS[route.provider]?.name||route.provider}`:'Aucun fournisseur');
-    }
-
-    if(!route.provider){
-      const errMsg = "⚠️ Aucun fournisseur n'est configuré. Rendez-vous dans ⚙️ **Réglages**.";
-      state.conversation.push({role:'assistant',content:errMsg,provider:'local'});
-      renderMessages(); saveConversation(); state.isSending = false; sendBtn.disabled = false; updateStatus('Configuration requise', 'warning');
-      return;
-    }
-
-    const history = state.conversation.filter(m=>m.role==='user'||m.role==='assistant').map(m=>({role:m.role,content:m.content}));
-    const messages = [{role:'system',content:SYSTEM_PROMPT},...history.slice(-20)];
-
-    appendTyping();
-    try{
-      const result = await dispatchWithFallback(route.provider,messages);
-      removeTyping();
-      state.conversation.push({role:'assistant',content:result.content,provider:result.provider});
-      renderMessages(); saveConversation();
-      updateStatus(`Prêt · ${PROVIDERS[result.provider]?.name||result.provider}`);
-    }catch(e){
-      removeTyping();
-      const msg = "❌ Erreur : "+e.message;
-      state.conversation.push({role:'assistant',content:msg,provider:'local'});
-      renderMessages(); saveConversation(); updateStatus('Erreur de connexion', 'offline'); toast(e.message,'error');
-    }finally{
-      state.isSending = false; sendBtn.disabled = false;
-    }
-  }
-
-  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)) }
-  function saveConversation(){ store.set('conversation',state.conversation.slice(-100)) }
-  function loadConversation(){ const c = store.get('conversation',[]); if(Array.isArray(c)) state.conversation = c }
-
-  function updateStatus(text, type=''){
-    $('#status-text').textContent = text;
-    const dot = $('#status-dot'); dot.className = 'dot'; if(type) dot.classList.add(type);
-  }
-
-  function checkInitialStatus() {
-    const k = getKeys();
-    if (k.groq || k.openrouter || k.gemini || k.kilo) updateStatus('Prêt');
-    else if (k.pollinations) updateStatus('Mode gratuit (Pollinations)');
-    else updateStatus('Configuration requise', 'warning');
-  }
-
-  function loadSettingsUI(){
-    const k = getKeys();
-    $('#key-groq').value = k.groq; $('#key-openrouter').value = k.openrouter; $('#key-gemini').value = k.gemini;
-    $('#key-kilo').value = k.kilo; $('#base-kilo').value = k.kiloBase; $('#toggle-pollinations').checked = k.pollinations !== false;
-    refreshPuterUI();
-  }
-
-  function saveSettings(){
-    store.set('key_groq',$('#key-groq').value.trim()); store.set('key_openrouter',$('#key-openrouter').value.trim());
-    store.set('key_gemini',$('#key-gemini').value.trim()); store.set('key_kilo',$('#key-kilo').value.trim());
-    store.set('base_kilo',$('#base-kilo').value.trim()||'https://api.kilocode.ai/v1'); store.set('pollinations_on',$('#toggle-pollinations').checked);
-    checkInitialStatus();
-  }
-
-  function refreshPuterUI(){
-    const signedIn = typeof puter!=='undefined' && puter.auth && puter.auth.isSignedIn && puter.auth.isSignedIn();
-    $('#puter-status').textContent = signedIn ? '✅ Connecté : '+(puter.auth.getUser?(puter.auth.getUser()?.username||'utilisateur'):'utilisateur') : 'Non connecté';
-    $('#btn-puter-login').style.display = signedIn?'none':'block'; $('#btn-puter-logout').style.display = signedIn?'block':'none';
-  }
-
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-  function renderTestResults(){
-    const c = $('#test-results'); c.innerHTML = '';
-    for(const id of Object.keys(PROVIDERS)){
-      const p = PROVIDERS[id]; const st = state.testResults[id] || {status:'idle',detail:'Non testé'};
-      const card = document.createElement('div'); card.className = 'provider-card';
-      const bc = st.status==='ok'?'ok':st.status==='ko'?'ko':st.status==='pending'?'pending':'idle';
-      const bt = st.status==='ok'?'OK':st.status==='ko'?'Erreur':st.status==='pending'?'…':'—';
-      card.innerHTML = `<div class="p-icon">${p.icon}</div><div class="p-info"><div class="p-name">${p.name}</div><div class="p-status">${escapeHtml(st.detail)}</div></div><div class="p-badge ${bc}">${bt}</div>`;
-      c.appendChild(card);
-    }
-  }
-
-  async function testProvider(id,fn){
-    state.testResults[id] = {status:'pending',detail:'Test...'}; renderTestResults();
-    try{ const detail = await fn(); state.testResults[id] = {status:'ok',detail:'Prêt · '+(detail||'OK')}; }
-    catch(e){ state.testResults[id] = {status:'ko',detail:e.message.slice(0,120)}; }
-    renderTestResults();
-  }
-
-  async function runTests(){
-    const btn = $('#btn-run-test'); btn.disabled = true; btn.textContent = '⏳ Test en cours...';
-    for(const id of Object.keys(PROVIDERS)) state.testResults[id] = {status:'pending',detail:'Test...'};
-    renderTestResults(); const k = getKeys();
-
-    await testProvider('groq',async()=>{ if(!k.groq) throw new Error('Clé API manquante'); return (await callGroq([{role:'user',content:'Réponds uniquement "OK".'}],k.groq)).slice(0,40); });
-    await testProvider('openrouter',async()=>{ if(!k.openrouter) throw new Error('Clé API manquante'); return (await callOpenRouter([{role:'user',content:'Réponds uniquement "OK".'}],k.openrouter)).slice(0,40); });
-    await testProvider('gemini',async()=>{ if(!k.gemini) throw new Error('Clé API manquante'); return (await callGemini([{role:'user',content:'Réponds uniquement "OK".'}],k.gemini)).slice(0,40); });
-    await testProvider('puter',async()=>{ if(typeof puter==='undefined') throw new Error('SDK non chargé'); if(!puter.auth.isSignedIn()) throw new Error('Non connecté'); return (await callPuter([{role:'user',content:'Réponds uniquement "OK".'}])).slice(0,40); });
-    await testProvider('kilo',async()=>{ return (await callKilo([{role:'user',content:'Réponds uniquement "OK."'}], k.kilo)).slice(0,40); });
-    await testProvider('pollinations',async()=>{ if(!k.pollinations) throw new Error('Désactivé'); return (await callPollinations([{role:'user',content:'Réponds uniquement "OK."'}])).slice(0,40); });
-
-    btn.disabled = false; btn.textContent = '▶ Relancer le test complet'; toast('Test terminé','success');
-  }
-
-  function switchView(view){
-    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+view));
-    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
-    inputBar.classList.toggle('hidden',view!=='chat');
-    if(view==='settings') loadSettingsUI(); if(view==='test') renderTestResults();
-  }
-
-  document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>switchView(btn.dataset.view)));
-  sendBtn.addEventListener('click',send);
-  inputEl.addEventListener('input',()=>{ inputEl.style.height = 'auto'; inputEl.style.height = Math.min(inputEl.scrollHeight,120)+'px'; });
-  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-  inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey && !isCoarse){ e.preventDefault(); send() } });
-
-  $('#btn-new').addEventListener('click',()=>{
-    if(state.conversation.length && !confirm('Démarrer une nouvelle conversation ?')) return;
-    state.conversation = []; saveConversation(); renderMessages(); switchView('chat'); checkInitialStatus(); toast('Nouvelle conversation','success');
-  });
-
-  ['#key-groq','#key-openrouter','#key-gemini','#key-kilo','#base-kilo','#toggle-pollinations'].forEach(sel=>{
-    $(sel).addEventListener('change',saveSettings); $(sel).addEventListener('blur',saveSettings);
-  });
-
-  $('#btn-reset').addEventListener('click',()=>{
-    if(!confirm('Effacer toutes les clés API et conversations ?')) return;
-    Object.keys(localStorage).filter(k=>k.startsWith('nexus_')).forEach(k=>localStorage.removeItem(k));
-    state.conversation = []; loadSettingsUI(); renderMessages(); checkInitialStatus(); toast('Données effacées','success');
-  });
-
-  $('#btn-puter-login').addEventListener('click',async()=>{
-    try{ if(typeof puter==='undefined') throw new Error('SDK Puter non chargé'); await puter.auth.signIn(); refreshPuterUI(); toast('Connecté à Puter','success'); checkInitialStatus(); }
-    catch(e){ toast('Erreur Puter : '+e.message,'error') }
-  });
-  $('#btn-puter-logout').addEventListener('click',async()=>{
-    try{ await puter.auth.signOut(); refreshPuterUI(); toast('Déconnecté','success'); checkInitialStatus(); }
-    catch(e){ toast('Erreur : '+e.message,'error') }
-  });
-
-  $('#btn-run-test').addEventListener('click',runTests);
-
-  if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('SW:',e)); }); }
-  window.addEventListener('online',()=>checkInitialStatus()); window.addEventListener('offline',()=>updateStatus('Hors ligne', 'offline'));
-
-  (function init(){
-    loadConversation(); loadSettingsUI(); renderMessages(); renderTestResults(); checkInitialStatus();
-    setTimeout(()=>{ try{ refreshPuterUI(); checkInitialStatus(); }catch{} },800);
-  })();
-  </script>
-</body>
-</html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="NEXUS AI">
+<link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-180.png"><title>NEXUS AI</title>
+<style>
+:root{--bg:#0a0a0f;--c2:#15151f;--c3:#20202e;--bd:rgba(255,255,255,.09);--tx:#f0f0f5;--dm:#9a9ab0;--ac:#6366f1;--ac2:#a855f7;--ok:#10b981;--er:#ef4444}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font:16px -apple-system,system-ui,'Segoe UI',sans-serif;overscroll-behavior:none}
+#app{height:var(--h,100dvh);display:flex;flex-direction:column;padding:0 env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+header{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;border-bottom:1px solid var(--bd);background:var(--c2)}
+header b{font-size:17px}#stt{flex:1;font-size:12px;color:var(--dm)}
+button{font:inherit;color:inherit;cursor:pointer}
+.ib{width:38px;height:38px;border-radius:50%;background:var(--c3);border:1px solid var(--bd);font-size:19px}
+main{flex:1;min-height:0;position:relative}.v{display:none;height:100%;flex-direction:column;overflow-y:auto;padding:14px}.v.on{display:flex}
+#v-chat{padding:0}#msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.m{max-width:88%;display:flex;flex-direction:column}.m.user{align-self:flex-end}
+.bb{padding:10px 14px;border-radius:16px;line-height:1.5;font-size:15px;word-wrap:break-word;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+.user .bb{background:linear-gradient(135deg,#4f46e5,#7c3aed)}.ai .bb{background:var(--c2);border:1px solid var(--bd)}
+pre{background:#000a;padding:10px;border-radius:10px;overflow-x:auto;font-size:13px;margin:8px 0}code{font-family:Menlo,monospace;font-size:13px;background:#fff1;padding:1px 5px;border-radius:5px}pre code{background:none;padding:0}
+a{color:#93c5fd}.mt{font-size:11px;color:var(--dm);margin:4px 4px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.mt button{background:none;border:0;font-size:13px;padding:2px 4px;color:var(--dm)}
+#bar{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;border-top:1px solid var(--bd);background:var(--c2)}
+#in{flex:1;background:var(--c3);border:1px solid var(--bd);border-radius:20px;color:var(--tx);padding:10px 14px;font:inherit;font-size:16px;resize:none;max-height:120px;outline:0}
+#sb{width:42px;height:42px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--ac),var(--ac2));font-size:18px}
+nav{display:flex;border-top:1px solid var(--bd);background:var(--c2);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;padding:10px 0 8px;color:var(--dm);font-size:11px}nav button.on{color:var(--ac)}nav span{display:block;font-size:20px}
+.cd{background:var(--c2);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px}
+.cd input[type=password],#q{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px;color:var(--tx);font-size:16px;margin-top:8px}#q{margin:0 0 12px}
+.sw{display:flex;align-items:center;gap:8px}.sw input{width:22px;height:22px}.h{font-size:12px;color:var(--dm);margin-top:6px;word-break:break-word}
+.b2{width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--c3)}.b2.r{color:var(--er)}
+.hi{display:flex;gap:8px;align-items:center;padding:12px;border:1px solid var(--bd);border-radius:12px;margin-bottom:8px;background:var(--c2)}.hi div{flex:1;min-width:0}.hi small{color:var(--dm)}
+textarea#rep{width:100%;height:90px;margin-top:8px;background:var(--bg);color:var(--dm);border:1px solid var(--bd);border-radius:10px;font-size:11px}
+#ts{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--c3);padding:10px 18px;border-radius:14px;font-size:14px;display:none;z-index:9;max-width:90vw}
+</style></head><body>
+<div id="app"><header><b>NEXUS AI</b><span id="stt">…</span><button class="ib" id="nw" title="Nouvelle conversation">＋</button></header>
+<main>
+<section class="v on" id="v-chat"><div id="msgs"></div><div id="bar"><textarea id="in" rows="1" placeholder="Demandez à NEXUS..." enterkeyhint="send"></textarea><button id="sb">➤</button></div></section>
+<section class="v" id="v-hist"><input id="q" placeholder="Rechercher dans l'historique…"><div id="hl"></div></section>
+<section class="v" id="v-set"></section>
+</main>
+<nav><button class="on" data-v="chat"><span>💬</span>Chat</button><button data-v="hist"><span>🕘</span>Historique</button><button data-v="set"><span>⚙️</span>Réglages</button></nav></div>
+<div id="ts"></div>
+<script async src="https://js.puter.com/v2/"></script>
+<script>
+const $=s=>document.querySelector(s),V='3.2';
+const S={g(k,d){try{const v=localStorage.getItem('nexus_'+k);return v===null?d:JSON.parse(v)}catch{return d}},s(k,v){try{localStorage.setItem('nexus_'+k,JSON.stringify(v))}catch(e){}}};
+const P={groq:{n:'Groq',i:'⚡',k:1,m:30,d:1000},gemini:{n:'Gemini',i:'💎',k:1},openrouter:{n:'OpenRouter',i:'🔀',k:1,m:20,d:50},puter:{n:'Puter',i:'🖥️'},kilo:{n:'Kilo',i:'🚀',h:200,o:1},pollinations:{n:'Pollinations',i:'🌸'}};
+const st={keys:S.g('keys',{}),on:S.g('on',{}),convs:S.g('convs',[]),cur:S.g('cur',null),log:S.g('log',[]),pause:S.g('pause',{}),cnt:S.g('cnt',{}),cache:S.g('cache',{}),busy:0,tests:{}};
+let ac=null;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’]/g,' ').replace(/\s+/g,' ').trim();
+const num=s=>parseFloat(String(s).replace(',','.')),fx=x=>+x.toFixed(4);
+function toast(m){const e=$('#ts');e.textContent=m;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2800)}
+function L(type,d){st.log.push({t:new Date().toISOString(),type,...d});if(st.log.length>200)st.log=st.log.slice(-200);S.s('log',st.log)}
+addEventListener('error',e=>L('js_error',{msg:e.message,at:(e.filename||'').split('/').pop()+':'+e.lineno}));
+addEventListener('unhandledrejection',e=>L('js_rejection',{msg:String(e.reason&&e.reason.message||e.reason).slice(0,200)}));
+/* ---------- disponibilité & quotas (estimation locale) ---------- */
+const signed=()=>{try{return puter.auth.isSignedIn()}catch{return false}};
+function avail(id){const p=P[id],n=Date.now();if(st.on[id]===false||(p.k&&!st.keys[id])||(id==='puter'&&!signed())||(st.pause[id]||0)>n)return false;const c=st.cnt[id]||[];return!((p.m&&c.filter(x=>n-x<6e4).length>=p.m)||(p.h&&c.filter(x=>n-x<36e5).length>=p.h)||(p.d&&c.filter(x=>n-x<864e5).length>=p.d))}
+function count(id){const n=Date.now();st.cnt[id]=(st.cnt[id]||[]).filter(x=>n-x<864e5);st.cnt[id].push(n);S.s('cnt',st.cnt)}
+function upd(){const k=Object.keys(P).filter(avail).length;$('#stt').textContent=(navigator.onLine?k+' IA prête'+(k>1?'s':''):'Hors ligne — fonctions locales seulement')}
+/* ---------- routeur local (0 crédit) ---------- */
+const KW={code:['code','programme','fonction','function','debug','erreur','script','javascript','python','html','css','sql','bug','algorithme'],creative:['raconte','histoire','poeme','creatif','invente','imagine','scenario','chanson','fiction'],translation:['traduis','traduire','traduction','translate'],long:['resume','synthese','corrige ce texte','analyse']};
+const PREF={code:['groq','openrouter','gemini'],creative:['openrouter','gemini','groq'],translation:['gemini','groq','openrouter'],long:['gemini','openrouter','groq'],general:['gemini','groq','openrouter']};
+function intent(t){const n=norm(t);for(const k in KW)if(KW[k].some(w=>new RegExp('(^|[^a-z])'+w).test(n)))return k;return t.length>500?'long':'general'}
+function order(it,simple){const o=simple?['pollinations','kilo','puter',...PREF[it]]:[...PREF[it],'puter','pollinations','kilo'];return[...new Set(o)].filter(avail)}
+/* ---------- appels IA ---------- */
+async function ft(url,o){ac=new AbortController();let to=0;const t=setTimeout(()=>{to=1;ac.abort()},25000);try{return await fetch(url,{...o,signal:ac.signal})}catch(e){throw Object.assign(new Error(to?'Délai dépassé (25 s)':ac.signal.aborted?'Annulé':e.message),{status:to?408:0,abort:!to&&ac.signal.aborted})}finally{clearTimeout(t)}}
+async function oa(url,key,model,msgs,mx,x){const r=await ft(url,{method:'POST',headers:{'Content-Type':'application/json',...(key?{Authorization:'Bearer '+key}:{}),...(x||{})},body:JSON.stringify({model,messages:msgs,temperature:.7,max_tokens:mx})});if(!r.ok)throw Object.assign(new Error('HTTP '+r.status+' '+(await r.text()).slice(0,160)),{status:r.status});const d=await r.json();return d.choices?.[0]?.message?.content||''}
+const CALL={
+groq:(m,x)=>oa('https://api.groq.com/openai/v1/chat/completions',st.keys.groq,'openai/gpt-oss-120b',m,x),
+openrouter:(m,x)=>oa('https://openrouter.ai/api/v1/chat/completions',st.keys.openrouter,'openrouter/free',m,x,{'X-Title':'NEXUS AI'}),
+kilo:(m,x)=>oa('https://api.kilo.ai/api/gateway/chat/completions',st.keys.kilo||'','kilo-auto/free',m,x),
+pollinations:(m,x)=>oa('https://text.pollinations.ai/openai','','openai-fast',m,x),
+async gemini(m,mx){const sy=m.find(x=>x.role==='system'),b={contents:m.filter(x=>x.role!=='system').map(x=>({role:x.role==='assistant'?'model':'user',parts:[{text:x.content}]})),generationConfig:{temperature:.7,maxOutputTokens:mx}};if(sy)b.systemInstruction={parts:[{text:sy.content}]};const r=await ft('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key='+encodeURIComponent(st.keys.gemini),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});if(!r.ok)throw Object.assign(new Error('HTTP '+r.status+' '+(await r.text()).slice(0,160)),{status:r.status});const d=await r.json();return(d.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('')},
+async puter(m){if(typeof puter==='undefined')throw Object.assign(new Error('SDK Puter non chargé'),{status:0});try{const r=await puter.ai.chat(m);return typeof r==='string'?r:(typeof r?.message?.content==='string'?r.message.content:r?.message?.content?.[0]?.text)||r?.text||''}catch(e){const s=(e&&e.message)||JSON.stringify(e);throw Object.assign(new Error('Puter: '+String(s).slice(0,160)),{status:/insufficient|402/i.test(JSON.stringify(e)+s)?402:0})}}};
+async function run(id,msgs,mx){const t0=Date.now();count(id);try{const o=await CALL[id](msgs,mx);if(!o||!o.trim())throw Object.assign(new Error('Réponse vide'),{status:0});const ms=Date.now()-t0;L('try',{p:id,ok:1,ms});return{o,ms}}catch(e){const s=e.status;L('try',{p:id,ok:0,status:s,err:e.message.slice(0,200),ms:Date.now()-t0});if(s===402){const d=new Date();d.setMonth(d.getMonth()+1,1);d.setHours(0,0,0,0);st.pause[id]=+d}else if(s===429)st.pause[id]=Date.now()+6e5;else if([401,403,404].includes(s))st.pause[id]=Date.now()+18e5;if(s)S.s('pause',st.pause);throw e}}
+/* ---------- fonctions locales ---------- */
+const U={km:['l',1000],m:['l',1],cm:['l',.01],mm:['l',.001],mi:['l',1609.344],miles:['l',1609.344],ft:['l',.3048],pieds:['l',.3048],kg:['m',1],g:['m',.001],lb:['m',.45359237],livres:['m',.45359237],l:['v',1],ml:['v',.001],gal:['v',3.785411784],c:['t'],celsius:['t'],f:['t'],fahrenheit:['t'],kmh:['s',1],mph:['s',1.609344]};
+const CITY={paris:'Europe/Paris',londres:'Europe/London',berlin:'Europe/Berlin',madrid:'Europe/Madrid',rome:'Europe/Rome',moscou:'Europe/Moscow',istanbul:'Europe/Istanbul',casablanca:'Africa/Casablanca',alger:'Africa/Algiers',tunis:'Africa/Tunis',dakar:'Africa/Dakar',abidjan:'Africa/Abidjan',lagos:'Africa/Lagos',"le caire":'Africa/Cairo',dubai:'Asia/Dubai',tokyo:'Asia/Tokyo',pekin:'Asia/Shanghai',shanghai:'Asia/Shanghai',seoul:'Asia/Seoul',bangkok:'Asia/Bangkok',delhi:'Asia/Kolkata',sydney:'Australia/Sydney',"new york":'America/New_York',montreal:'America/Toronto',chicago:'America/Chicago',"los angeles":'America/Los_Angeles',"sao paulo":'America/Sao_Paulo',"mexico":'America/Mexico_City'};
+const CUR=x=>/^euro/.test(x)?'EUR':/^dollar/.test(x)?'USD':x.toUpperCase();
+const wc=c=>c===0?'ciel dégagé':c<4?'nuageux':c<50?'brouillard':c<60?'bruine':c<70?'pluie':c<80?'neige':c<85?'averses':c<95?'averses de neige':'orage';
+const fd=d=>d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const J=async u=>{const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()};
+async function local(raw){const n=norm(raw),now=new Date();let m;
+if(m=n.match(/^(bonjour|salut|hello|coucou|bonsoir|hey|cc)( nexus)?\s*[!.?]*$/))return(now.getHours()<18?'Bonjour':'Bonsoir')+' ! Je suis NEXUS 👋 Posez-moi une question ou tapez **aide**.';
+if(/^(merci|merci beaucoup|thanks)( nexus)?\s*[!.]*$/.test(n))return'Avec plaisir ! 😊';
+if(/^(qui es[- ]tu|tu es qui|presente[- ]toi)\??$/.test(n))return'Je suis **NEXUS**, un assistant qui répond seul aux demandes simples et choisit une IA gratuite quand c\'est nécessaire, pour économiser les crédits.';
+if(/^(aide|help|commandes|que (sais|peux)[- ]tu faire)\??$/.test(n))return'**En local (0 crédit)** : calculs, pourcentages, conversions (`10 km en mi`, `20 c en f`), devises (`100 eur en usd`), dates (`dans 3 semaines`, `quel jour etait le 14/07/1789`, `combien de jours avant le 25/12/2026`), heure (`quelle heure est-il a Tokyo`), météo (`meteo Lyon`), Wikipédia (`qui est Marie Curie`), dés, pile ou face, tirage (`choisis entre a, b ou c`), mot de passe, `compte mots : texte`.\n**Forcer une IA** : `/groq`, `/gemini`, `/openrouter`, `/kilo`, `/puter`, `/pollinations` + votre question.';
+if(/^(quelle heure est[- ]il|il est quelle heure)\??$/.test(n))return'Il est **'+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'** ('+fd(now)+').';
+if(m=n.match(/^(?:quelle heure est[- ]il|il est quelle heure) (?:a|au|en) (.+?)\??$/)){const z=CITY[m[1]];if(z)return'À **'+m[1]+'** il est **'+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:z})+'** ('+now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:z})+').'}
+if(/^(quel jour (sommes|est)[- ]nous|on est quel jour|quelle est la date( d aujourd hui)?|date d aujourd hui|quelle date sommes[- ]nous)\??$/.test(n))return'Nous sommes le **'+fd(now)+'**.';
+if(m=n.match(/^dans (\d+) (jours?|semaines?|mois|ans?)\??$/)){const d=new Date(),k=+m[1];/^jour/.test(m[2])?d.setDate(d.getDate()+k):/^sem/.test(m[2])?d.setDate(d.getDate()+7*k):m[2]==='mois'?d.setMonth(d.getMonth()+k):d.setFullYear(d.getFullYear()+k);return'📅 Dans '+m[1]+' '+m[2]+', nous serons le **'+fd(d)+'**.'}
+if(m=n.match(/^quel jour (?:etait|est|sera) le (\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})\??$/)){const d=new Date(+m[3],m[2]-1,+m[1]);if(d.getMonth()==m[2]-1)return'Le '+m[1]+'/'+m[2]+'/'+m[3]+' : **'+fd(d)+'**.'}
+if(m=n.match(/^combien de jours (?:avant|jusqu a|jusqu au) (?:le )?(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})\??$/)){const d=new Date(+m[3],m[2]-1,+m[1]),t=new Date();t.setHours(0,0,0,0);const k=Math.round((d-t)/864e5);return k>=0?'⏳ Il reste **'+k+' jour(s)** jusqu\'au '+fd(d)+'.':'Cette date est passée il y a **'+(-k)+' jour(s)**.'}
+if(/^(pile ou face|lance une piece)\??$/.test(n))return'🪙 **'+(Math.random()<.5?'Pile':'Face')+'** !';
+if(m=n.match(/^(?:lance|jette|roule) (?:un )?des? ?(?:a )?(\d+)? ?(?:faces)?\??$/)){const f=Math.max(2,+m[1]||6);return'🎲 Dé à '+f+' faces : **'+(1+Math.floor(Math.random()*f))+'**'}
+if(/^(choisis|tire au sort)\b/.test(n)&&(m=raw.match(/^\S+(?:\s+au\s+sort)?\s+(?:entre\s+)?([\s\S]+?)\s*\??$/i))){const it=m[1].split(/\s*(?:,|\bou\b)\s*/).filter(Boolean);if(it.length>1)return'🎯 Je choisis : **'+it[Math.floor(Math.random()*it.length)]+'**'}
+if(m=n.match(/^(?:genere|cree|creer|donne)(?:[- ]moi)? un (?:mot de passe|mdp)(?: de (\d+) caracteres)?\??$/)){const L2=Math.min(64,Math.max(8,+m[1]||16)),cs='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';let p='';for(const v of crypto.getRandomValues(new Uint32Array(L2)))p+=cs[v%cs.length];return'🔐 Mot de passe de '+L2+' caractères :\n\n`'+p+'`'}
+if(m=raw.match(/^(?:compte|nombre de|combien de)\s+(mots|caract[eè]res)\s*(?:dans)?\s*[:\-]\s*([\s\S]+)$/i)){const t=m[2].trim();return'✍️ **'+(/^mot/i.test(m[1])?t.split(/\s+/).length+' mots**':t.length+' caractères**')}
+if(m=n.match(/^(\d+(?:[.,]\d+)?)\s*%\s*de\s*(\d+(?:[.,]\d+)?)\??$/))return'**'+m[1]+' % de '+m[2]+' = '+fx(num(m[1])*num(m[2])/100)+'**';
+if(/^[\d\s+\-*/().,^%x×÷]+$/.test(n)&&/\d/.test(n)&&/[+\-*/^x×÷]/.test(n)&&!/^\d{4}-\d{2}-\d{2}$/.test(n)){const e=n.replace(/,/g,'.').replace(/[x×]/g,'*').replace(/÷/g,'/').replace(/\^/g,'**').replace(/%/g,'/100');if(/^[\d\s+\-*/().]+$/.test(e))try{const v=Function('"use strict";return('+e+')')();if(typeof v==='number'&&isFinite(v))return'**'+raw.trim()+' = '+fx(v)+'**'}catch{}}
+if(m=n.match(/^(\d+(?:[.,]\d+)?)\s*(eur|euros?|usd|dollars?|gbp|chf|cad|jpy|mad|dzd|tnd)\s+(?:en|to|vers)\s+(eur|euros?|usd|dollars?|gbp|chf|cad|jpy|mad|dzd|tnd)\??$/)){const a=CUR(m[2]),b=CUR(m[3]),x=num(m[1]);try{let r;try{r=(await J('https://open.er-api.com/v6/latest/'+a)).rates[b]}catch{r=(await J('https://api.frankfurter.app/latest?from='+a+'&to='+b)).rates[b]}if(r)return'💱 **'+x+' '+a+' = '+fx(x*r)+' '+b+'** (taux du jour, mis à jour une fois par jour)'}catch{}return null}
+if(m=n.replace(/km\/h/g,'kmh').match(/^(-?\d+(?:[.,]\d+)?)\s*([a-z]+)\s+(?:en|to|vers)\s+([a-z]+)\??$/)){const A=U[m[2]],B=U[m[3]],x=num(m[1]);if(A&&B&&A[0]===B[0]){let r;if(A[0]==='t'){const f=/^f/.test(m[2]),g=/^f/.test(m[3]);r=f===g?x:f?(x-32)*5/9:x*9/5+32}else r=x*A[1]/B[1];return'📏 **'+x+' '+m[2]+' = '+fx(r)+' '+m[3]+'**'}}
+if(m=n.match(/^(?:meteo|quel temps(?: fait[- ]il)?)\s*(?:a|au|aux|en|de|pour|sur)?\s*([a-z -]{2,40}?)\??$/)){try{const g=(await J('https://geocoding-api.open-meteo.com/v1/search?count=1&language=fr&name='+encodeURIComponent(m[1]))).results?.[0];if(!g)return null;const w=await J('https://api.open-meteo.com/v1/forecast?latitude='+g.latitude+'&longitude='+g.longitude+'&current=temperature_2m,apparent_temperature,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=1'),c=w.current,d=w.daily;return'🌤️ **'+g.name+'** ('+(g.country||'')+') : '+wc(c.weather_code)+', **'+Math.round(c.temperature_2m)+' °C** (ressenti '+Math.round(c.apparent_temperature)+' °C), vent '+Math.round(c.wind_speed_10m)+' km/h.\nAujourd\'hui : '+Math.round(d.temperature_2m_min[0])+' à '+Math.round(d.temperature_2m_max[0])+' °C, pluie '+(d.precipitation_probability_max[0]??'?')+' %.\nDonnées : [Open-Meteo.com](https://open-meteo.com/)'}catch{return null}}
+if(m=n.match(/^(?:qui (?:est|etait)|qu est[- ]ce qu(?:e|un|une)|c est quoi)\s+(.{2,40}?)\??$/)){const q=m[1].replace(/^(le|la|les|l|un|une|des) /,'');if(q.split(' ').length<=4)try{const r=await J('https://fr.wikipedia.org/w/api.php?action=query&generator=search&gsrlimit=1&gsrsearch='+encodeURIComponent(q)+'&prop=extracts&exintro=1&explaintext=1&exsentences=3&format=json&origin=*'),p=Object.values(r.query?.pages||{})[0];if(p&&p.extract&&q.split(' ').every(w=>norm(p.title).includes(w)))return'📖 **'+p.title+'** — '+p.extract+'\n\nSource : [Wikipédia](https://fr.wikipedia.org/?curid='+p.pageid+') (vérifiez que c\'est bien le sujet voulu)'}catch{}return null}
+return null}
+/* ---------- conversations ---------- */
+const cur0=()=>st.convs.find(c=>c.id===st.cur),save=()=>{st.convs=st.convs.slice(-50);S.s('convs',st.convs);S.s('cur',st.cur)};
+function cur(){let c=cur0();if(!c){c={id:Date.now(),t:'',d:Date.now(),m:[]};st.convs.push(c);st.cur=c.id}return c}
+function md(t){const sp=[],k=h=>{sp.push(h);return'\u0001'+(sp.length-1)+'\u0001'};let h=String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+h=h.replace(/```\w*\n?([\s\S]*?)```/g,(m,c)=>k('<pre><code>'+c.replace(/\n$/,'')+'</code></pre>')).replace(/`([^`\n]+)`/g,(m,c)=>k('<code>'+c+'</code>'));
+h=h.replace(/^#{1,6}\s*(.+)$/gm,'<b>$1</b>').replace(/^\s*[-*]\s+/gm,'• ').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<i>$2</i>').replace(/\[([^\]]+)\]\((https?:[^)"\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+return h.replace(/\n/g,'<br>').replace(/\u0001(\d+)\u0001/g,(m,i)=>sp[i])}
+function render(){const c=cur0(),e=$('#msgs');if(!c||!c.m.length){e.innerHTML='<div style="text-align:center;color:var(--dm);padding:40px 10px"><h2 style="color:var(--tx)">NEXUS AI</h2>Je réponds seul aux demandes simples et je ne sollicite une IA que si c\'est nécessaire.<br>Tapez <b>aide</b> pour voir ce que je sais faire.</div>';return}
+e.innerHTML=c.m.map((m,i)=>m.r==='user'?`<div class="m user"><div class="bb">${esc(m.c)}</div></div>`:`<div class="m ai"><div class="bb">${md(m.c)}</div><div class="mt"><span>${P[m.p]?P[m.p].i+' '+P[m.p].n:'🧠 Nexus local'}${m.why?' · '+esc(m.why):''}${m.ms?' · '+(m.ms/1000).toFixed(1)+' s':''}</span><button data-a="cp" data-i="${i}">📋</button><button data-a="bd" data-i="${i}" style="${m.bad?'color:var(--er)':''}">👎</button></div></div>`).join('')+(st.busy?'<div class="m ai"><div class="bb">…</div></div>':'');e.scrollTop=e.scrollHeight}
+function say(c,o){c.m.push({r:'ai',...o});save();render()}
+async function send(t0){if(st.busy){if(ac)ac.abort();st.stop=1;return}
+const raw=(t0??$('#in').value).trim();if(!raw)return;$('#in').value='';$('#in').style.height='auto';
+const c=cur();c.m.push({r:'user',c:raw});if(!c.t)c.t=raw.slice(0,40);save();st.busy=1;st.stop=0;$('#sb').textContent='■';render();
+try{let text=raw,forced=null,fm=raw.match(/^\/(groq|gemini|openrouter|kilo|puter|pollinations)\s+([\s\S]+)/i);if(fm){forced=fm[1].toLowerCase();text=fm[2].trim()}
+if(!forced){const l=await local(raw);if(l){L('req',{via:'local',q:raw.slice(0,200)});say(c,{p:'local',c:l,why:'local, 0 crédit'});return}}
+const it=intent(text),simple=it==='general'&&text.length<150&&c.m.length<4;let ord;
+if(forced){ord=(P[forced].k&&!st.keys[forced])?[]:(forced==='puter'&&!signed())?[]:[forced];if(!ord.length){say(c,{p:'local',err:1,c:'⚠️ **'+P[forced].n+'** n\'est pas configuré (clé manquante ou non connecté). Voir ⚙️ Réglages.'});return}}else ord=order(it,simple);
+L('req',{it,simple,ord,forced,q:raw.slice(0,300)});
+if(!ord.length){say(c,{p:'local',err:1,c:navigator.onLine?'⚠️ Aucune IA disponible (désactivées, sans clé, en pause ou quota atteint). Voir ⚙️ Réglages.':'📴 Hors connexion : seules les fonctions locales marchent.'});return}
+const ck=norm(text),first=c.m.length===1&&!forced;if(first&&st.cache[ck]){say(c,{p:st.cache[ck].p,c:st.cache[ck].c,why:'réponse mémorisée, 0 crédit'});return}
+const h=[];for(let i=0;i<c.m.length-1;i++){const a=c.m[i],b=c.m[i+1];if(a.r==='user'&&(b.p==='local'||b.err))i++;else if(a.p!=='local'&&!a.err)h.push({role:a.r==='user'?'user':'assistant',content:a.c})}
+const sys='Tu es NEXUS, un assistant utile, précis et concis. Réponds en français par défaut. Date et heure actuelles : '+new Date().toLocaleString('fr-FR',{dateStyle:'full',timeStyle:'short'})+' (fuseau '+Intl.DateTimeFormat().resolvedOptions().timeZone+').';
+const msgs=[{role:'system',content:sys},...h.slice(-6),{role:'user',content:text}],mx=simple?500:1800,fail=[];
+for(const id of ord){try{const r=await run(id,msgs,mx);if(st.stop)return;say(c,{p:id,c:r.o,ms:r.ms,why:(forced?'forcé':it+(simple?' simple':''))+(fail.length?' · après échec : '+fail.join(', '):'')});if(first){st.cache[ck]={p:id,c:r.o};const ks=Object.keys(st.cache);if(ks.length>100)delete st.cache[ks[0]];S.s('cache',st.cache)}return}catch(e){if(e.abort||st.stop)return;fail.push(P[id].n+' ('+(e.status||'err')+')')}}
+say(c,{p:'local',err:1,c:'❌ Aucune IA n\'a pu répondre : '+fail.join(', ')+'. Le détail est dans le journal (⚙️ Réglages).'})
+}catch(e){L('send_error',{msg:e.message});say(c,{p:'local',err:1,c:'❌ Erreur : '+e.message})}finally{st.busy=0;$('#sb').textContent='➤';render();upd()}}
+/* ---------- historique ---------- */
+function rhist(){const q=norm($('#q').value||''),l=[...st.convs].reverse().filter(c=>!q||norm(c.t+' '+c.m.map(m=>m.c).join(' ')).includes(q));$('#hl').innerHTML=l.length?l.map(c=>`<div class="hi" data-o="${c.id}"><div><b>${esc(c.t||'(vide)')}</b><br><small>${new Date(c.d).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${c.m.length} messages</small></div><button class="ib" data-del="${c.id}">🗑</button></div>`).join(''):'<div class="h">Aucune conversation.</div>'}
+/* ---------- réglages, test, journal ---------- */
+function pstat(){for(const id in P){const e=$('#ps-'+id);if(!e)continue;const t=st.tests[id],ps=st.pause[id]>Date.now()?'⏸ en pause jusqu\'à '+new Date(st.pause[id]).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'',n=(st.cnt[id]||[]).filter(x=>Date.now()-x<864e5).length;e.textContent=[t?(t.ok?'✅ Test OK · '+t.d:'❌ '+t.d):'',ps,n+' appel(s) / 24 h'].filter(Boolean).join(' · ')}$('#pst')&&($('#pst').textContent=signed()?'✅ Connecté à Puter':'Non connecté')}
+function rset(){let h='<div class="h" style="margin-bottom:10px">Un interrupteur désactive une IA (ignorée par le routeur). Les clés restent sur ce téléphone.</div>';for(const id in P){const p=P[id];h+=`<div class="cd"><label class="sw"><input type="checkbox" data-on="${id}" ${st.on[id]===false?'':'checked'}> ${p.i} <b>${p.n}</b></label>`+(p.k||p.o?`<input type="password" data-k="${id}" placeholder="${p.o?'Clé facultative (mode gratuit sans clé)':'Clé API '+p.n}" value="${esc(st.keys[id]||'')}" autocomplete="off">`:'')+(id==='puter'?'<div class="h" id="pst"></div><button class="b2" data-a="pl">Se connecter / se déconnecter de Puter</button>':'')+`<div class="h" id="ps-${id}"></div></div>`}
+h+='<div class="cd"><b>🧪 Test des IA</b><div class="h">Envoie un court message à chaque IA active (consomme 1 appel chacune).</div><button class="b2" data-a="tt" id="tt">▶ Lancer le test</button></div><div class="cd"><b>📋 Journal de diagnostic</b><div class="h">Toujours actif. Copiez le rapport et collez-le dans une IA puissante pour trouver l\'origine des erreurs.</div><button class="b2" data-a="rp">Copier le rapport</button><textarea id="rep" readonly placeholder="Le rapport apparaît ici"></textarea><button class="b2" data-a="rz">Réinitialiser les pauses</button><button class="b2" data-a="lc">Vider le journal</button></div><button class="b2 r" data-a="all">Tout effacer (clés, historique, journal)</button><div class="h" style="text-align:center;margin:14px">NEXUS AI v'+V+'</div>';$('#v-set').innerHTML=h;pstat()}
+function report(){const c=cur0();return['# Rapport NEXUS AI v'+V,'Contexte : app web de chat multi-IA (routeur local + IA gratuites). Analyse ce journal : pour chaque erreur, donne la cause probable et la correction à faire.','Date : '+new Date().toISOString()+' | fuseau : '+Intl.DateTimeFormat().resolvedOptions().timeZone+' | en ligne : '+navigator.onLine+' | UA : '+navigator.userAgent,'IA : '+Object.keys(P).map(i=>i+':'+(st.on[i]===false?'off':'on')+(P[i].k?(st.keys[i]?',clé ok':',sans clé'):'')+(st.pause[i]>Date.now()?',pause→'+new Date(st.pause[i]).toISOString():'')).join(' ; '),'','## Conversation en cours',...(c?c.m.map(m=>'['+m.r+(m.p?' '+m.p:'')+(m.why?' | '+m.why:'')+(m.ms?' | '+m.ms+'ms':'')+(m.bad?' | 👎 signalée':'')+'] '+m.c):['(aucune)']),'','## Journal (200 derniers événements)',...st.log.map(x=>JSON.stringify(x))].join('\n')}
+async function tests(){const b=$('#tt');b.disabled=true;b.textContent='⏳ Test…';for(const id in P){if(P[id].k&&!st.keys[id]){st.tests[id]={ok:0,d:'clé manquante'};continue}if(id==='puter'&&!signed()){st.tests[id]={ok:0,d:'non connecté'};continue}try{const r=await run(id,[{role:'user',content:'Réponds uniquement OK.'}],20);st.tests[id]={ok:1,d:(r.ms/1000).toFixed(1)+' s'}}catch(e){st.tests[id]={ok:0,d:e.message.slice(0,90)}}pstat()}b.disabled=false;b.textContent='▶ Relancer le test';upd()}
+async function copy(t){try{await navigator.clipboard.writeText(t);return 1}catch{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();let ok=0;try{ok=document.execCommand('copy')}catch{}a.remove();return ok}}
+/* ---------- événements ---------- */
+function view(v){document.querySelectorAll('.v').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));if(v==='set')rset();if(v==='hist')rhist()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>view(b.dataset.v));
+$('#sb').onclick=()=>send();$('#nw').onclick=()=>{st.cur=null;save();render();view('chat')};$('#q').oninput=rhist;
+$('#in').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,120)+'px'});
+$('#in').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();send()}});
+$('#msgs').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const c=cur0(),m=c&&c.m[b.dataset.i];if(!m)return;if(b.dataset.a==='cp')toast(await copy(m.c)?'Copié':'Copie impossible');else{m.bad=!m.bad;L('feedback',{bad:m.bad,p:m.p,q:(c.m[b.dataset.i-1]||{}).c?.slice(0,200),a:m.c.slice(0,300)});save();render()}};
+$('#hl').onclick=e=>{const d=e.target.closest('[data-del]');if(d){st.convs=st.convs.filter(c=>c.id!=d.dataset.del);if(st.cur==d.dataset.del)st.cur=null;save();rhist();return}const o=e.target.closest('[data-o]');if(o){st.cur=+o.dataset.o;save();render();view('chat')}};
+$('#v-set').addEventListener('change',e=>{const t=e.target;if(t.dataset.on){st.on[t.dataset.on]=t.checked;S.s('on',st.on)}if(t.dataset.k){st.keys[t.dataset.k]=t.value.trim();S.s('keys',st.keys)}upd()});
+$('#v-set').addEventListener('click',async e=>{const a=e.target.dataset.a;if(!a)return;if(a==='pl'){try{signed()?await puter.auth.signOut():await puter.auth.signIn()}catch(x){toast('Puter : '+x.message)}pstat();upd()}
+else if(a==='tt')tests();else if(a==='rp'){const r=report();$('#rep').value=r;toast(await copy(r)?'Rapport copié':'Sélectionnez le texte du cadre pour le copier')}
+else if(a==='rz'){st.pause={};S.s('pause',{});st.cnt={};S.s('cnt',{});pstat();upd();toast('Pauses réinitialisées')}else if(a==='lc'){st.log=[];S.s('log',[]);toast('Journal vidé')}
+else if(a==='all'&&confirm('Tout effacer : clés, historique, journal ?')){Object.keys(localStorage).filter(k=>k.startsWith('nexus_')).forEach(k=>localStorage.removeItem(k));location.reload()}});
+const vv=window.visualViewport,fit=()=>{document.documentElement.style.setProperty('--h',(vv?vv.height:innerHeight)+'px');scrollTo(0,0)};if(vv){vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit)}fit();
+addEventListener('online',upd);addEventListener('offline',upd);
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>L('sw_error',{msg:e.message})));
+render();upd();setTimeout(upd,1500);L('start',{v:V});
+</script></body></html>
