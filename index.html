@@ -366,7 +366,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 #nexusHorlogeBar b{color:var(--text);font-weight:600}
 #nexusHorlogeHeure{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
-<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">12:31:15</span></span></div>
+<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">12:39:50</span></span></div>
 
 
 <main>
@@ -396,7 +396,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795087862674)"><span class="conv-del" onclick="deleteConversation(1795087862674,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795088390675)"><span class="conv-del" onclick="deleteConversation(1795088390675,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -435,7 +435,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="field"><label>Raccourcis</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('projet')">📁 Projet…</button><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('memoire')">🧠 Mémoire…</button><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('web')">🌐 Web…</button></div><small>Ces boutons remplissent ta zone de texte, tu n'as plus qu'à compléter et envoyer.</small></div>
 <div class="field"><label>Effacer la mémoire</label><button class="btn btn-secondary" onclick="nexusReglages_OublieTout()">🧹 Oublie tout (mémoire seulement)</button><small>Supprime souvenirs + projets. Tes conversations ne sont pas touchées.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">☁️ STOCKAGE &amp; CLOUD</div>
-<div class="field"><label>Synchro auto</label><div id="nexusCloudStatut" style="font-size:12px;color:var(--text-muted)">☁️ Cloud : Puter pas chargé, local à jour</div><button id="nexusCloudBouton" class="btn btn-secondary" style="display:none;width:100%;margin-top:8px" onclick="nexusReglages_ConnecterCloud()">☁️ Activer la synchro auto (1 clic)</button><small>1 clic une fois, puis tout automatique. IndexedDB sauve déjà en local, sans rien faire.</small></div>
+<div class="field"><label>Synchro auto</label><div id="nexusCloudStatut" style="font-size:12px;color:var(--text-muted)">☁️ Cloud : vérification…</div><button id="nexusCloudBouton" class="btn btn-secondary" style="display:none;width:100%;margin-top:8px" onclick="nexusReglages_ConnecterCloud()">☁️ Activer la synchro auto (1 clic)</button><small>1 clic une fois, puis tout automatique. IndexedDB sauve déjà en local, sans rien faire.</small></div>
 <div class="field"><label>Sauvegarde manuelle (secours)</label><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusExportJSON()">⬇ Exporter</button><button class="btn btn-secondary" style="flex:1" onclick="document.getElementById('nexusImportFile').click()">⬆ Importer</button></div><input type="file" id="nexusImportFile" accept=".json,application/json" style="display:none" onchange="nexusImportJSON(event)"><small>Tu n'es plus censé t'en servir au quotidien. C'est juste si le cloud est indisponible.</small></div>
 <button class="btn btn-primary" onclick="closeSettings()">Fermer</button>
 </div>
@@ -1065,9 +1065,7 @@ async function nexusImageCloudflare(prompt, signal){
   } else {
     // V24 : token seul -> NEXUS retrouve l'Account ID tout seul, pas besoin de le chercher sur Cloudflare
     token = brut;
-    const rAcc = await fetch('https://api.cloudflare.com/client/v4/accounts', { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } });
-    const jAcc = await rAcc.json().catch(() => null);
-    accountId = jAcc && jAcc.result && jAcc.result[0] && jAcc.result[0].id;
+    accountId = await nexusCloudflareAccountId(token);
     if(!accountId) throw new Error('Token Cloudflare sans droit Account:Read');
   }
   if(!accountId || !token) throw new Error('Colle juste le TOKEN Cloudflare');
@@ -1076,7 +1074,7 @@ async function nexusImageCloudflare(prompt, signal){
   const off = () => ctrl.abort();
   if(signal) signal.addEventListener('abort', off, { once: true });
   try{
-    const r = await fetch('https://api.cloudflare.com/client/v4/accounts/' + encodeURIComponent(accountId) + '/ai/run/@cf/black-forest-labs/flux-1-schnell', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: prompt, num_steps: 4, width: 1024, height: 1024 }), signal: ctrl.signal });
+    const r = await nexusFetchCloudflare('https://api.cloudflare.com/client/v4/accounts/' + encodeURIComponent(accountId) + '/ai/run/@cf/black-forest-labs/flux-1-schnell', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: prompt, num_steps: 4, width: 1024, height: 1024 }), signal: ctrl.signal });
     if(!r.ok) throw new Error('Cloudflare image ' + r.status);
     const ct = (r.headers.get('content-type') || '').toLowerCase();
     if(ct.includes('json')){
@@ -1090,6 +1088,22 @@ async function nexusImageCloudflare(prompt, signal){
     return URL.createObjectURL(blob);
   }finally{ clearTimeout(timer); if(signal) signal.removeEventListener('abort', off); }
 }
+// Cloudflare via relais CORS : api.cloudflare.com ne renvoie pas d'en-tête CORS, le navigateur bloque en direct (Load failed).
+// On essaie direct, puis via corsproxy.io. Sans ça, même un bon token affiche Load failed.
+async function nexusFetchCloudflare(url, options){
+  try{
+    const r = await fetch(url, options);
+    return r;
+  }catch(eDirect){
+    const proxied = 'https://corsproxy.io/?url=' + encodeURIComponent(url);
+    return await fetch(proxied, options);
+  }
+}
+async function nexusCloudflareAccountId(token){
+  const r = await nexusFetchCloudflare('https://api.cloudflare.com/client/v4/accounts', { headers: { 'Authorization': 'Bearer ' + token } });
+  const j = await r.json().catch(() => null);
+  return j && j.result && j.result[0] && j.result[0].id;
+}
 // Cloudflare texte : même token, aucune permission en plus. Llama 3.1 8B, en secours texte après OpenRouter.
 async function nexusTexteCloudflare(messages, signal){
   const brut = String((nexusClesLire() || {}).cloudflare || '').trim();
@@ -1100,13 +1114,11 @@ async function nexusTexteCloudflare(messages, signal){
     accountId = parts[0]; token = parts.slice(1).join(':');
   } else {
     token = brut;
-    const rAcc = await fetch('https://api.cloudflare.com/client/v4/accounts', { headers: { 'Authorization': 'Bearer ' + token } });
-    const jAcc = await rAcc.json().catch(() => null);
-    accountId = jAcc && jAcc.result && jAcc.result[0] && jAcc.result[0].id;
+    accountId = await nexusCloudflareAccountId(token);
     if(!accountId) throw new Error('Token Cloudflare sans droit Account:Read');
   }
   const msgs = (messages || []).map(m => ({ role: m.role, content: String(m.content || '').slice(0, 4000) }));
-  const r = await fetch('https://api.cloudflare.com/client/v4/accounts/' + encodeURIComponent(accountId) + '/ai/run/@cf/meta/llama-3.1-8b-instruct', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: msgs, max_tokens: 2000 }), signal: signal });
+  const r = await nexusFetchCloudflare('https://api.cloudflare.com/client/v4/accounts/' + encodeURIComponent(accountId) + '/ai/run/@cf/meta/llama-3.1-8b-instruct', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: msgs, max_tokens: 2000 }), signal: signal });
   if(!r.ok) throw new Error('Cloudflare texte ' + r.status);
   const j = await r.json().catch(() => null);
   const txt = j && j.result && (j.result.response || j.result.text);
