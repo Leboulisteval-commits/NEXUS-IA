@@ -366,11 +366,11 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 #nexusHorlogeBar b{color:var(--text);font-weight:600}
 #nexusHorlogeHeure{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
-<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">13:49:46</span></span></div>
+<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">14:17:56</span></span></div>
 
 
 <main>
-<div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Salut 👋</h2><p>On discute de quoi ?<br>Pose une question, envoie une photo ou un document, je suis là.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
+<div id="nexus-banniere-concert" style="margin: 10px 12px 0px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2,var(--surface)); font-size: 12px; line-height: 1.5;"><b>👑 NEXUS — La plateforme par où passer pour tout avoir.</b><br><span style="color:var(--text-muted)">Tu demandes à NEXUS, NEXUS s’occupe de tout et te rend la réponse.</span></div><div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Salut 👋</h2><p>On discute de quoi ?<br>Pose une question, envoie une photo ou un document, je suis là.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
 <div id="suggestions">
 <button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button>
 <button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')">Poème sur la mer</button>
@@ -396,7 +396,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795092547007)"><span class="conv-del" onclick="deleteConversation(1795092547007,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795094269886)"><span class="conv-del" onclick="deleteConversation(1795094269886,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -414,13 +414,12 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 </div><small>Le thème change les couleurs. Le bouton en haut à droite ne change que Jour / Nuit.</small></div>
 <div class="field"><label>Jour / Nuit</label><button id="nexusJourNuitBouton" class="btn btn-secondary" onclick="toggleTheme()">🌙 Mode nuit</button><small>Aussi en haut à droite.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🤖 INTELLIGENCE</div>
-<div class="field"><label>Mode de fonctionnement</label>
-<select id="mo" onchange="toggleSettings();saveModeVerif()">
-<option value="puter">Puter (recommandé)</option>
-<option value="cles">Mes clés API</option>
-</select>
-<small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
+<div class="field"><label>Mode de fonctionnement — ENSEMBLE, plus de choix</label><div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:13px;line-height:1.6"><b>✅ TOUT EN CONCERT : tout travaille ensemble.</b><br>Tes clés (Groq, Gemini, OpenRouter) + Puter + Secours, en même temps, dans la même réponse. Texte + Image + Vidéo + Musique + Son, sans choisir. NEXUS orchestre tout, il prend le meilleur de chaque à chaque fois.</div><select id="mo" onchange="toggleSettings();saveModeVerif()" style="display:none"><option value="puter" selected="">Puter (recommandé)</option><option value="cles">Mes clés API</option></select><small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
 <div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">👑 NEXUS — LA PLATEFORME, PAR OÙ PASSER POUR TOUT AVOIR</div>
+<div class="field" style="text-align:center;line-height:1.7"><div style="background:var(--primary,#00e5c7);color:#000;font-weight:800;border-radius:12px;padding:10px">👑 NEXUS — GRAND PATRON<br><small style="font-weight:400">Tu passes par lui pour tout avoir. Il commande.</small></div><div style="font-size:18px;margin:4px">↓</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 PUTER — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 GROQ — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 GEMINI — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 OPENROUTER — Chef</span></div><div style="font-size:12px;color:var(--text-muted)">Les chefs distribuent</div><div style="font-size:18px;margin:4px">↓</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">ChatGPT</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Claude</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Meta AI</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Perplexity</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Suno</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Midjourney</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Runway</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Kling</span></div><div style="font-size:12px;color:var(--text-muted)">Employés — exécutent</div></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔧 DIAGNOSTIC — POUR TOI SEUL (pas visible dans le chat)</div>
+<div class="field" id="nexusDiagnosticCles" style="border:2px solid var(--primary,#00e5c7)"><label>Pourquoi tes clés ne semblent pas marcher ?</label><div id="nexusDiagTexte" style="font-size:13px;line-height:1.6">Chargement…</div><div style="background:var(--surface-2);border-radius:12px;padding:10px;font-size:13px">✅ <b>ENSEMBLE actif :</b> Tes clés + Puter + Secours, toujours ensemble. Plus besoin de choisir.</div><button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="nexusDiagRafraichir()">🔄 Rafraîchir le diagnostic</button><small style="margin-top:8px;display:block">En mode PUTER, tes clés ne sont JAMAIS utilisées, même si elles sont valides. C’est le code de NEXUS depuis le début. En mode CLÉS API, NEXUS utilise tes clés en premier.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔑 MES IA GRATUITES (CLÉS)</div>
 <div class="field"><small style="margin-bottom:12px">Colle une clé : elle est enregistrée toute seule, sur cet appareil uniquement. NEXUS les utilise en premier, puis Puter, puis le secours. Pour les retrouver sur un autre appareil, utilise la sauvegarde chiffrée plus bas.</small><div id="nexusClesListe"><div style="margin-bottom:14px"><label>Groq <span id="kst-groq" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-groq" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('groq')">Supprimer</button></div><small>Clé gratuite : console.groq.com</small></div><div style="margin-bottom:14px"><label>Google Gemini <span id="kst-gemini" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-gemini" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('gemini')">Supprimer</button></div><small>Clé gratuite : aistudio.google.com</small></div><div style="margin-bottom:14px"><label>OpenRouter (Claude, GPT, Gemini, +100 IA) <span id="kst-openrouter" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-openrouter" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('openrouter')">Supprimer</button></div><small>Clé gratuite : openrouter.ai - passerelle vers Claude, GPT, Gemini, Llama, etc.</small></div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusClesTester()">Tester mes IA</button><button class="btn btn-danger" style="flex:1" onclick="nexusClesToutSupprimer()">🗑 Tout supprimer</button></div></div>
 <div class="field" style="display: none;"><label>🌐 Invités dans NEXUS — TOUTES les IA</label><small style="margin-bottom:8px">Même les IA sans API gratuite : NEXUS les invite ici, comme un onglet. Ton prompt est transmis à l’invité. NEXUS reste ton centre, tu ne quittes jamais NEXUS.<br><br><b>NEXUS (V40) :</b> Toujours discret, tout le temps. Tu parles à NEXUS, NEXUS choisit en arrière-plan la meilleure IA gratuite pour ton domaine — texte, recherche, image, musique, vidéo — et il te répond comme NEXUS. Aucun bouton, aucune fenêtre, aucun nom d’IA externe visible. Les IA les plus fortes restent branchées en arrière-plan, en premier : Groq, puis Gemini, puis OpenRouter, puis Puter, puis secours.<br><br><b>🥷 Discret Max (V39) :</b> ON = plus aucune trace de l’IA externe, plus de carte, plus de nom. L’utilisateur voit juste « NEXUS travaille… » puis la réponse NEXUS. Qualité max sans ouvrir = impossible en gratuit pour ChatGPT / Claude / Suno / Runway, car il faut leur clé API payante pour les appeler en caché. En gratuit, le max discret c’est Groq / Gemini / OpenRouter / Puter en arrière-plan, présentés comme NEXUS. Si un jour tu as une clé API payante, tu la colles dans tes clés, et là NEXUS donnera vraiment la qualité max en discret, sans ouvrir.<br><br><b>🥷 Incognito (V38) :</b> ON = l’IA ne s’ouvre plus du tout. C’est NEXUS qui donne la réponse, avec ses IA gratuites en arrière-plan. OFF = l’invité s’ouvre de nouveau dans NEXUS.<br><br><b>🤖 Auto-redirection (V37) :</b> tu parles à NEXUS, NEXUS détecte le domaine et invite tout seul la bonne IA — musique → Suno, vidéo → Runway, recherche → Perplexity, image pro → Midjourney, app/code → Claude. Pour forcer NEXUS à répondre lui-même, commence par « nexus : ».</small><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('ChatGPT')">ChatGPT</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Claude')">Claude</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Gemini')">Gemini</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Meta AI')">Meta AI</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Perplexity')">Perplexity</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Suno (Musique)')">Suno 🎵</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Midjourney (Image)')">Midjourney 🖼️</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Runway (Vidéo)')">Runway 🎬</button></div></div>
@@ -792,6 +791,10 @@ function saveModeVerif(){
   }catch(e){}
 }
 function loadModeVerif(){
+  // V43 ENSEMBLE : on force toujours puter (= ensemble clés + Puter), on ne laisse plus le choix puter VS clés.
+  try{ localStorage.setItem('nexus_mode', 'puter'); }catch(e){}
+  try{ const s = document.getElementById('mo'); if(s) s.value = 'puter'; }catch(e){}
+  return;
   try{
     let m = localStorage.getItem("nexus_mode");
     // Migration : les anciens modes hybride / keyless n'existent plus
@@ -1041,93 +1044,14 @@ function nexusSecoursImagePollinations(prompt){
   // Maintenant modèle 'flux' (bien meilleur), 1024x1024, enhance=true (il améliore le prompt), nologo=true (pas de filigrane).
   return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=1024&height=1024&seed=' + Math.floor(Math.random()*1000000) + '&model=flux&enhance=true&nologo=true';
 }
-async function nexusImageHuggingFace(prompt, signal){
-  // Image Hugging Face FLUX, gratuit avec token HF (même clé que le texte Hugging Face). Retourne une URL blob, pas une URL http.
-  const cle = (nexusClesLire() || {}).huggingface;
-  if(!cle) throw new Error('Pas de clé Hugging Face');
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 60000);
-  const off = () => ctrl.abort();
-  if(signal) signal.addEventListener('abort', off, { once: true });
-  try{
-    const r = await fetch('https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell', { method: 'POST', headers: { 'Authorization': 'Bearer ' + cle, 'Content-Type': 'application/json' }, body: JSON.stringify({ inputs: prompt }), signal: ctrl.signal });
-    if(!r.ok) throw new Error('Hugging Face image ' + r.status);
-    const blob = await r.blob();
-    if(!blob || !blob.size) throw new Error('Hugging Face image vide');
-    return URL.createObjectURL(blob);
-  }finally{ clearTimeout(timer); if(signal) signal.removeEventListener('abort', off); }
-}
-async function nexusImageCloudflare(prompt, signal){
-  // Image Cloudflare FLUX.1-schnell, gratuit : ~230 images/jour, sans carte. Clé dans NEXUS = ACCOUNT_ID:TOKEN
-  const brut = String((nexusClesLire() || {}).cloudflare || '').trim();
-  if(!brut) throw new Error('Pas de clé Cloudflare');
-  let accountId = '', token = '';
-  if(brut.includes(':') || brut.includes('|')){
-    const parts = brut.split(/[:|\s\n]+/).filter(Boolean);
-    accountId = parts[0]; token = parts.slice(1).join(':');
-  } else {
-    // V24 : token seul -> NEXUS retrouve l'Account ID tout seul, pas besoin de le chercher sur Cloudflare
-    token = brut;
-    accountId = await nexusCloudflareAccountId(token);
-    if(!accountId) throw new Error('Token Cloudflare sans droit Account:Read');
-  }
-  if(!accountId || !token) throw new Error('Colle juste le TOKEN Cloudflare');
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 60000);
-  const off = () => ctrl.abort();
-  if(signal) signal.addEventListener('abort', off, { once: true });
-  try{
-    const r = await nexusFetchCloudflare('https://api.cloudflare.com/client/v4/accounts/' + encodeURIComponent(accountId) + '/ai/run/@cf/black-forest-labs/flux-1-schnell', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: prompt, num_steps: 4, width: 1024, height: 1024 }), signal: ctrl.signal });
-    if(!r.ok) throw new Error('Cloudflare image ' + r.status);
-    const ct = (r.headers.get('content-type') || '').toLowerCase();
-    if(ct.includes('json')){
-      const j = await r.json();
-      const b64 = j && j.result && (j.result.image || j.result.data);
-      if(b64 && typeof b64 === 'string' && b64.length > 100) return 'data:image/png;base64,' + b64;
-      throw new Error('Cloudflare image vide');
-    }
-    const blob = await r.blob();
-    if(!blob || !blob.size) throw new Error('Cloudflare image vide');
-    return URL.createObjectURL(blob);
-  }finally{ clearTimeout(timer); if(signal) signal.removeEventListener('abort', off); }
-}
+// V45 vérifiée : nexusImageHuggingFace supprimé (code mort, 0 appel, HF retiré)
+// V45 vérifiée : nexusImageCloudflare supprimé (code mort, 0 appel, Cloudflare retiré)
 // Cloudflare via relais CORS : api.cloudflare.com ne renvoie pas d'en-tête CORS, le navigateur bloque en direct (Load failed).
 // On essaie direct, puis via corsproxy.io. Sans ça, même un bon token affiche Load failed.
-async function nexusFetchCloudflare(url, options){
-  try{
-    const r = await fetch(url, options);
-    return r;
-  }catch(eDirect){
-    const proxied = 'https://corsproxy.io/?url=' + encodeURIComponent(url);
-    return await fetch(proxied, options);
-  }
-}
-async function nexusCloudflareAccountId(token){
-  const r = await nexusFetchCloudflare('https://api.cloudflare.com/client/v4/accounts', { headers: { 'Authorization': 'Bearer ' + token } });
-  const j = await r.json().catch(() => null);
-  return j && j.result && j.result[0] && j.result[0].id;
-}
+// V45 vérifiée : nexusFetchCloudflare supprimé (code mort, 0 appel, Cloudflare retiré)
+// V45 vérifiée : nexusCloudflareAccountId supprimé (code mort, 0 appel, Cloudflare retiré)
 // Cloudflare texte : même token, aucune permission en plus. Llama 3.1 8B, en secours texte après OpenRouter.
-async function nexusTexteCloudflare(messages, signal){
-  const brut = String((nexusClesLire() || {}).cloudflare || '').trim();
-  if(!brut) throw new Error('Pas de clé Cloudflare');
-  let accountId = '', token = '';
-  if(brut.includes(':') || brut.includes('|')){
-    const parts = brut.split(/[:|\s\n]+/).filter(Boolean);
-    accountId = parts[0]; token = parts.slice(1).join(':');
-  } else {
-    token = brut;
-    accountId = await nexusCloudflareAccountId(token);
-    if(!accountId) throw new Error('Token Cloudflare sans droit Account:Read');
-  }
-  const msgs = (messages || []).map(m => ({ role: m.role, content: String(m.content || '').slice(0, 4000) }));
-  const r = await nexusFetchCloudflare('https://api.cloudflare.com/client/v4/accounts/' + encodeURIComponent(accountId) + '/ai/run/@cf/meta/llama-3.1-8b-instruct', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: msgs, max_tokens: 2000 }), signal: signal });
-  if(!r.ok) throw new Error('Cloudflare texte ' + r.status);
-  const j = await r.json().catch(() => null);
-  const txt = j && j.result && (j.result.response || j.result.text);
-  if(!txt) throw new Error('Cloudflare texte vide');
-  return txt;
-}
+// V45 vérifiée : nexusTexteCloudflare supprimé (code mort, 0 appel, Cloudflare retiré)
 // OpenRouter Image retiré en V31 : OpenRouter l'écrit lui-même "No image model carries :free, every generation draws on your credit balance".
 // Avec une clé gratuite sans crédits, ça fait toujours 402 -> ça retombait toujours sur Pollinations. On ne fait plus semblant.
 // ===== NEXUS CENTRE RACCOURCIS (V34) : TOUTES les IA via internet, même sans API =====
@@ -1142,7 +1066,6 @@ const NEXUS_RACCOURCIS = [
   { nom: 'Meta AI', url: p => 'https://www.meta.ai/?q=' + encodeURIComponent(p), cat: 'Texte' },
   { nom: 'Perplexity', url: p => 'https://www.perplexity.ai/?q=' + encodeURIComponent(p), cat: 'Texte' },
   { nom: 'Copilot', url: p => 'https://copilot.microsoft.com/?q=' + encodeURIComponent(p), cat: 'Texte' },
-  { nom: 'Le Chat Mistral', url: p => 'https://chat.mistral.ai/chat?q=' + encodeURIComponent(p), cat: 'Texte' },
   { nom: 'Grok', url: p => 'https://grok.com/?q=' + encodeURIComponent(p), cat: 'Texte' },
   { nom: 'Suno (Musique)', url: p => 'https://suno.com/create?prompt=' + encodeURIComponent(p), cat: 'Musique' },
   { nom: 'Udio (Musique)', url: p => 'https://udio.com/', cat: 'Musique' },
@@ -1394,16 +1317,11 @@ async function nexusGenerateImage(prompt, signal, t){
       }
     }catch(eModele){ if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError'); continue; }
   }
-  try{
-    // 2b. Si Puter image a échoué sur les 4 modèles, on passe à Pollinations ci-dessous.
-  }catch(ePuter){
-    // 3. Pas d'OpenRouter Image : pas gratuit (402 avec une clé gratuite). On passe direct à Pollinations.
-    // 4. Pollinations en tout dernier secours.
-    // 4. Pollinations en TOUT DERNIER secours, sans clé, qualité la plus faible.
-    nexusSetEssai(t, 'Essai Pollinations FLUX');
-    try{ window.__nexusDernierModele = 'Pollinations FLUX (secours)'; }catch(e2){}
-    return nexusSecoursImagePollinations(promptFinal);
-  }
+  // 3. Puter image a échoué sur les 4 modèles : Pollinations en TOUT DERNIER secours, sans clé.
+  // Pas d'OpenRouter Image : pas gratuit (402 avec une clé gratuite).
+  nexusSetEssai(t, 'Essai Pollinations FLUX');
+  try{ window.__nexusDernierModele = 'Pollinations FLUX (secours)'; }catch(e2){}
+  return nexusSecoursImagePollinations(promptFinal);
 }
 
 
@@ -1490,7 +1408,7 @@ async function nexusTranslate(texte, lang, mode, tObj, signal){
   const sys = lang === 'auto'
     ? 'Tu es un traducteur professionnel, précis et fidèle.\\nRègles strictes :\\n- Détecte toi-même la langue du texte.\\n- Si le texte est en français, traduis-le en anglais. Sinon, traduis-le en français.\\n- Renvoie UNIQUEMENT la traduction, sans explication, sans introduction, sans dire quelle langue tu as détectée, sans guillemets ajoutés, sans commentaire.\\n- Conserve la mise en forme, les sauts de ligne et le ton du texte original.\\n- Ne corrige pas le sens, ne résume pas, ne rajoute rien.'
     : 'Tu es un traducteur professionnel, précis et fidèle.\\nRègles strictes :\\n- Détecte toi-même la langue du texte, on ne te la donne pas.\\n- Traduis le texte en ' + lang + '.\\n- Renvoie UNIQUEMENT la traduction, sans explication, sans introduction, sans dire quelle langue tu as détectée, sans guillemets ajoutés, sans commentaire.\\n- Conserve la mise en forme, les sauts de ligne et le ton du texte original.\\n- Ne corrige pas le sens, ne résume pas, ne rajoute rien.';
-  if(mode === 'puter'){
+  if(true){ // V43 ENSEMBLE : toujours clés + Puter
     return await callPuterProducteur([{ role:'system', content: sys }, { role:'user', content: texte }], signal, null, tObj);
   }
   const prompt = '[INSTRUCTIONS]\\n' + sys + '\\n\\n[TEXTE À TRADUIRE]\\n' + texte + '\\n\\nRenvoie UNIQUEMENT la traduction.';
@@ -1939,6 +1857,33 @@ const NEXUS_CLES_DEF = [
   { id: 'gemini', nom: 'Google Gemini', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', modeles: ['gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.8-flash'], aide: 'aistudio.google.com' },
   { id: 'openrouter', nom: 'OpenRouter (Claude, GPT, Gemini, +100 IA)', url: 'https://openrouter.ai/api/v1/chat/completions', modeles: ['openrouter/free'], aide: 'openrouter.ai - passerelle vers Claude, GPT, Gemini, Llama, etc.' }
 ];
+// ===== V42 : TES CLÉS EN DUR DANS LE CODE — À REMPLIR TOI-MÊME, NE M'ENVOIE RIEN ICI =====
+// COMMENT FAIRE (1 fois, 2 minutes) :
+// 1. Ouvre ce fichier .html dans un éditeur de texte (sur téléphone : ouvre avec un éditeur, pas juste le navigateur)
+// 2. Cherche : NEXUS_CLES_EN_DUR
+// 3. Entre les guillemets "", colle TA clé, sans espace avant / après. Exemple : groq: "gsk_...."
+// 4. Enregistre. Rouvre le fichier. C'est tout. NEXUS les recharge tout seul à chaque fois.
+// Tu ne les remettras plus jamais, même si tu vides le cache.
+// ⚠️ NE PARTAGE JAMAIS ce fichier avec tes clés dedans. Tout le monde pourrait les utiliser et vider ton quota.
+// Si tu veux partager NEXUS, partage la version sans clés (V41).
+const NEXUS_CLES_EN_DUR = {
+  groq: "",       // <-- colle ta clé Groq entre les guillemets, ex : "gsk_..."
+  gemini: "",     // <-- colle ta clé Gemini
+  openrouter: "", // <-- colle ta clé OpenRouter
+};
+function nexusClesEnDurAppliquer(){
+  try{
+    const dur = NEXUS_CLES_EN_DUR || {};
+    const aAppliquer = {};
+    Object.keys(dur).forEach(k => { const v = String(dur[k] || '').trim(); if(v && v.length > 10) aAppliquer[k] = v; });
+    if(!Object.keys(aAppliquer).length) return false;
+    const actuel = nexusClesLire();
+    let change = false;
+    Object.keys(aAppliquer).forEach(k => { if(actuel[k] !== aAppliquer[k]){ actuel[k] = aAppliquer[k]; change = true; } });
+    if(change) nexusClesEcrire(actuel);
+    return true;
+  }catch(e){ return false; }
+}
 const NEXUS_CLES_CLE = 'nexus_cles_v1';
 function nexusClesLire(){ try{ return JSON.parse(localStorage.getItem(NEXUS_CLES_CLE) || '{}') || {}; }catch(e){ return {}; } }
 function nexusClesEcrire(o){ try{ localStorage.setItem(NEXUS_CLES_CLE, JSON.stringify(o)); }catch(e){} }
@@ -1966,6 +1911,16 @@ function nexusClesToutSupprimer(){
   showToast('Toutes les clés ont été supprimées.');
 }
 function nexusClesInit(){
+  try{ nexusClesEnDurAppliquer(); }catch(e){}
+  try{
+    // Si tu as mis des clés en dur, NEXUS passe tout seul en mode CLÉS API, sinon tes clés ne serviraient à rien.
+    const dur = NEXUS_CLES_EN_DUR || {};
+    const aUneCle = Object.keys(dur).some(k => String(dur[k]||'').trim().length > 10);
+    if(aUneCle){
+      try{ localStorage.setItem('nexus_mode', 'cles'); }catch(e){}
+      try{ const sel = document.getElementById('mo'); if(sel) sel.value = 'cles'; }catch(e){}
+    }
+  }catch(e){}
   const box = document.getElementById('nexusClesListe'); if(!box) return;
   const o = nexusClesLire();
   box.innerHTML = NEXUS_CLES_DEF.map(d => '<div style="margin-bottom:14px"><label>' + d.nom + ' <span id="kst-' + d.id + '" style="font-size:12px;text-transform:none"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-' + d.id + '" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer(\'' + d.id + '\')">Supprimer</button></div><small>Clé gratuite : ' + d.aide + '</small></div>').join('');
@@ -2125,20 +2080,22 @@ async function callPuterProducteur(messages, signal, image = null, t){
 
 async function ask(t, role, prompt, tier, json, image = null){
   const signal = currentController ? currentController.signal : undefined;
-  // Plus d'injection d'identité forcée
   const finalPrompt = prompt;
   let txt, usedProvider;
-
-  if(t.mode === "puter"){
+  // V44 TOUT EN CONCERT : ask() aussi passe par l'orchestre complet, plus jamais un seul.
+  // Avant : Puter SEUL ou clé unique SEULE. Maintenant : tes clés + Puter + secours, ensemble.
+  try{
+    txt = await callPuterProducteur([{ role: 'user', content: String(finalPrompt || '') }], signal, image, t);
+    usedProvider = 'concert';
+  }catch(e){
+    if(e && e.name === 'AbortError') throw e;
+    // Dernier filet : Puter seul, pour ne jamais rester sans réponse
     txt = await callPuter(finalPrompt, signal, image);
-    usedProvider = "puter";
-  } else {
-    // Mode "cles" - producteur uniquement
-    txt = await callCustom("p", finalPrompt, signal, image);
-    usedProvider = "custom-p";
+    usedProvider = 'puter';
   }
 
   t.pProvider = usedProvider;
+  try{ localStorage.setItem('nexus_dernier_provider', String(usedProvider)); }catch(e){}
 
   if(json){
     const o = pj(txt);
@@ -2966,7 +2923,7 @@ Règles importantes :
         t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
         }
       } else {
-        // Mode "cles" : INCHANGÉ, passe par l'ancien chemin ask -> callCustom.
+        // V43 ENSEMBLE : même si une vieille conversation dit "cles", on fait quand même ENSEMBLE (clés + Puter), plus de choix.
         // On reconstruit le texte équivalent pour callCustom qui attend une chaîne.
         const promptP = `[INSTRUCTIONS SYSTÈME]\n${systemBlock}\n\n` +
           (_toolCtx ? _toolCtx + "\n\n" : "") +
@@ -3014,6 +2971,81 @@ let nexusIncognito = true; // V40 : toujours discret, plus de bouton, plus de OF
 // L'utilisateur voit juste : "NEXUS travaille..." puis la réponse NEXUS. Aucune fenêtre, aucune carte invité, aucun nom d'IA externe.
 // Qualité max sans ouvrir = impossible en gratuit pour ChatGPT / Claude / Suno / Runway, car il faut leur clé API payante pour les appeler en caché.
 // Le max discret en gratuit, c'est : Groq / Gemini / OpenRouter / Puter / Pollinations en arrière-plan, présentés comme NEXUS.
+function nexusDiagInfos(){
+  try{
+    let mode = 'puter';
+    try{ mode = localStorage.getItem('nexus_mode') || 'puter'; }catch(e){}
+    let cles = {};
+    try{ cles = JSON.parse(localStorage.getItem('nexus_cles_v1') || localStorage.getItem('nexusCles') || '{}'); }catch(e){}
+    // Essaie aussi l'autre clé utilisée par nexusClesListe
+    try{
+      const alt = JSON.parse(localStorage.getItem('nexus_cles') || '{}');
+      if(Object.keys(alt).length) cles = alt;
+    }catch(e){}
+    let dernier = '— aucune réponse encore —';
+    try{ dernier = localStorage.getItem('nexus_dernier_provider') || dernier; }catch(e){}
+    let enDur = 0;
+    try{ Object.keys(NEXUS_CLES_EN_DUR || {}).forEach(k => { if(String((NEXUS_CLES_EN_DUR||{})[k]||'').trim().length > 10) enDur++; }); }catch(e){}
+    let nb = 0;
+    try{
+      if(Array.isArray(cles)) nb = cles.length;
+      else if(typeof cles === 'object') nb = Object.keys(cles).filter(k => { const v = cles[k]; return v && (v.key || v.cle || typeof v === 'string'); }).length;
+    }catch(e){}
+    return { mode, nb, dernier, cles };
+  }catch(e){ return { mode: 'puter', nb: 0, dernier: '—', cles: {} }; }
+}
+function nexusDiagRafraichir(){
+  try{
+    const el = document.getElementById('nexusDiagTexte');
+    if(!el) return;
+    const d = nexusDiagInfos();
+    const modeTxt = '✅ NEXUS PLATEFORME — Patron : NEXUS → Chefs : Puter + Tes API (Groq, Gemini, OpenRouter) → Employés : toutes les IA externes. Tu passes par NEXUS pour tout avoir. Tout travaille en concert.';
+    el.innerHTML = '<b>Mode actuel :</b> ' + modeTxt + '<br><b>Clés enregistrées :</b> ' + d.nb + ' dont <b>' + enDur + ' en dur dans le code</b> (si 0 en dur, tu n’as pas encore collé tes clés dans NEXUS_CLES_EN_DUR)<br><b>Dernière réponse via :</b> ' + String(d.dernier).replace(/</g,'') + '<br><b>IA extérieures :</b> en V40 elles sont cachées volontairement (toujours discret). Elles bossent en arrière-plan, tu ne les vois pas dans le chat. C’est pour ça que tu as l’impression que rien ne fait quoi que ce soit.';
+    // Met aussi à jour le hint du chat pour toi
+    const hint = document.getElementById('modeHint');
+    if(hint) hint.textContent = 'NEXUS • Mode : ' + (d.mode === 'cles' ? 'CLÉS API — tes clés servent' : 'PUTER — tes clés ne servent pas') + ' • Dernière : ' + d.dernier;
+  }catch(e){}
+}
+function nexusDiagBasculerCles(){
+  try{
+    const sel = document.getElementById('mo');
+    if(sel){ sel.value = 'cles'; }
+    try{ localStorage.setItem('nexus_mode', 'cles'); }catch(e){}
+    try{ if(typeof saveModeVerif === 'function') saveModeVerif(); }catch(e){}
+    try{ if(typeof updateModeUI === 'function') updateModeUI(); }catch(e){}
+    nexusDiagRafraichir();
+    try{ showToast('Mode CLÉS API : tes clés sont maintenant utilisées.'); }catch(e){}
+  }catch(e){}
+}
+function nexusDiagBasculerPuter(){
+  try{
+    const sel = document.getElementById('mo');
+    if(sel){ sel.value = 'puter'; }
+    try{ localStorage.setItem('nexus_mode', 'puter'); }catch(e){}
+    try{ if(typeof saveModeVerif === 'function') saveModeVerif(); }catch(e){}
+    try{ if(typeof updateModeUI === 'function') updateModeUI(); }catch(e){}
+    nexusDiagRafraichir();
+    try{ showToast('Mode PUTER : tes clés ne sont plus utilisées.'); }catch(e){}
+  }catch(e){}
+}
+setInterval(()=>{ try{ nexusDiagRafraichir(); }catch(e){} }, 5000);
+// V44 : bannière concert, discrète, qui dit que tout bosse ensemble sans citer les IA externes
+// ===== V45 NEXUS PLATEFORME : le grand patron, par où passer pour tout avoir =====
+// Tu passes par NEXUS pour tout avoir. NEXUS commande, les chefs distribuent, les employés exécutent.
+// NEXUS (Patron) -> PUTER + GROQ + GEMINI + OPENROUTER (Chefs) -> ChatGPT, Claude, Meta AI, Perplexity, Suno, Midjourney, Runway, Kling, Grok (Employés)
+function nexusBanniereConcert(){
+  try{
+    if(document.getElementById('nexus-banniere-concert')) return;
+    const chat = document.getElementById('chat');
+    if(!chat) return;
+    const div = document.createElement('div');
+    div.id = 'nexus-banniere-concert';
+    div.style.cssText = 'margin:10px 12px 0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2,var(--surface));font-size:12px;line-height:1.5';
+    div.innerHTML = '<b>👑 NEXUS — La plateforme par où passer pour tout avoir.</b><br><span style="color:var(--text-muted)">Tu demandes à NEXUS, NEXUS s’occupe de tout et te rend la réponse.</span>';
+    chat.parentNode.insertBefore(div, chat);
+  }catch(e){}
+}
+setTimeout(()=>{ try{ nexusBanniereConcert(); }catch(e){} }, 800);
 function nexusAppliquerDiscret(){
   try{
     const barre = document.getElementById('nexus-barre-raccourcis');
