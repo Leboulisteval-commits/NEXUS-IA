@@ -268,7 +268,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{max-width:560px;margin:auto;text-align:center;padding:36px 16px}
 .empty h2{font-size:22px;margin:14px 0 8px;font-weight:700}
-.empty p{color:var(--text-muted);font-size:14px;line-height:1.55}
+.empty p{color:var(--text-muted);font-size:14px;line-height:1.55}uu
 .empty-logo{
   display:inline-block;
   font-family:var(--font-mono);
@@ -293,8 +293,15 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div class="header-spacer"></div>
 <span class="badge-verif" id="modeBadge">PUTER</span>
 <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Thème">🌙</button>
-<button class="icon-btn" onclick="openSettings()" aria-label="Réglages">⚙️</button>
+<button class="icon-btn" onclick="openSettings()" aria-label="Réglages" style="font-size:24px;width:46px;height:46px;padding:0;display:flex;align-items:center;justify-content:center">⚙️</button>
 </header>
+<style>
+#nexusMemoireBar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 14px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface)}
+#nexusMemoireBar button{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
+#nexusMemoireBar button:active{opacity:.7}
+</style>
+<div id="nexusMemoireBar"><span id="nexusMemoireProjet">📁 Aucun projet</span><span id="nexusMemoireFaits">🧠 0 souvenir</span><span id="nexusMemoireWeb">🌐 Web : auto si actu</span><span style="margin-left:auto;font-size:11px">Réglages dans ⚙️</span></div>
+
 
 <main>
 <div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Bonjour.</h2><p>Pose une question, joins une image ou un document,<br>ou demande une vérification croisée.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
@@ -319,25 +326,28 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 </div>
 </main>
 
-<aside id="sidebar">
+<aside id="sidebar" class="">
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795043659855)"><span class="conv-del" onclick="deleteConversation(1795043659855,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
-<div class="sidebar-foot"><button class="btn btn-secondary" style="flex:1" onclick="toggleTheme()">🌓 Thème</button><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer</button></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795048207982)"><span class="conv-del" onclick="deleteConversation(1795048207982,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
-<div id="overlay" onclick="closeSidebar()"></div>
+<div id="overlay" onclick="closeSidebar()" class=""></div>
 
 <dialog id="settingsModal">
 <div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
 <div class="modal-body">
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:4px 0 8px">🎨 APPARENCE</div>
+<div class="field"><label>Thème</label><button class="btn btn-secondary" onclick="toggleTheme()">🌓 Changer de thème</button><small>Aussi accessible en haut à droite (🌙).</small></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🤖 INTELLIGENCE</div>
 <div class="field"><label>Mode de fonctionnement</label>
 <select id="mo" onchange="toggleSettings();saveModeVerif()">
 <option value="puter">Puter (recommandé)</option>
 <option value="cles">Mes clés API</option>
 </select>
 <small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
-<div class="check-row"><input type="checkbox" id="vf" checked="" onchange="saveModeVerif()"><div><b>Vérification croisée</b><br><small>Un 2e modèle vérifie chaque réponse et la corrige si besoin (max 3 tours).</small></div></div>
+<div class="check-row" style="border:1px solid var(--border);border-radius:12px;padding:10px"><input type="checkbox" id="vf" checked="" onchange="nexusReglages_ToggleVerif()"><div><b>Vérification croisée — <span id="nexusVerifStatut">activée</span></b><br><small>Un 2e modèle vérifie chaque réponse et la corrige si besoin (max 3 tours).</small></div></div>
 <div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
 <div id="api-settings" style="display:none">
 <div class="field"><label>🔑 Producteur (P) - URL API</label><input id="up" list="dl" placeholder="https://api.groq.com/openai/v1/chat/completions"><datalist id="dl"><option value="https://api.groq.com/openai/v1/chat/completions"></option><option value="https://api.mistral.ai/v1/chat/completions"></option><option value="https://openrouter.ai/api/v1/chat/completions"></option></datalist></div>
@@ -350,6 +360,12 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div class="field"><label>Modèle Vérificateur</label><input id="mv" placeholder="llama-3.3-70b-versatile"></div>
 <div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="saveProvider('v');testP('v')">Tester V</button><span id="tv" style="font-family:var(--font-mono);font-size:12px;align-self:center"></span></div>
 </div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🧠 MÉMOIRE / PROJETS / WEB</div>
+<div class="field"><label>Raccourcis</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('projet')">📁 Projet…</button><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('memoire')">🧠 Mémoire…</button><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('web')">🌐 Web…</button></div><small>Ces boutons remplissent ta zone de texte, tu n'as plus qu'à compléter et envoyer.</small></div>
+<div class="field"><label>Effacer la mémoire</label><button class="btn btn-secondary" onclick="nexusReglages_OublieTout()">🧹 Oublie tout (mémoire seulement)</button><small>Supprime souvenirs + projets. Tes conversations ne sont pas touchées.</small></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">☁️ STOCKAGE &amp; CLOUD</div>
+<div class="field"><label>Synchro auto</label><div id="nexusCloudStatut" style="font-size:12px;color:var(--text-muted)">☁️ Cloud : Puter pas chargé, local à jour</div><button id="nexusCloudBouton" class="btn btn-secondary" style="display:none;width:100%;margin-top:8px" onclick="nexusReglages_ConnecterCloud()">☁️ Activer la synchro auto (1 clic)</button><small>1 clic une fois, puis tout automatique. IndexedDB sauve déjà en local, sans rien faire.</small></div>
+<div class="field"><label>Sauvegarde manuelle (secours)</label><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusExportJSON()">⬇ Exporter</button><button class="btn btn-secondary" style="flex:1" onclick="document.getElementById('nexusImportFile').click()">⬆ Importer</button></div><input type="file" id="nexusImportFile" accept=".json,application/json" style="display:none" onchange="nexusImportJSON(event)"><small>Tu n'es plus censé t'en servir au quotidien. C'est juste si le cloud est indisponible.</small></div>
 <button class="btn btn-primary" onclick="closeSettings()">Fermer</button>
 </div>
 </dialog>
@@ -484,11 +500,13 @@ function save(){
   // localStorage = ~5 Mo max -> au bout de quelques photos, la sauvegarde plantait.
   // Maintenant : on essaie d'abord de tout sauver. Si le quota est dépassé, on re-sauve SANS les images (le texte des conversations est gardé).
   // L'image reste en mémoire pour l'envoi en cours, elle disparaît juste de l'historique après rechargement.
-  try{ localStorage.setItem(K, JSON.stringify(state)); return; }catch(e){ console.warn('Sauvegarde complète impossible (quota ?), on re-sauve sans les images.', e); }
+  try{ localStorage.setItem(K, JSON.stringify(state)); try{ nexusIDB_Miroir(); }catch(e){} try{ nexusCloud_Planifier(); }catch(e){} return; }catch(e){ console.warn('Sauvegarde complète impossible (quota ?), on re-sauve sans les images.', e); }
   try{
     const copie = JSON.parse(JSON.stringify(state));
     (copie.convs || []).forEach(c => (c.messages || []).forEach(m => { if(m.image){ m.image = null; m.imageEnvoyee = true; } }));
     localStorage.setItem(K, JSON.stringify(copie));
+    try{ nexusIDB_Miroir(); }catch(e){}
+    try{ nexusCloud_Planifier(); }catch(e){}
   }catch(e2){ console.warn('Sauvegarde impossible.', e2); }
 }
 function load(){
@@ -712,6 +730,7 @@ function saveModeVerif(){
     localStorage.setItem("nexus_mode", $("#mo").value);
     localStorage.setItem("nexus_verif", $("#vf").checked ? "1" : "0");
   }catch(e){}
+  try{ nexusMajBoutonVerif(); }catch(e){}
 }
 function loadModeVerif(){
   try{
@@ -721,6 +740,7 @@ function loadModeVerif(){
     if(m !== "puter" && m !== "cles") m = "puter";
     $("#mo").value = m;
     $("#vf").checked = localStorage.getItem("nexus_verif") !== "0";
+    try{ nexusMajBoutonVerif(); }catch(e){}
   }catch(e){}
 }
 
@@ -1094,30 +1114,129 @@ function nexusListeModelesTexte(){
     '\\n\\nPour forcer une IA : tape par exemple "/model claude" ou "/model gemini" devant ta demande.';
 }
 function nexusChoisirModele(messages){
-  const texte = (messages||[]).map(m => String(m.content||'')).join('\\n').toLowerCase();
-  // 1. Choix manuel explicite : "/model claude", "/ia gemini", "/model gpt..."
+  // ROUTEUR À SCORES v6 : la demande est ÉTUDIÉE avant d'être redirigée, pas juste « premier mot trouvé ».
+  // Chaque IA reçoit des points selon ce que contient la demande. La meilleure note gagne.
+  // Lite est gardé, mais SEULEMENT pour les vrais besoins triviaux (heure / jour / bonjour / oui-non). Plus jamais pour une question de fond.
+  const msgs = (messages||[]).filter(m => m && m.role === 'user');
+  const derniere = msgs.length ? String(msgs[msgs.length-1].content||'') : '';
+  const texte = derniere.toLowerCase();
+  const avantDerniere = msgs.length > 1 ? String(msgs[msgs.length-2].content||'').toLowerCase() : '';
+
+  // 1. Choix manuel explicite : "/model claude", "/ia gemini", "/model gpt..." -> prioritaire sur tout.
   const manuel = texte.match(/(?:\/model|\/modele|\/ia)\s+([a-z0-9][a-z0-9\-]*)/);
   if(manuel){
     const mot = manuel[1];
     const trouve = NEXUS_MODELES.find(m => m.id.startsWith(mot) || m.famille.toLowerCase() === mot || m.id.includes(mot));
+    try{ window.__nexusRoutageRaison = 'manuel : /model ' + mot; }catch(e){}
     if(trouve) return trouve.id;
-    return mot; // Puter essaiera ce nom, et retombera sur gpt-5.5 si inconnu
+    return mot;
   }
-  // 2. Traducteur : modèle fiable et précis
-  if(texte.includes('traducteur professionnel')) return 'gpt-5.5';
-  // 3. Code / debug : Claude Sonnet ou DeepSeek
-  if(/\b(code|debug|débog|bug|python|javascript|js\b|html|css|fonction|script|erreur de code|corrige.*code|typescript|sql)\b/.test(texte)) return 'claude-sonnet-5.5';
-  // 4. Rédaction longue : Claude Opus
-  if(/\b(rédige|redige|lettre|dissertation|histoire|roman|discours|exposé|expose|écris|ecris|rédaction|redaction|poème|poeme|article)\b/.test(texte)) return 'claude-opus-5.5';
-  // 5. Maths / logique / raisonnement : GPT-5.5 ou DeepSeek
-  if(/\b(calcule|math|maths|mathématique|logique|raisonne|démontre|demonstre|probabilité|équation|equation|analyse.*données|compare.*modèles)\b/.test(texte)) return 'gpt-5.5';
-  // 6. Résumé : Gemini Flash (avant la règle "question courte", sinon un résumé court partirait en Lite)
-  if(/\b(résume|resume|résumé|synthèse|synthese|condense)\b/.test(texte)) return 'gemini-3.6-flash';
-  // 7. Questions simples / rapides / définitions : Gemini Flash Lite, le plus rapide
-  if(/^(c'est quoi|qu'est-ce que|définition|definition|qui est|quelle est la capitale|combien font|traduis|quelle heure|quel jour|on est quel)/.test(texte.trim()) || texte.length < 80) return 'gemini-3.5-flash-lite';
-  // 8. Par défaut : GPT-5.5
-  return 'gpt-5.5';
+
+  // 2. Suite de conversation : « pareil », « continue », « corrige ça », « et pour l'autre » -> on reprend le modèle de la demande précédente, sinon on perd le contexte.
+  // Avant, une suite partait sur GPT-5.5 par défaut, même si on parlait de code juste avant.
+  if(avantDerniere && texte.trim().length < 90 && /^(pareil|continue|suite|encore|et pour|et aussi|corrige|corrige ça|améliore|ameliore|explique|développe|developpe|plus de détails|plus de detail|et après|et apres|fais pareil|idem)/.test(texte.trim())){
+    const msgsPrev = (messages||[]).slice(0, -1);
+    const modelePrev = nexusChoisirModele(msgsPrev);
+    try{ window.__nexusRoutageRaison = 'suite : même modèle que la demande précédente (' + modelePrev + ')'; }catch(e){}
+    return modelePrev;
+  }
+
+  // 3. Scores. Chaque besoin note les IA. Le plus haut score gagne. Égalité -> l'ordre de priorité ci-dessous tranche.
+  const scores = { 'gpt-5.5': 0, 'claude-sonnet-5.5': 0, 'claude-opus-5.5': 0, 'gemini-3.6-flash': 0, 'gemini-3.5-flash-lite': 0, 'deepseek-v4-flash': 0, 'kimi-k2': 0, 'gpt-4o': 0, 'qwen-3': 0 };
+  const ajouter = (modele, pts, raison) => { scores[modele] = (scores[modele] || 0) + pts; };
+  const raisons = [];
+
+  // Trivial / instant : Lite, et seulement là. Bonjour, merci, oui/non, heure, jour.
+  if(/^(bonjour|salut|hello|merci|ok|oui|non|ça va|ca va|quelle heure|quel jour|on est quel|quelle date)/.test(texte.trim())){ ajouter('gemini-3.5-flash-lite', 10); raisons.push('trivial (heure/jour/salutation)'); }
+  // Traduction : précision avant tout.
+  if(/(traducteur professionnel|traduis|traduire|translation|translate|en anglais|en français|en francais|en espagnol|en allemand|en italien)/.test(texte)){ ajouter('gpt-5.5', 8); raisons.push('traduction'); }
+  // Code / debug : Sonnet en tête, DeepSeek et Qwen en renfort.
+  if(/\b(code|debug|débog|debog|bug|python|javascript|js\b|typescript|html|css|fonction|script|erreur de code|corrige.*code|sql|java|php|rust|go\b)\b/.test(texte)){ ajouter('claude-sonnet-5.5', 8); ajouter('deepseek-v4-flash', 5); ajouter('qwen-3', 3); raisons.push('code/debug'); }
+  // Rédaction longue / créatif : Opus.
+  if(/\b(rédige|redige|lettre|dissertation|histoire|roman|discours|exposé|expose|écris|ecris|rédaction|redaction|poème|poeme|article|nouvelle|scénario|scenario)\b/.test(texte)){ ajouter('claude-opus-5.5', 8); ajouter('gpt-5.5', 2); raisons.push('rédaction longue'); }
+  // Maths / logique / raisonnement : GPT-5.5, DeepSeek en renfort.
+  if(/\b(calcule|math|maths|mathématique|mathematique|logique|raisonne|démontre|demonstre|probabilité|probabilite|équation|equation|analyse.*données|analyse.*donnees|compare.*modèles|compare.*modeles)\b/.test(texte)){ ajouter('gpt-5.5', 8); ajouter('deepseek-v4-flash', 6); raisons.push('maths/logique'); }
+  // Résumé / synthèse : Flash, rapide et bon pour condenser.
+  if(/\b(résume|resume|résumé|resume|synthèse|synthese|condense|résumer|resumer)\b/.test(texte)){ ajouter('gemini-3.6-flash', 8); raisons.push('résumé'); }
+  // Long texte : Kimi, fait pour les longs textes / analyses. Avant, il n'était JAMAIS choisi.
+  if(derniere.length > 8000){ ajouter('kimi-k2', 10); ajouter('claude-opus-5.5', 3); ajouter('gpt-5.5', 2); raisons.push('long texte ' + derniere.length + ' caractères'); }
+  else if(derniere.length > 3000){ ajouter('kimi-k2', 5); ajouter('gpt-5.5', 2); raisons.push('texte moyen-long'); }
+  // Image jointe : GPT-4o, fait pour les images. Avant, il n'était JAMAIS choisi non plus.
+  if(texte.includes('[image jointe') || texte.includes('image jointe')){ ajouter('gpt-4o', 10); raisons.push('image jointe'); }
+  // Question courte de définition : Flash, pas Lite. Lite était trop faible pour du fond.
+  if(derniere.trim().length < 120 && /^(c'est quoi|qu'est-ce que|définition|definition|qui est|quelle est|combien)/.test(texte.trim())){ ajouter('gemini-3.6-flash', 6); ajouter('gpt-5.5', 3); raisons.push('question courte de définition'); }
+  // Vérification de fait : précision, pas vitesse.
+  if(/(vérifie ce fait|verifie ce fait|est-ce vrai|est ce vrai|vrai ou faux)/.test(texte)){ ajouter('gpt-5.5', 8); raisons.push('vérification de fait'); }
+  // Explication simple / pédagogie : Opus, meilleur pour expliquer.
+  if(/(explique simplement|explique-moi|explique moi|comme si j'avais 10 ans|comme si j'avais 12 ans|vulgarise)/.test(texte)){ ajouter('claude-opus-5.5', 6); raisons.push('explication simple'); }
+
+  // Meilleur score. Égalité -> priorité : gpt-5.5 > sonnet > opus > kimi > flash > deepseek > gpt-4o > lite.
+  const priorite = ['gpt-5.5', 'claude-sonnet-5.5', 'claude-opus-5.5', 'kimi-k2', 'gemini-3.6-flash', 'deepseek-v4-flash', 'gpt-4o', 'qwen-3', 'gemini-3.5-flash-lite'];
+  let meilleur = 'gpt-5.5', meilleurScore = -1;
+  for(const m of priorite){ if((scores[m] || 0) > meilleurScore){ meilleurScore = scores[m] || 0; meilleur = m; } }
+  try{ window.__nexusRoutageRaison = (raisons.length ? raisons.join(' + ') : 'aucun signal, défaut') + ' → ' + meilleur + ' (' + meilleurScore + ' pts)'; }catch(e){}
+  return meilleur;
 }
+
+async function nexusRouteurIntelligent(messages, image){
+  // ROUTEUR INTELLIGENT v7 : 2 étages, pour ne pas gaspiller de crédits Puter à trier.
+  // Étage 1 (mots-clés v6, gratuit, instantané) : si le besoin est CLAIR (un seul signal, ex : « corrige ce code python »), on garde le résultat, on n'appelle pas d'IA pour trier.
+  // Étage 2 (petite IA, seulement si ambigu) : si le besoin est AMBIGU (2 signaux, aucun signal, ou phrase piégée comme « code postal »), on demande à un petit modèle rapide (Lite) de classer.
+  // Si la petite IA échoue / répond mal / Puter est HS, on retombe sur l'étage 1. Le tri ne peut jamais planter la réponse.
+  const msgs = (messages||[]).filter(m => m && m.role === 'user');
+  const derniere = msgs.length ? String(msgs[msgs.length-1].content||'') : '';
+  const texte = derniere.toLowerCase();
+
+  // Cas qui ne passent jamais par la petite IA : choix manuel, image, long texte.
+  if(/\/(model|modele|ia)\s+[a-z0-9]/.test(texte)) return nexusChoisirModele(messages);
+  if(image || texte.includes('[image jointe')) return 'gpt-4o';
+  if(derniere.length > 8000) return 'kimi-k2';
+
+  const gagnantMotsCles = nexusChoisirModele(messages);
+  let raisonMotsCles = '';
+  try{ raisonMotsCles = String(window.__nexusRoutageRaison || ''); }catch(e){}
+  // Suite de conversation : déjà gérée par l'étage 1, on ne re-classe pas.
+  if(raisonMotsCles.startsWith('suite :')) return gagnantMotsCles;
+  // Phrases piégées que les mots-clés classent toujours mal : « code postal » n'est pas du code, « histoire de la guerre » n'est pas une rédaction, « lettre de l'alphabet » n'est pas une lettre à écrire.
+  const pieges = /(code postal|code de la route|code-barres|code barres|code pin|histoire de|lettre de l'alphabet|lettre de|histoire du|article de|article du)/;
+  const estPiege = pieges.test(texte);
+  // Ambigu si : 2 signaux ou plus (ex : « traduis ce code »), aucun signal, ou phrase piégée.
+  const nbSignaux = (raisonMotsCles.split(' + ').length);
+  const estAmbigu = estPiege || raisonMotsCles.includes('aucun signal') || nbSignaux >= 2;
+  if(!estAmbigu) return gagnantMotsCles;
+  // Puter déjà HS : on ne rappelle pas Puter pour trier (sinon sa popup réapparaît). On garde les mots-clés.
+  if(typeof window !== 'undefined' && window.__nexusPuterHS) return gagnantMotsCles;
+  if(!window.puter || !puter.ai || !puter.ai.chat) return gagnantMotsCles;
+
+  // Étage 2 : petite IA, modèle le moins cher, timeout 8s, on ne laisse jamais le tri bloquer la réponse.
+  try{
+    const promptClassement = 'Tu es un routeur d\'IA. Classe la demande suivante en UNE seule catégorie parmi : trivial, traduction, code, redaction, maths, resume, question_courte, verification, explication, general.\nRègles : "code postal", "code de la route", "code-barres", "code PIN" ne sont PAS du code, ce sont general ou question_courte. "histoire de la guerre", "histoire du monde" ne sont PAS de la rédaction, ce sont general. "lettre de l\'alphabet" n\'est PAS de la rédaction. "traduis ce code" est traduction si on demande de traduire, code si on demande de corriger.\nRetourne UNIQUEMENT ce JSON, sans texte autour : {"categorie":"code","confiance":0.9}\nDemande : "' + derniere.slice(0, 2000).replace(/"/g, "'") + '"';
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => { try{ ctrl.abort(); }catch(e){} }, 8000);
+    let res;
+    try{ res = await puter.ai.chat([{ role: 'user', content: promptClassement }], false, { model: 'gemini-3.5-flash-lite', signal: ctrl.signal }); }
+    finally{ clearTimeout(timer); }
+    let txt = '';
+    if(typeof res === 'string') txt = res;
+    else if(res && res.message && typeof res.message.content === 'string') txt = res.message.content;
+    else if(res && typeof res.text === 'string') txt = res.text;
+    else if(res && Array.isArray(res.choices) && res.choices[0] && res.choices[0].message) txt = String(res.choices[0].message.content || '');
+    const mJson = String(txt || '').match(/\{[^}]*"categorie"[^}]*\}/);
+    if(!mJson) return gagnantMotsCles;
+    const parsed = JSON.parse(mJson[0]);
+    const cat = String(parsed.categorie || '').toLowerCase();
+    const conf = Number(parsed.confiance || 0);
+    if(conf < 0.6) return gagnantMotsCles;
+    const carte = { 'trivial': 'gemini-3.5-flash-lite', 'traduction': 'gpt-5.5', 'code': 'claude-sonnet-5.5', 'redaction': 'claude-opus-5.5', 'maths': 'gpt-5.5', 'resume': 'gemini-3.6-flash', 'question_courte': 'gemini-3.6-flash', 'verification': 'gpt-5.5', 'explication': 'claude-opus-5.5', 'general': 'gpt-5.5' };
+    if(!carte[cat]) return gagnantMotsCles;
+    try{ window.__nexusRoutageRaison = 'intelligent : ' + cat + ' (confiance ' + conf + ', mots-clés disaient ' + gagnantMotsCles + ')'; }catch(e){}
+    return carte[cat];
+  }catch(e){
+    // Échec du classement intelligent : on retombe sur les mots-clés, sans jamais marquer Puter comme HS (sinon on perdrait Puter pour la vraie réponse).
+    return gagnantMotsCles;
+  }
+}
+
 async function nexusAppelerModele(messages, signal, image, modele){
   const options = { model: modele };
   if(signal) options.signal = signal;
@@ -1296,10 +1415,11 @@ async function callPuterProducteur(messages, signal, image = null){
       catch(ePoll){ throw new Error("Puter sans crédits. [Secours échoués :" + String((typeof window !== 'undefined' && window.__nexusSecoursErreurs) || ' ?') + "]"); }
     }
   }
-  const modeleChoisi = nexusChoisirModele(messages);
+  // ROUTEUR INTELLIGENT v7 : on attend le classement (mots-clés instantané, ou petite IA si ambigu). Si le classement échoue, il retombe tout seul sur les mots-clés.
+  const modeleChoisi = await nexusRouteurIntelligent(messages, image);
   // Mémorise le modèle utilisé pour l'afficher dans la conversation (Prod : PUTER • gpt-5.5, etc.)
   try{ window.__nexusDernierModele = modeleChoisi; }catch(e){}
-  const essais = [modeleChoisi, 'gpt-5.5', null].filter((v,i,a) => a.indexOf(v) === i);
+  const essais = [modeleChoisi, 'gpt-5.5', 'claude-sonnet-5.5', null].filter((v,i,a) => a.indexOf(v) === i);
   let derniereErreur = null;
   for(const modele of essais){
     try{
@@ -1310,18 +1430,29 @@ async function callPuterProducteur(messages, signal, image = null){
         // Dernier recours : sans modèle précisé, Puter choisit son modèle par défaut
         res = image ? await puter.ai.chat(messages.map(m => m.content).join("\n\n"), image, false, {}) : await puter.ai.chat(messages, false, {});
       }
+      const txtPuter = extractPuterText(res);
+      // PUISSANCE v5b : contrôle qualité Puter, CORRIGÉ. En v5, on rejetait toute réponse < 20 caractères. Problème : « Oui. », « Vrai. », « Paris. » sont des réponses légitimes et courtes, on les jetait pour rien et on gaspillait des crédits à réessayer.
+      // Maintenant : on ne rejette que le vide, le refus, ou une réponse très courte (< 20) alors que la demande était longue (> 500 caractères, on attendait une longue réponse).
+      const _demandeLen = String(messages && messages.length ? messages[messages.length-1].content || '' : '').length;
+      const _estRefus = /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txtPuter ? txtPuter.trim() : '');
+      if(!txtPuter || !txtPuter.trim() || _estRefus || (txtPuter.trim().length < 20 && _demandeLen > 500)){
+        derniereErreur = new Error('Puter ' + (modele || 'défaut') + ' réponse insuffisante');
+        continue;
+      }
       try{ window.__nexusDernierModele = modele || 'défaut Puter'; }catch(e){}
-      return extractPuterText(res);
+      return txtPuter;
     }catch(e){
       if(e.name === 'AbortError') throw e;
-      try{ if(typeof window !== 'undefined') window.__nexusPuterHS = true; }catch(e2){}
       derniereErreur = e;
       const msg = String(e.message||'').toLowerCase();
-      // Erreur crédits : on sort de la boucle pour aller au secours Pollinations (juste après), on ne jette pas l'erreur ici.
-      // CORRIGÉ v2 : ne plus jeter l'erreur Puter tout de suite. Sur toute erreur, on sort de la boucle pour aller aux secours.
-      // On ne retente un autre modèle Puter que si le problème vient du modèle lui-même.
-      if(/model.*not found|unknown model|invalid.*model|model.*unavailable|not available|introuvable/.test(msg)) continue;
-      break;
+      // PUISSANCE v5 : avant, sur toute erreur on tombait direct au secours faible. Maintenant on distingue :
+      // - Crédits (funding / credits / Low Balance / 402 / upgrade) : on arrête Puter, on va aux secours, c'est inutile de réessayer.
+      // - Tout le reste (modèle introuvable, timeout, 500, 429, réseau) : erreur passagère = on essaie le modèle Puter suivant AVANT de tomber au secours faible.
+      if(/credit|funding|low balance|insufficient|402|upgrade|payant|quota|billing/.test(msg)){
+        try{ if(typeof window !== 'undefined') window.__nexusPuterHS = true; }catch(e2){}
+        break;
+      }
+      continue;
     }
   }
   // Puter a échoué (crédits / funding / Low Balance / autre) ? On bascule sur les secours sans clé.
@@ -1398,6 +1529,639 @@ function setBusy(b){
 function stopGeneration(){
   if(currentController){ try{ currentController.abort(); }catch(e){} }
 }
+
+// ===== MÉMOIRE + PROJETS + WEB — ajouté, ne touche à rien d'autre. Clé séparée, conversations intactes. =====
+const NEXUS_MEMOIRE_CLE = 'nexus_memoire_v1';
+function nexusMemoireCharger(){
+  try{
+    const raw = localStorage.getItem(NEXUS_MEMOIRE_CLE);
+    if(!raw) return { faits: [], projets: {}, projetActuel: null };
+    const m = JSON.parse(raw) || {};
+    if(!Array.isArray(m.faits)) m.faits = [];
+    if(!m.projets || typeof m.projets !== 'object') m.projets = {};
+    if(typeof m.projetActuel !== 'string') m.projetActuel = null;
+    return m;
+  }catch(e){ return { faits: [], projets: {}, projetActuel: null }; }
+}
+function nexusMemoireSauver(m){
+  try{ localStorage.setItem(NEXUS_MEMOIRE_CLE, JSON.stringify(m)); }catch(e){ /* quota : on ne casse jamais l'app pour la mémoire */ }
+  try{ nexusIDB_Miroir(); }catch(e){}
+  try{ nexusCloud_Planifier(); }catch(e){}
+}
+function nexusMemoireTexte(){
+  const m = nexusMemoireCharger();
+  const parts = [];
+  const faits = (m.faits || []).slice(-20);
+  if(faits.length) parts.push('MÉMOIRE NEXUS (faits à respecter, mémoire locale sur cet appareil) :\n- ' + faits.map(f => String(f).slice(0, 300)).join('\n- '));
+  if(m.projetActuel){
+    const pr = (m.projets || {})[m.projetActuel];
+    const notes = pr && Array.isArray(pr.notes) ? pr.notes.slice(-10) : [];
+    if(notes.length) parts.push('PROJET ACTUEL : ' + m.projetActuel + '\nNOTES DU PROJET (à respecter) :\n- ' + notes.map(n => String(n).slice(0, 300)).join('\n- '));
+    else parts.push('PROJET ACTUEL : ' + m.projetActuel + ' (aucune note pour l\'instant)');
+  }
+  return parts.join('\n\n');
+}
+function nexusMemoireRender(){
+  try{
+    const m = nexusMemoireCharger();
+    const elP = document.getElementById('nexusMemoireProjet');
+    const elF = document.getElementById('nexusMemoireFaits');
+    if(elP) elP.textContent = m.projetActuel ? ('📁 Projet : ' + m.projetActuel) : '📁 Aucun projet';
+    if(elF){
+      const n = (m.faits || []).length;
+      elF.textContent = '🧠 ' + n + ' souvenir' + (n > 1 ? 's' : '');
+    }
+  }catch(e){}
+}
+function nexusMemoireBarRaccourci(type){
+  try{
+    const q = document.getElementById('q');
+    if(!q) return;
+    if(type === 'projet') q.value = '/projet ';
+    else if(type === 'memoire') q.value = 'Souviens-toi que ';
+    else if(type === 'web') q.value = '/web ';
+    q.focus();
+  }catch(e){}
+}
+function nexusProjetNom(nom){
+  return String(nom || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+}
+function nexusCommandesMemoireProjet(demande){
+  const d = String(demande || '').trim();
+  if(!d) return null;
+  const bas = d.toLowerCase();
+  // --- Oublier tout (avant "oublie ..." simple) ---
+  if(/^\s*(oublie tout|efface ma mémoire|efface toute ma mémoire|oublie tout ce que tu sais|efface tout ce que tu sais)/i.test(d)){
+    nexusMemoireSauver({ faits: [], projets: {}, projetActuel: null });
+    nexusMemoireRender();
+    return '✅ Mémoire effacée : souvenirs, projets et projet actuel supprimés (sur cet appareil). Tes conversations ne sont pas touchées.';
+  }
+  // --- Souviens-toi que ... / Mémorise ... / Retiens que ... ---
+  let mSouviens = d.match(/^\s*(souviens-toi que|souviens toi que|mémorise|memorise|retiens que|n['’]oublie pas que|à retenir|a retenir)\s*[:\-]?\s*(.+)$/i);
+  if(mSouviens && mSouviens[2] && mSouviens[2].trim()){
+    const fait = mSouviens[2].trim().slice(0, 500);
+    const m = nexusMemoireCharger();
+    if(!m.faits.includes(fait)){ m.faits.push(fait); if(m.faits.length > 50) m.faits = m.faits.slice(-50); nexusMemoireSauver(m); }
+    nexusMemoireRender();
+    return '✅ Retenu : « ' + fait + ' »\nJe m\'en souviendrai dans nos prochaines conversations (mémoire locale, sur cet appareil). Pour voir ce que je sais, dis : « Que sais-tu de moi ? ». Pour tout effacer, dis : « Oublie tout ».';
+  }
+  // --- Oublie que ... / Oublie ... (un seul fait) ---
+  let mOublie = d.match(/^\s*oublie (que\s+)?(.+)$/i);
+  if(mOublie && mOublie[2] && !/tout/.test(mOublie[2])){
+    const cible = mOublie[2].trim().toLowerCase();
+    const m = nexusMemoireCharger();
+    const avant = m.faits.length;
+    m.faits = m.faits.filter(f => String(f).toLowerCase().indexOf(cible) === -1 && cible.indexOf(String(f).toLowerCase()) === -1);
+    if(m.faits.length === avant) return 'Je n\'avais rien retenu sur « ' + mOublie[2].trim() + ' ».';
+    nexusMemoireSauver(m); nexusMemoireRender();
+    return '✅ Oublié : « ' + mOublie[2].trim() + ' ».';
+  }
+  // --- Que sais-tu de moi ? / Ma mémoire ---
+  if(/^(que sais-tu|que sais tu|qu['’]est-ce que tu sais|ce que tu sais|ma mémoire|ma memoire|qu['’]as-tu retenu|que as-tu retenu)/i.test(d)){
+    const m = nexusMemoireCharger();
+    let out = '🧠 Ce que j\'ai retenu (mémoire locale, sur cet appareil) :\n';
+    if(!m.faits.length) out += '- Rien pour l\'instant. Dis « Souviens-toi que … » pour que je retienne quelque chose.';
+    else out += m.faits.map(f => '- ' + f).join('\n');
+    const noms = Object.keys(m.projets || {});
+    out += '\n\n📁 Projets : ' + (noms.length ? noms.join(', ') : 'aucun');
+    out += '\nProjet actuel : ' + (m.projetActuel || 'aucun');
+    return out;
+  }
+  // --- /projets : lister ---
+  if(/^\s*(\/projets|liste mes projets|mes projets|voir mes projets)\s*$/i.test(d)){
+    const m = nexusMemoireCharger();
+    const noms = Object.keys(m.projets || {});
+    if(!noms.length) return '📁 Aucun projet pour l\'instant. Dis « /projet Nom » pour en créer un.';
+    return '📁 Tes projets :\n' + noms.map(n => '- ' + n + (n === m.projetActuel ? '  ← actuel' : '') + ' (' + (((m.projets[n] || {}).notes || []).length) + ' note(s))').join('\n') + '\n\nPour aller sur un projet, dis : « /projet Nom ». Pour quitter, dis : « /projet aucun ».';
+  }
+  // --- Quitter le projet ---
+  if(/^\s*(\/projet aucun|\/projet none|quitte le projet|quitter le projet|aucun projet|sortir du projet)\s*$/i.test(d)){
+    const m = nexusMemoireCharger();
+    const ancien = m.projetActuel;
+    m.projetActuel = null; nexusMemoireSauver(m); nexusMemoireRender();
+    return ancien ? ('✅ Projet quitté : tu n\'es plus sur « ' + ancien + ' ».') : 'Tu n\'étais déjà sur aucun projet.';
+  }
+  // --- /projet Nom : créer / choisir (exige /projet, "nouveau projet" ou "projet :" pour ne pas piéger "c'est quoi un projet ?") ---
+  let mProjet = d.match(/^\s*\/projet\s+(.+)$/i) || d.match(/^\s*(nouveau projet|crée un projet|cree un projet|passe au projet|aller sur le projet|projet\s*:)\s*(.+)$/i);
+  if(mProjet){
+    const nomBrut = mProjet[2] || mProjet[1] || '';
+    const nom = nexusProjetNom(nomBrut);
+    if(!nom || /^(aucun|none)$/i.test(nom)){
+      const m = nexusMemoireCharger(); m.projetActuel = null; nexusMemoireSauver(m); nexusMemoireRender();
+      return '✅ Projet quitté.';
+    }
+    const m = nexusMemoireCharger();
+    const existe = !!m.projets[nom];
+    if(!m.projets[nom]) m.projets[nom] = { notes: [], cree: Date.now() };
+    m.projetActuel = nom; nexusMemoireSauver(m); nexusMemoireRender();
+    return existe ? ('✅ Tu es sur le projet « ' + nom + ' ».') : ('✅ Projet créé : « ' + nom + ' ». Tu es dessus.\nPour y ajouter une note, dis : « Note pour le projet : … ». Pour voir les notes, dis : « Notes du projet ».');
+  }
+  // --- Notes du projet : voir ---
+  if(/^(notes du projet|voir les notes|notes projet|voir les notes du projet)/i.test(d)){
+    const m = nexusMemoireCharger();
+    if(!m.projetActuel) return 'Tu n\'es sur aucun projet. Dis d\'abord « /projet Nom ».';
+    const notes = ((m.projets[m.projetActuel] || {}).notes || []);
+    if(!notes.length) return '📁 Projet « ' + m.projetActuel + ' » : aucune note pour l\'instant. Dis « Note pour le projet : … » pour en ajouter une.';
+    return '📁 Notes du projet « ' + m.projetActuel + ' » :\n' + notes.map(n => '- ' + n).join('\n');
+  }
+  // --- Note pour le projet : ... ---
+  let mNote = d.match(/^\s*(note pour le projet|ajoute au projet|ajouter au projet|note projet)\s*[:\-]?\s*(.+)$/i);
+  if(mNote && mNote[2]){
+    const m = nexusMemoireCharger();
+    if(!m.projetActuel) return 'Tu n\'es sur aucun projet. Dis d\'abord « /projet Nom », puis « Note pour le projet : … ».';
+    const note = mNote[2].trim().slice(0, 500);
+    if(!m.projets[m.projetActuel]) m.projets[m.projetActuel] = { notes: [], cree: Date.now() };
+    m.projets[m.projetActuel].notes.push(note);
+    if(m.projets[m.projetActuel].notes.length > 50) m.projets[m.projetActuel].notes = m.projets[m.projetActuel].notes.slice(-50);
+    nexusMemoireSauver(m); nexusMemoireRender();
+    return '✅ Note ajoutée au projet « ' + m.projetActuel + ' » : « ' + note + ' ».';
+  }
+  return null;
+}
+// ----- WEB : seulement si la demande a vraiment besoin du web -----
+function nexusWebBesoin(demande){
+  const d = String(demande || '');
+  if(/^\s*\/(web|recherche|actu|actualite|actualité|meteo|météo|news)\b/i.test(d)) return true;
+  return /(actualité|actualités|en ce moment|aujourd['’]hui|hier|dernières nouvelles|dernieres nouvelles|qui a gagné|résultat du|resultat du|météo|meteo|quel temps|va-t-il pleuvoir|va t-il pleuvoir|prévisions|previsions|température|temperature|prix du|bourse|cours de|nouvelle loi|quoi de neuf|recherche sur le web|cherche sur internet|sur internet|sur le web|dernier match|vient de sortir|vient d['’]annoncer|dernière info|derniere info)/i.test(d);
+}
+// ----- WEB AMÉLIORÉ : plusieurs sources en parallèle, sans clé. Uniquement ce bloc est modifié. -----
+function nexusWebNettoyer(requete){
+  let q = String(requete || '').replace(/^\s*\/(web|recherche|actu|actualite|actualité|meteo|météo|news)\s*/i, '').replace(/(recherche sur le web|cherche sur internet|sur internet|sur le web)/gi, '').trim();
+  q = q.replace(/\n+/g, ' ').replace(/\s+/g, ' ').slice(0, 200).trim();
+  return q || String(requete || '').replace(/\n+/g, ' ').slice(0, 200).trim();
+}
+async function nexusWebViaProxy(urlCible, signal){
+  // CHAÎNE DE PROXYS CUMULÉS : si un proxy est HS, on passe aussitôt au suivant. C'est ce qui rend le web sans clé fiable.
+  // Ordre = fiabilité observée : AllOrigins d'abord (le plus stable), puis CorsProxy, Codetabs, Isomorphic, Cors.lol.
+  // Timeout par proxy : 3s max. On ne reste jamais bloqué 10s sur un proxy mort. Total plafonné par le contrôleur principal (10s).
+  // AllOrigins /get renvoie du JSON {contents:"..."} : on le décode, sinon on prend le texte brut.
+  const proxys = [
+    { nom: 'AllOrigins raw', url: u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u), json: false },
+    { nom: 'CorsProxy.io', url: u => 'https://corsproxy.io/?url=' + encodeURIComponent(u), json: false },
+    { nom: 'Codetabs', url: u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u), json: false },
+    { nom: 'Isomorphic-Git', url: u => 'https://cors.isomorphic-git.org/' + u, json: false },
+    { nom: 'Cors.lol', url: u => 'https://api.cors.lol/?url=' + encodeURIComponent(u), json: false },
+    { nom: 'AllOrigins get', url: u => 'https://api.allorigins.win/get?url=' + encodeURIComponent(u), json: true }
+  ];
+  for(const p of proxys){
+    if(signal && signal.aborted) return null;
+    const ctrlUn = new AbortController();
+    const timerUn = setTimeout(() => { try{ ctrlUn.abort(); }catch(e){} }, 3000);
+    let off = null;
+    if(signal){
+      off = () => { try{ ctrlUn.abort(); }catch(e){} };
+      try{ signal.addEventListener('abort', off); }catch(e){}
+    }
+    try{
+      const r = await fetch(p.url(urlCible), { signal: ctrlUn.signal });
+      if(!r.ok) continue;
+      let txt = '';
+      if(p.json){
+        try{ const j = await r.json(); txt = String((j && j.contents) || ''); }catch(e){ continue; }
+      } else {
+        txt = await r.text();
+      }
+      if(txt && txt.length > 50) return txt;
+    }catch(e){
+      // Proxy HS / timeout / CORS : on passe aussitôt au suivant, sans jamais planter.
+      continue;
+    }finally{
+      clearTimeout(timerUn);
+      if(signal && off){ try{ signal.removeEventListener('abort', off); }catch(e){} }
+    }
+  }
+  return null;
+}
+async function nexusWebWikipedia(q, signal){
+  try{
+    const r = await fetch('https://fr.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(q) + '&format=json&origin=*&srlimit=3', { signal });
+    const j = await r.json();
+    const out = [];
+    (j.query && j.query.search || []).forEach(s => {
+      const txt = String(s.snippet || '').replace(/<[^>]*>/g, '').trim();
+      if(txt) out.push('[Wikipédia] ' + s.title + ' — ' + txt + ' (https://fr.wikipedia.org/wiki/' + encodeURIComponent(String(s.title).replace(/ /g, '_')) + ')');
+    });
+    return out;
+  }catch(e){ return []; }
+}
+async function nexusWebDDGInstant(q, signal){
+  try{
+    const r = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(q) + '&format=json&no_html=1&skip_disambig=1', { signal });
+    const j = await r.json();
+    const out = [];
+    if(j && j.AbstractText) out.push('[DuckDuckGo] ' + String(j.AbstractText).slice(0, 600) + (j.AbstractURL ? ' (' + j.AbstractURL + ')' : ''));
+    (j && j.RelatedTopics || []).slice(0, 2).forEach(rt => { if(rt && rt.Text) out.push('[DuckDuckGo] ' + String(rt.Text).slice(0, 400)); });
+    return out;
+  }catch(e){ return []; }
+}
+async function nexusWebActus(q, signal){
+  // Google News RSS (gratuit, sans clé) via proxy. C'est lui qui donne les vraies actus du jour, pas Wikipédia.
+  try{
+    const rssUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=fr&gl=FR&ceid=FR:fr';
+    const txt = await nexusWebViaProxy(rssUrl, signal);
+    if(!txt) return [];
+    const doc = new DOMParser().parseFromString(txt, 'text/xml');
+    const items = Array.from(doc.querySelectorAll('item')).slice(0, 4);
+    return items.map(it => {
+      const titre = (it.querySelector('title') ? it.querySelector('title').textContent : '').trim();
+      const lien = (it.querySelector('link') ? it.querySelector('link').textContent : '').trim();
+      const desc = String(it.querySelector('description') ? it.querySelector('description').textContent : '').replace(/<[^>]*>/g, '').trim().slice(0, 250);
+      const date = (it.querySelector('pubDate') ? it.querySelector('pubDate').textContent : '').trim();
+      return '[Actu Google News] ' + titre + (desc ? ' — ' + desc : '') + (date ? ' (' + new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ')' : '') + (lien ? ' ' + lien : '');
+    }).filter(Boolean);
+  }catch(e){ return []; }
+}
+async function nexusWebMeteo(q, signal){
+  // Météo réelle : géocodage Nominatim (gratuit) + Open-Meteo (gratuit, sans clé). Pas d'invention de météo.
+  try{
+    let ville = '';
+    const mVille = String(q || '').match(/(?:à|a|pour|sur|de)\s+([A-Za-zÀ-ÿ\-\s]{2,30})/i);
+    if(mVille) ville = mVille[1].trim().replace(/\s+(aujourd'hui|hui|demain|ce week-end|week-end).*$/i, '').trim();
+    if(!ville || /^(aujourd|hui|demain|quel|temps|météo|meteo)$/i.test(ville)) ville = 'Caen';
+    ville = ville.split(' ')[0] + (ville.split(' ')[1] && !/^(aujourd|demain|quel)/i.test(ville.split(' ')[1]) ? ' ' + ville.split(' ')[1] : '');
+    ville = ville.trim();
+    const geoTxt = await nexusWebViaProxy('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(ville), signal);
+    let lat = 49.18, lon = -0.37, nomAffiche = ville;
+    try{
+      const gj = JSON.parse(geoTxt || '[]');
+      if(gj && gj[0]){ lat = parseFloat(gj[0].lat); lon = parseFloat(gj[0].lon); nomAffiche = String(gj[0].display_name || ville).split(',')[0]; }
+    }catch(e){}
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2', { signal });
+    const j = await r.json();
+    const cur = j.current || {};
+    const dj = j.daily || {};
+    const codeTemps = { 0: 'ciel dégagé', 1: 'plutôt dégagé', 2: 'nuageux', 3: 'couvert', 45: 'brouillard', 48: 'brouillard givrant', 51: 'bruine légère', 53: 'bruine', 55: 'bruine forte', 61: 'pluie légère', 63: 'pluie', 65: 'forte pluie', 71: 'neige légère', 73: 'neige', 75: 'forte neige', 80: 'averses légères', 81: 'averses', 82: 'fortes averses', 95: 'orage', 96: 'orage avec grêle', 99: 'orage avec forte grêle' };
+    const auj = dj.time && dj.time[0] ? ('Aujourd\'hui (' + new Date(dj.time[0]).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) + ') : min ' + (dj.temperature_2m_min ? dj.temperature_2m_min[0] : '?') + '°C / max ' + (dj.temperature_2m_max ? dj.temperature_2m_max[0] : '?') + '°C, proba pluie ' + (dj.precipitation_probability_max ? dj.precipitation_probability_max[0] : '?') + '%.') : '';
+    const dem = dj.time && dj.time[1] ? (' Demain (' + new Date(dj.time[1]).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) + ') : min ' + (dj.temperature_2m_min ? dj.temperature_2m_min[1] : '?') + '°C / max ' + (dj.temperature_2m_max ? dj.temperature_2m_max[1] : '?') + '°C, proba pluie ' + (dj.precipitation_probability_max ? dj.precipitation_probability_max[1] : '?') + '%.') : '';
+    return ['[Météo Open-Meteo] Météo à ' + nomAffiche + ' en ce moment : ' + (cur.temperature_2m != null ? cur.temperature_2m + '°C' : '?') + ', ' + (codeTemps[cur.weather_code] || 'temps') + ', humidité ' + (cur.relative_humidity_2m != null ? cur.relative_humidity_2m + '%' : '?') + ', vent ' + (cur.wind_speed_10m != null ? cur.wind_speed_10m + ' km/h' : '?') + '. ' + auj + dem + ' Source : https://open-meteo.com'];
+  }catch(e){ return []; }
+}
+async function nexusWebRechercheHTML(q, signal){
+  // Recherche générale : page HTML DuckDuckGo via proxy, on extrait les vrais titres + liens. C'est ce qui manquait : avant on n'avait que l'Instant Answer, qui est souvent vide.
+  try{
+    const html = await nexusWebViaProxy('https://html.duckduckgo.com/html/?q=' + encodeURIComponent(q), signal);
+    if(!html) return [];
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const liens = Array.from(doc.querySelectorAll('a.result__a')).slice(0, 4);
+    return liens.map(a => {
+      const titre = (a.textContent || '').trim().slice(0, 120);
+      let href = a.getAttribute('href') || '';
+      try{
+        if(href.indexOf('uddg=') !== -1) href = decodeURIComponent(href.split('uddg=')[1].split('&')[0]);
+      }catch(e){}
+      return titre ? ('[Recherche web] ' + titre + (href ? ' ' + href : '')) : '';
+    }).filter(Boolean);
+  }catch(e){ return []; }
+}
+async function nexusRechercheWeb(requete, signal){
+  const q = nexusWebNettoyer(requete);
+  if(!q) return null;
+  const bas = q.toLowerCase();
+  const estMeteo = /(météo|meteo|quel temps|va-t-il pleuvoir|va t-il pleuvoir|température|temperature|prévisions|previsions|pleuvoir|quel temps fait)/.test(bas);
+  const estActu = /(actualité|actualités|dernières nouvelles|dernieres nouvelles|news|vient de|annoncé|annonce|qui a gagné|résultat|resultat|dernière info|derniere info|aujourd['’]hui|en ce moment)/.test(bas);
+  // Contrôleur séparé : un timeout web ne doit jamais annuler la génération principale. 10s car on lance tout en parallèle.
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => { try{ ctrl.abort(); }catch(e){} }, 10000);
+  let off = null;
+  if(signal){
+    off = () => { try{ ctrl.abort(); }catch(e){} };
+    try{ signal.addEventListener('abort', off); }catch(e){}
+  }
+  let lignes = [];
+  try{
+    const promesses = [
+      nexusWebWikipedia(q, ctrl.signal),
+      nexusWebDDGInstant(q, ctrl.signal),
+      nexusWebRechercheHTML(q, ctrl.signal)
+    ];
+    if(estMeteo) promesses.push(nexusWebMeteo(q, ctrl.signal));
+    if(estActu || /^\s*\/(web|actu)/i.test(String(requete || ''))) promesses.push(nexusWebActus(q, ctrl.signal));
+    const resultats = await Promise.allSettled(promesses);
+    resultats.forEach(r => { if(r.status === 'fulfilled' && Array.isArray(r.value)) lignes = lignes.concat(r.value); });
+  }finally{
+    clearTimeout(timer);
+    if(signal && off){ try{ signal.removeEventListener('abort', off); }catch(e){} }
+  }
+  // Déduplication simple sur les 80 premiers caractères
+  const vus = new Set(); lignes = lignes.filter(l => { const cle = String(l).slice(0, 80); if(vus.has(cle)) return false; vus.add(cle); return true; });
+  if(!lignes.length) return null;
+  // Météo en premier si c'est une question météo, actus en premier si c'est de l'actu
+  if(estMeteo) lignes.sort((a, b) => (String(a).indexOf('[Météo') === 0 ? -1 : 0) - (String(b).indexOf('[Météo') === 0 ? -1 : 0));
+  if(estActu && !estMeteo) lignes.sort((a, b) => (String(a).indexOf('[Actu') === 0 ? -1 : 0) - (String(b).indexOf('[Actu') === 0 ? -1 : 0));
+  const dateJour = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return 'RÉSULTATS WEB (recherche du ' + dateJour + ', à utiliser en priorité pour les faits récents, ne pas inventer au-delà) :\n- ' + lignes.slice(0, 8).join('\n- ') + '\nSources : Open-Meteo, Google News, Wikipédia, DuckDuckGo. Si ces résultats ne répondent pas à la question, dis-le clairement, n\'invente pas. Cite les sources que tu utilises.';
+}
+
+try{ nexusMemoireRender(); }catch(e){}
+
+
+// ===== STOCKAGE : IndexedDB + Export/Import — ajouté, ne touche à rien d'autre. localStorage reste le cache rapide, IndexedDB est le grand stockage. =====
+let nexusIDB_Promesse = null;
+function nexusIDB_Ouvrir(){
+  if(nexusIDB_Promesse) return nexusIDB_Promesse;
+  nexusIDB_Promesse = new Promise((resolve, reject) => {
+    try{
+      if(!window.indexedDB){ reject(new Error('IndexedDB indisponible')); return; }
+      const req = window.indexedDB.open('nexus-ai-db', 1);
+      req.onupgradeneeded = () => {
+        try{
+          const db = req.result;
+          if(!db.objectStoreNames.contains('nexus')) db.createObjectStore('nexus', { keyPath: 'cle' });
+        }catch(e){}
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error || new Error('Ouverture IndexedDB impossible'));
+    }catch(e){ reject(e); }
+  });
+  return nexusIDB_Promesse;
+}
+function nexusIDB_Sauver(cle, valeur){
+  return nexusIDB_Ouvrir().then(db => new Promise((resolve, reject) => {
+    try{
+      const tx = db.transaction(['nexus'], 'readwrite');
+      const store = tx.objectStore('nexus');
+      const req = store.put({ cle: cle, valeur: valeur, date: Date.now() });
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error || new Error('Écriture IndexedDB impossible'));
+    }catch(e){ reject(e); }
+  }));
+}
+function nexusIDB_Charger(cle){
+  return nexusIDB_Ouvrir().then(db => new Promise((resolve) => {
+    try{
+      const tx = db.transaction(['nexus'], 'readonly');
+      const store = tx.objectStore('nexus');
+      const req = store.get(cle);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    }catch(e){ resolve(null); }
+  })).catch(() => null);
+}
+function nexusIDB_Miroir(){
+  // Miroir silencieux : on ne bloque jamais l'app pour IndexedDB, on ne montre jamais d'erreur. Si IndexedDB échoue, localStorage continue seul.
+  try{
+    if(typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persist){
+      try{ navigator.storage.persist().catch(() => {}); }catch(e){}
+    }
+    let memoireRaw = null;
+    try{ memoireRaw = localStorage.getItem(NEXUS_MEMOIRE_CLE); }catch(e){}
+    // On sauve l'état COMPLET (avec images) : IndexedDB encaisse des centaines de Mo, localStorage non. C'est lui qui garde les images après rechargement.
+    nexusIDB_Sauver(K, state).catch(() => {});
+    if(memoireRaw){
+      try{ nexusIDB_Sauver(NEXUS_MEMOIRE_CLE, JSON.parse(memoireRaw)).catch(() => {}); }catch(e){}
+    }
+  }catch(e){}
+}
+async function nexusIDB_AuDemarrage(){
+  // Restauration douce : seulement si localStorage est vide mais IndexedDB a quelque chose (ex : navigateur qui a vidé localStorage, mais pas IndexedDB).
+  // On n'écrase JAMAIS un localStorage qui a déjà des conversations, pour ne pas perdre des données plus récentes.
+  try{
+    const localVide = !state || !Array.isArray(state.convs) || state.convs.every(c => !c.messages || !c.messages.length);
+    if(!localVide) return;
+    const rec = await nexusIDB_Charger(K);
+    if(rec && rec.valeur && Array.isArray(rec.valeur.convs) && rec.valeur.convs.some(c => c.messages && c.messages.length)){
+      state = rec.valeur;
+      try{ localStorage.setItem(K, JSON.stringify(state)); }catch(e){}
+      try{ render(); nexusMemoireRender(); }catch(e){}
+      try{ showToast('Sauvegarde IndexedDB restaurée.'); }catch(e){}
+    }
+    // Mémoire : même règle, seulement si locale vide
+    let memoireLocaleVide = true;
+    try{ const m = nexusMemoireCharger(); memoireLocaleVide = !m.faits.length && !Object.keys(m.projets || {}).length; }catch(e){}
+    if(memoireLocaleVide){
+      const recM = await nexusIDB_Charger(NEXUS_MEMOIRE_CLE);
+      if(recM && recM.valeur){
+        try{ localStorage.setItem(NEXUS_MEMOIRE_CLE, JSON.stringify(recM.valeur)); nexusMemoireRender(); }catch(e){}
+      }
+    }
+  }catch(e){}
+}
+setTimeout(() => { try{ nexusIDB_AuDemarrage(); }catch(e){} }, 600);
+function nexusExportJSON(){
+  try{
+    const data = {
+      version: 1,
+      appli: 'NEXUS AI',
+      date: new Date().toISOString(),
+      state: state,
+      memoire: null,
+      persona: null
+    };
+    try{ const mr = localStorage.getItem(NEXUS_MEMOIRE_CLE); if(mr) data.memoire = JSON.parse(mr); }catch(e){}
+    try{ data.persona = localStorage.getItem('nexus_persona') || null; }catch(e){}
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const jour = new Date().toISOString().slice(0, 10);
+    a.href = url; a.download = 'nexus-sauvegarde-' + jour + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => { try{ URL.revokeObjectURL(url); }catch(e){} }, 1000);
+    try{ showToast('Sauvegarde exportée.'); }catch(e){}
+  }catch(e){
+    try{ showToast('Export impossible : ' + (e.message || 'erreur')); }catch(_){}
+  }
+}
+async function nexusImportJSON(event){
+  try{
+    const file = event && event.target && event.target.files ? event.target.files[0] : null;
+    if(event && event.target) event.target.value = '';
+    if(!file) return;
+    const texte = await file.text();
+    let data = null;
+    try{ data = JSON.parse(texte); }catch(e){ try{ showToast('Fichier invalide : ce n’est pas une sauvegarde NEXUS.'); }catch(_){} return; }
+    if(!data || !data.state || !Array.isArray(data.state.convs)){ try{ showToast('Fichier invalide : pas de conversations dedans.'); }catch(_){} return; }
+    if(!confirm('Importer cette sauvegarde du ' + (data.date ? new Date(data.date).toLocaleDateString('fr-FR') : '?') + ' ? Elle remplacera tes conversations actuelles. Pense à exporter d’abord si tu veux garder l’actuel.')) return;
+    state = data.state;
+    try{ localStorage.setItem(K, JSON.stringify(state)); }catch(e){}
+    if(data.memoire){
+      try{ localStorage.setItem(NEXUS_MEMOIRE_CLE, JSON.stringify(data.memoire)); }catch(e){}
+    }
+    if(typeof data.persona === 'string'){
+      try{ localStorage.setItem('nexus_persona', data.persona); }catch(e){}
+    }
+    try{ nexusIDB_Miroir(); }catch(e){}
+    try{ save(); render(); nexusMemoireRender(); }catch(e){}
+    try{ showToast('Sauvegarde importée.'); }catch(_){}
+  }catch(e){
+    try{ showToast('Import impossible : ' + (e.message || 'erreur')); }catch(_){}
+  }
+}
+
+
+// ===== CLOUD AUTO Puter : 1 clic une fois, puis tout automatique. Export/Import devient juste un secours. =====
+const NEXUS_CLOUD_FICHIER = 'nexus-ai/sauvegarde.json';
+const NEXUS_CLOUD_DATE_CLE = 'nexus_date_locale';
+let nexusCloud_Timer = null;
+let nexusCloud_EnCours = false;
+let nexusCloud_DejaTenteDemarrage = false;
+function nexusCloud_Statut(texte){
+  try{
+    const el = document.getElementById('nexusCloudStatut');
+    if(el) el.textContent = texte;
+  }catch(e){}
+}
+function nexusCloud_MajDateLocale(){
+  try{ localStorage.setItem(NEXUS_CLOUD_DATE_CLE, String(Date.now())); }catch(e){}
+}
+function nexusCloud_DateLocale(){
+  try{ const v = parseInt(localStorage.getItem(NEXUS_CLOUD_DATE_CLE) || '0', 10); return isNaN(v) ? 0 : v; }catch(e){ return 0; }
+}
+async function nexusCloud_EstConnecte(){
+  try{
+    if(!window.puter || !puter.auth) return false;
+    if(typeof puter.auth.isSignedIn === 'function'){
+      try{ const r = await puter.auth.isSignedIn(); if(r) return true; }catch(e){}
+    }
+    // Si isSignedIn n'existe pas ou échoue, on teste une lecture : si ça passe sans erreur d'auth, on est connecté.
+    if(puter.fs && typeof puter.fs.stat === 'function'){
+      try{ await puter.fs.stat(NEXUS_CLOUD_FICHIER); return true; }catch(e){ if(e && /auth|sign|login/i.test(e.message || '')) return false; }
+    }
+    return false;
+  }catch(e){ return false; }
+}
+function nexusCloud_Planifier(){
+  // Debounce 2s : on ne spamme pas le cloud à chaque frappe, on attend que tu aies fini d'écrire.
+  try{ nexusCloud_MajDateLocale(); }catch(e){}
+  try{
+    if(nexusCloud_Timer) clearTimeout(nexusCloud_Timer);
+    nexusCloud_Timer = setTimeout(() => { nexusCloud_Sauvegarder().catch(() => {}); }, 2000);
+  }catch(e){}
+}
+async function nexusCloud_Sauvegarder(){
+  // Sauvegarde auto silencieuse : jamais de popup, jamais de blocage. Si pas connecté, on reste en local, c'est tout.
+  if(nexusCloud_EnCours) return;
+  try{
+    if(!window.puter || !puter.fs || typeof puter.fs.write !== 'function') return;
+    const connecte = await nexusCloud_EstConnecte();
+    if(!connecte){
+      nexusCloud_Statut('☁️ Cloud : non connecté — 1 clic pour la synchro auto');
+      try{ const b = document.getElementById('nexusCloudBouton'); if(b) b.style.display = 'block'; }catch(e){}
+      return;
+    }
+    nexusCloud_EnCours = true;
+    let memoire = null, persona = null;
+    try{ const mr = localStorage.getItem(NEXUS_MEMOIRE_CLE); if(mr) memoire = JSON.parse(mr); }catch(e){}
+    try{ persona = localStorage.getItem('nexus_persona') || null; }catch(e){}
+    const data = { version: 1, appli: 'NEXUS AI', date: Date.now(), state: state, memoire: memoire, persona: persona };
+    await puter.fs.write(NEXUS_CLOUD_FICHIER, JSON.stringify(data));
+    const heure = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    nexusCloud_Statut('☁️ Cloud : synchronisé à ' + heure);
+    try{ const b = document.getElementById('nexusCloudBouton'); if(b) b.style.display = 'none'; }catch(e){}
+  }catch(e){
+    // Échec cloud = on reste en local, sans jamais embêter l'utilisateur. IndexedDB a déjà sauvé.
+    try{
+      const msg = (e && e.message) || '';
+      if(/auth|sign|login/i.test(msg)){
+        nexusCloud_Statut('☁️ Cloud : non connecté — 1 clic pour la synchro auto');
+        try{ const b = document.getElementById('nexusCloudBouton'); if(b) b.style.display = 'block'; }catch(_){}
+      } else {
+        nexusCloud_Statut('☁️ Cloud : synchro en pause, local à jour');
+      }
+    }catch(_){}
+  }finally{ nexusCloud_EnCours = false; }
+}
+async function nexusCloud_Connecter(){
+  try{
+    nexusCloud_Statut('☁️ Cloud : connexion…');
+    if(!window.puter || !puter.auth || typeof puter.auth.signIn !== 'function'){
+      nexusCloud_Statut('☁️ Cloud : Puter pas encore chargé, réessaie dans 2 secondes');
+      return;
+    }
+    await puter.auth.signIn();
+    nexusCloud_Statut('☁️ Cloud : connecté, synchro…');
+    try{ const b = document.getElementById('nexusCloudBouton'); if(b) b.style.display = 'none'; }catch(e){}
+    await nexusCloud_AuDemarrage(true);
+    await nexusCloud_Sauvegarder();
+    try{ showToast('Synchro auto activée. Plus besoin d’exporter.'); }catch(e){}
+  }catch(e){
+    nexusCloud_Statut('☁️ Cloud : connexion annulée, tu restes en local');
+  }
+}
+async function nexusCloud_AuDemarrage(forceApresConnexion){
+  // Au démarrage : si le cloud est plus récent que le local, on restaure le cloud. Si le local est plus récent, on pousse le local. Sinon, on ne fait rien.
+  if(nexusCloud_DejaTenteDemarrage && !forceApresConnexion) return;
+  nexusCloud_DejaTenteDemarrage = true;
+  try{
+    if(!window.puter || !puter.fs || typeof puter.fs.read !== 'function') { nexusCloud_Statut('☁️ Cloud : Puter pas chargé, local à jour'); return; }
+    const connecte = await nexusCloud_EstConnecte();
+    if(!connecte){
+      nexusCloud_Statut('☁️ Cloud : non connecté — 1 clic pour la synchro auto');
+      try{ const b = document.getElementById('nexusCloudBouton'); if(b) b.style.display = 'block'; }catch(e){}
+      return;
+    }
+    let contenu = null;
+    try{ contenu = await puter.fs.read(NEXUS_CLOUD_FICHIER); }catch(e){
+      // Pas de fichier cloud encore : c'est la première synchro, on pousse le local.
+      nexusCloud_Statut('☁️ Cloud : première synchro…');
+      await nexusCloud_Sauvegarder();
+      return;
+    }
+    if(contenu && typeof contenu.text === 'function'){ try{ contenu = await contenu.text(); }catch(e){} }
+    if(typeof contenu !== 'string'){ nexusCloud_Statut('☁️ Cloud : fichier illisible, local gardé'); return; }
+    let data = null;
+    try{ data = JSON.parse(contenu); }catch(e){ nexusCloud_Statut('☁️ Cloud : fichier invalide, local gardé'); return; }
+    if(!data || !data.state || !Array.isArray(data.state.convs)){ nexusCloud_Statut('☁️ Cloud : fichier vide, local gardé'); return; }
+    const dateCloud = data.date || 0;
+    const dateLocale = nexusCloud_DateLocale();
+    // Si le cloud est plus récent de plus de 5 secondes, on le prend. Sinon, le local gagne, on pousse le local.
+    if(dateCloud > dateLocale + 5000){
+      state = data.state;
+      try{ localStorage.setItem(K, JSON.stringify(state)); }catch(e){}
+      if(data.memoire){ try{ localStorage.setItem(NEXUS_MEMOIRE_CLE, JSON.stringify(data.memoire)); }catch(e){} }
+      if(typeof data.persona === 'string'){ try{ localStorage.setItem('nexus_persona', data.persona); }catch(e){} }
+      try{ nexusIDB_Miroir(); }catch(e){}
+      try{ render(); nexusMemoireRender(); }catch(e){}
+      nexusCloud_Statut('☁️ Cloud : synchronisé depuis le cloud');
+      try{ showToast('Synchronisé depuis le cloud.'); }catch(e){}
+    } else {
+      // Local plus récent ou égal : on pousse, pour que l'autre appareil récupère.
+      nexusCloud_Statut('☁️ Cloud : local plus récent, envoi…');
+      await nexusCloud_Sauvegarder();
+    }
+  }catch(e){
+    nexusCloud_Statut('☁️ Cloud : synchro en pause, local à jour');
+  }
+}
+setTimeout(() => { try{ nexusCloud_AuDemarrage(false); }catch(e){} }, 1500);
+
+
+// ===== RANGEMENT RÉGLAGES : wrappers, aucune logique changée, on ferme juste la modale avant d'agir. =====
+function nexusReglages_Raccourci(type){
+  try{ closeSettings(); }catch(e){}
+  try{ nexusMemoireBarRaccourci(type); }catch(e){}
+}
+function nexusReglages_OublieTout(){
+  if(!confirm("Effacer toute la mémoire ? Souvenirs + projets. Tes conversations ne sont pas touchées.")) return;
+  try{ nexusMemoireSauver({ faits: [], projets: {}, projetActuel: null }); nexusMemoireRender(); }catch(e){}
+  try{ showToast('Mémoire effacée.'); }catch(e){}
+}
+function nexusReglages_ToutEffacer(){
+  try{ closeSettings(); }catch(e){}
+  try{ clearAllHistory(); }catch(e){}
+}
+function nexusReglages_ConnecterCloud(){
+  try{ closeSettings(); }catch(e){}
+  try{ nexusCloud_Connecter(); }catch(e){}
+}
+
+
+// ===== VÉRIFICATION : uniquement dans Réglages, comme avant. On garde juste le statut + le toast pour voir que ça a bien basculé. =====
+function nexusMajBoutonVerif(){
+  try{
+    const on = !!document.getElementById('vf') && document.getElementById('vf').checked;
+    const st = document.getElementById('nexusVerifStatut');
+    if(st) st.textContent = on ? 'activée' : 'désactivée';
+  }catch(e){}
+}
+function nexusReglages_ToggleVerif(){
+  try{ saveModeVerif(); }catch(e){}
+  try{ nexusMajBoutonVerif(); }catch(e){}
+  try{
+    const on = document.getElementById('vf').checked;
+    showToast(on ? 'Vérification activée.' : 'Vérification désactivée.');
+  }catch(e){}
+}
+
 async function run(t){
   const conv = currentConv();
   if(!conv) return;
@@ -1412,6 +2176,12 @@ async function run(t){
       save(); render();
       // OUTILS DIRECTS (traducteur / image / minuteur / chronomètre) : pas de chat, pas de vérification texte.
       // Le reste du run() (vérification comprise) n'est pas modifié.
+      // MÉMOIRE + PROJETS (commandes locales, sans IA, sans vérification — comme les outils directs).
+      const _memProjet = nexusCommandesMemoireProjet(t.demande);
+      if(_memProjet){
+        t.result = _memProjet; t.pProvider = "puter"; t.verif = false;
+        t.step = ""; save(); render(); nexusMemoireRender();
+      } else {
       const _trad = nexusTranslatorParse(t.demande);
       if(_trad){
         t.step = "Traduction en cours…"; save(); render();
@@ -1432,22 +2202,41 @@ async function run(t){
         t.result = _tc.text; if(_tc.tool) t.tool = _tc.tool; t.pProvider = "puter"; t.verif = false;
         t.step = ""; save(); render();
       } else {
+      // PUISSANCE v5b : contexte, CORRIGÉ. En v5, on plafonnait TOUT l'historique à 1500 caractères. Problème : si tu dis « corrige le code d'avant », le modèle ne voyait que le début du code, il avait perdu la fin.
+      // Maintenant : les 4 échanges les plus anciens sont plafonnés à 1500 caractères (contexte propre), MAIS le dernier échange (celui juste avant, celui auquel tu fais le plus souvent référence) reste en entier, jusqu'à 8000 caractères.
       const pastMessages = [];
-      conv.messages.filter(x => x.id !== t.id && x.result).slice(-5).forEach(x => {
-        pastMessages.push({ role: "user", content: x.demande });
-        pastMessages.push({ role: "assistant", content: x.result });
+      const _hist = conv.messages.filter(x => x.id !== t.id && x.result).slice(-5);
+      _hist.forEach((x, _idx) => {
+        const _limite = (_idx === _hist.length - 1) ? 8000 : 1500;
+        pastMessages.push({ role: "user", content: String(x.demande || '').slice(0, _limite) });
+        pastMessages.push({ role: "assistant", content: String(x.result || '').slice(0, _limite) });
       });
 
       // Prompt système plus strict pour réduire les hallucinations et mieux respecter le rôle
-      let systemBlock = `Tu es un assistant expert, précis et honnête.
+      // PUISSANCE v5 : prompt système producteur renforcé (vérification NON touchée, c'est un autre chemin).
+      // Avant : 4 lignes. Maintenant : raisonnement étape par étape, français par défaut, code complet, pas d'invention, structure.
+      let systemBlock = `Tu es NEXUS, un assistant expert, précis et honnête. Tu réponds en français, sauf si l'utilisateur demande une autre langue.
 Règles importantes :
-- Ne jamais inventer de faits, de chiffres ou de sources.
-- Si tu n'es pas sûr, dis-le clairement.
-- Réponds de façon structurée et utile.
+- Ne jamais inventer de faits, de chiffres, de dates ou de sources. Si tu ne sais pas, dis-le clairement : « Je ne sais pas ».
+- Pour une question complexe : raisonne étape par étape, puis donne la réponse finale.
+- Réponds de façon structurée et utile : titres, listes, exemples concrets. Pas de blabla.
+- Pour du code : donne le code COMPLET, qui marche, sans rien tronquer, sans « ... reste du code ... ». Si le code est long, donne-le en entier.
+- Pour une traduction : traduis fidèlement, sans ajouter ni enlever, et garde le ton et la mise en forme.
+- Pour une vérification de fait : dis VRAI ou FAUX, puis explique en 2-3 phrases avec la bonne information.
 - Respecte strictement le rôle / persona fourni s'il y en a un.`;
 
       if(persona){
         systemBlock += `\n\nRÔLE À ADOPTER (prioritaire) :\n${persona}`;
+      }
+
+      // MÉMOIRE + PROJETS + WEB (ajout seulement, le systemBlock d'origine ci-dessus n'est pas modifié).
+      const _memoireTxt = nexusMemoireTexte();
+      if(_memoireTxt) systemBlock += `\n\n${_memoireTxt}`;
+      if(nexusWebBesoin(t.demande)){
+        t.step = "Recherche web en cours…"; save(); render();
+        const _web = await nexusRechercheWeb(t.demande, currentController ? currentController.signal : undefined);
+        if(_web) systemBlock += `\n\n${_web}`;
+        t.step = "Génération en cours…"; save(); render();
       }
 
       const _toolCtx = nexusToolContext(t.demande);
@@ -1480,6 +2269,7 @@ Règles importantes :
       } // fin else minuteur/chrono
       } // fin else image
       } // fin else traducteur
+      } // fin else memoire/projet
       t.step = ""; save(); render();
     }
     if(t.verif){
@@ -1742,6 +2532,7 @@ async function testP(k){
 }
 updateThemeIcon();
 loadModeVerif();
+try{ nexusMajBoutonVerif(); }catch(e){}
 load();
 render();
 fillS();
