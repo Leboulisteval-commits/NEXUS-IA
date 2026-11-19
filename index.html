@@ -387,11 +387,10 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 #nexusHorlogeBar b{color:var(--text);font-weight:600}
 #nexusHorlogeHeure{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
-<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">17:33:41</span></span></div>
+<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">17:52:16</span></span></div>
 
 
 <main>
-<div id="nexus-banniere-concert" style="margin: 10px 12px 0px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2,var(--surface)); font-size: 12px; line-height: 1.5;"><b>👑 NEXUS — Tout automatisé.</b><br><span style="color:var(--text-muted)">Tu demandes → NEXUS transmet aux chefs (Groq, Gemini, OpenRouter, Puter) → Le chef choisit l’IA la plus adaptée → Il fait le prompt qui correspond → L’IA travaille → NEXUS te rend le résultat. T’as rien à faire. Regarde sous chaque réponse : NEXUS → Chef → Employé.</span></div><div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Salut 👋</h2><p>On discute de quoi ?<br>Pose une question, envoie une photo ou un document, je suis là.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
 <div id="suggestions">
 <button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button>
 <button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')">Poème sur la mer</button>
@@ -413,14 +412,14 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 </div>
 </main>
 
-<aside id="sidebar" class="">
+<aside id="sidebar">
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795105998983)"><span class="conv-del" onclick="deleteConversation(1795105998983,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795107134709)"><span class="conv-del" onclick="deleteConversation(1795107134709,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
-<div id="overlay" onclick="closeSidebar()" class=""></div>
+<div id="overlay" onclick="closeSidebar()"></div>
 
 <dialog id="settingsModal">
 <div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
@@ -435,19 +434,12 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 </div><small>Le thème change les couleurs. Le bouton en haut à droite ne change que Jour / Nuit.</small></div>
 <div class="field"><label>Jour / Nuit</label><button id="nexusJourNuitBouton" class="btn btn-secondary" onclick="toggleTheme()">🌙 Mode nuit</button><small>Aussi en haut à droite.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🤖 INTELLIGENCE</div>
-<div class="field"><label>Mode de fonctionnement — ENSEMBLE, plus de choix</label><div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:13px;line-height:1.6"><b>✅ TOUT EN CONCERT : tout travaille ensemble.</b><br>Tes clés (Groq, Gemini, OpenRouter) + Puter + Secours, en même temps, dans la même réponse. Texte + Image + Vidéo + Musique + Son, sans choisir. NEXUS orchestre tout, il prend le meilleur de chaque à chaque fois.</div><select id="mo" onchange="toggleSettings();saveModeVerif()" style="display:none"><option value="puter" selected="">Puter (recommandé)</option><option value="cles">Mes clés API</option></select><small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
+<div class="field"><label>Mode de fonctionnement — ENSEMBLE, plus de choix</label><select id="mo" onchange="toggleSettings();saveModeVerif()" style="display:none"><option value="puter" selected="">Puter (recommandé)</option><option value="cles">Mes clés API</option></select><small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
 <div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
-<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">👑 NEXUS — TOUT AUTOMATISÉ</div>
-<div class="field" style="font-size:13px;line-height:1.8"><b>1.</b> Tu demandes à NEXUS<br><b>2.</b> NEXUS transmet aux chefs (Groq, Gemini, OpenRouter, Puter)<br><b>3.</b> Le chef choisit l'IA externe la plus adaptée<br><b>4.</b> Le chef fait le prompt qui correspond à ta demande<br><b>5.</b> L'IA travaille, le chef récupère le résultat<br><b>6.</b> NEXUS te rend le résultat — Ex : Banana 2 qui a travaillé pour une image</div>
-<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">👑 NEXUS — LA PLATEFORME, PAR OÙ PASSER POUR TOUT AVOIR</div>
-<div class="field" style="text-align:center;line-height:1.7"><div style="background:var(--primary,#00e5c7);color:#000;font-weight:800;border-radius:12px;padding:10px">👑 NEXUS — GRAND PATRON<br><small style="font-weight:400">Tu passes par lui pour tout avoir. Il commande.</small></div><div style="font-size:18px;margin:4px">↓</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 PUTER — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 GROQ — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 GEMINI — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 OPENROUTER — Chef</span></div><div style="font-size:12px;color:var(--text-muted)">Les chefs distribuent</div><div style="font-size:18px;margin:4px">↓</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">ChatGPT</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Claude</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Meta AI</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Perplexity</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Suno</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Midjourney</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Runway</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Kling</span></div><div style="font-size:12px;color:var(--text-muted)">Employés — exécutent</div></div>
-<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔧 DIAGNOSTIC — POUR TOI SEUL (pas visible dans le chat)</div>
-<div class="field" id="nexusDiagnosticCles" style="border:2px solid var(--primary,#00e5c7)"><label>Pourquoi tes clés ne semblent pas marcher ?</label><div id="nexusDiagTexte" style="font-size:13px;line-height:1.6">Chargement…</div><div style="background:var(--surface-2);border-radius:12px;padding:10px;font-size:13px">✅ <b>ENSEMBLE actif :</b> Tes clés + Puter + Secours, toujours ensemble. Plus besoin de choisir.</div><button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="nexusDiagRafraichir()">🔄 Rafraîchir le diagnostic</button><small style="margin-top:8px;display:block">En mode PUTER, tes clés ne sont JAMAIS utilisées, même si elles sont valides. C’est le code de NEXUS depuis le début. En mode CLÉS API, NEXUS utilise tes clés en premier.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔑 MES IA GRATUITES (CLÉS)</div>
 <div class="field"><small style="margin-bottom:12px">Colle une clé : elle est enregistrée toute seule, sur cet appareil uniquement. NEXUS les utilise en premier, puis Puter, puis le secours. Pour les retrouver sur un autre appareil, utilise la sauvegarde chiffrée plus bas.</small><div id="nexusClesListe"><div style="margin-bottom:14px"><label>Groq <span id="kst-groq" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-groq" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('groq')">Supprimer</button></div><small>Clé gratuite : console.groq.com</small></div><div style="margin-bottom:14px"><label>Google Gemini <span id="kst-gemini" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-gemini" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('gemini')">Supprimer</button></div><small>Clé gratuite : aistudio.google.com</small></div><div style="margin-bottom:14px"><label>OpenRouter (Claude, GPT, Gemini, +100 IA) <span id="kst-openrouter" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-openrouter" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('openrouter')">Supprimer</button></div><small>Clé gratuite : openrouter.ai - passerelle vers Claude, GPT, Gemini, Llama, etc.</small></div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusClesTester()">Tester mes IA</button><button class="btn btn-danger" style="flex:1" onclick="nexusClesToutSupprimer()">🗑 Tout supprimer</button></div></div>
 <div class="field" style="display: none;"><label>🌐 Invités dans NEXUS — TOUTES les IA</label><small style="margin-bottom:8px">Même les IA sans API gratuite : NEXUS les invite ici, comme un onglet. Ton prompt est transmis à l’invité. NEXUS reste ton centre, tu ne quittes jamais NEXUS.<br><br><b>NEXUS (V40) :</b> Toujours discret, tout le temps. Tu parles à NEXUS, NEXUS choisit en arrière-plan la meilleure IA gratuite pour ton domaine — texte, recherche, image, musique, vidéo — et il te répond comme NEXUS. Aucun bouton, aucune fenêtre, aucun nom d’IA externe visible. Les IA les plus fortes restent branchées en arrière-plan, en premier : Groq, puis Gemini, puis OpenRouter, puis Puter, puis secours.<br><br><b>🥷 Discret Max (V39) :</b> ON = plus aucune trace de l’IA externe, plus de carte, plus de nom. L’utilisateur voit juste « NEXUS travaille… » puis la réponse NEXUS. Qualité max sans ouvrir = impossible en gratuit pour ChatGPT / Claude / Suno / Runway, car il faut leur clé API payante pour les appeler en caché. En gratuit, le max discret c’est Groq / Gemini / OpenRouter / Puter en arrière-plan, présentés comme NEXUS. Si un jour tu as une clé API payante, tu la colles dans tes clés, et là NEXUS donnera vraiment la qualité max en discret, sans ouvrir.<br><br><b>🥷 Incognito (V38) :</b> ON = l’IA ne s’ouvre plus du tout. C’est NEXUS qui donne la réponse, avec ses IA gratuites en arrière-plan. OFF = l’invité s’ouvre de nouveau dans NEXUS.<br><br><b>🤖 Auto-redirection (V37) :</b> tu parles à NEXUS, NEXUS détecte le domaine et invite tout seul la bonne IA — musique → Suno, vidéo → Runway, recherche → Perplexity, image pro → Midjourney, app/code → Claude. Pour forcer NEXUS à répondre lui-même, commence par « nexus : ».</small><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('ChatGPT')">ChatGPT</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Claude')">Claude</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Gemini')">Gemini</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Meta AI')">Meta AI</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Perplexity')">Perplexity</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Suno (Musique)')">Suno 🎵</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Midjourney (Image)')">Midjourney 🖼️</button><button class="btn btn-secondary" onclick="nexusOuvrirRaccourci('Runway (Vidéo)')">Runway 🎬</button></div></div>
 <div class="field"><label>🖼️ Crédits Puter (image)</label><small style="margin-bottom:8px">Puter sans compte = 0 crédit. Connecte-toi avec ton compte Puter gratuit, sans carte, pour débloquer tes crédits image quotidiens.</small><button class="btn btn-secondary" style="width:100%" onclick="nexusPuterConnecter()">🔑 Se connecter à Puter (gratuit, sans carte)</button></div>
-<div class="field"><label>🎬🎵 Vidéo + Musique + Son, depuis NEXUS</label><small style="margin-bottom:8px">Son = voix du navigateur, gratuit. Vidéo = depuis une image, bouton 🎬 sous l'image. Musique = petit loop généré dans le navigateur.</small><button class="btn btn-secondary" style="width:100%" onclick="nexusMusique(this)">🎵 Générer une musique (8s, gratuit)</button></div>
 <div class="field"><label>☁️ Sauvegarde chiffrée de mes clés</label><small style="margin-bottom:8px">Tes clés sont brouillées avec un mot de passe avant d’aller sur ton compte Puter. Ce mot de passe n’est enregistré nulle part : si tu l’oublies, tu recrées simplement des clés gratuites.</small><input type="password" id="nexusMdpCles" placeholder="Mot de passe (8 caractères minimum)" autocomplete="off"><input type="password" id="nexusMdpCles2" placeholder="Confirmer (seulement pour sauvegarder)" autocomplete="off" style="margin-top:8px"><div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusCloudClesSauver()">☁️ Sauvegarder</button><button class="btn btn-secondary" style="flex:1" onclick="nexusCloudClesRecuperer()">⬇ Récupérer</button></div><button class="btn btn-danger" style="width:100%;margin-top:8px" onclick="nexusCloudClesEffacer()">Effacer la sauvegarde cloud</button><div id="nexusCloudClesStatut" style="font-size:12px;margin-top:8px"></div></div>
 <div id="api-settings" style="display:none">
 <div class="field"><label>🔑 Producteur (P) - URL API</label><input id="up" list="dl" placeholder="https://api.groq.com/openai/v1/chat/completions"><datalist id="dl"><option value="https://api.groq.com/openai/v1/chat/completions"></option><option value="https://api.mistral.ai/v1/chat/completions"></option><option value="https://openrouter.ai/api/v1/chat/completions"></option></datalist></div>
@@ -1297,28 +1289,6 @@ async function nexusImageEnVideo(urlImage, btn){
     frame();
   }catch(e){ if(btn) btn.textContent = '🎬 Vidéo'; showToast('Vidéo impossible sur cette image (Pollinations bloque le téléchargement). Réessaie avec une image Puter.'); }
 }
-// Musique : petit loop généré dans le navigateur avec Web Audio, gratuit, sans clé. Pas de l'IA, mais ça te fait une musique depuis NEXUS.
-function nexusMusique(btn){
-  try{
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if(!AC) throw new Error('Audio non dispo');
-    const ctx = new AC();
-    const notes = [262, 329, 392, 523, 392, 329, 262, 196];
-    let i = 0;
-    if(btn) btn.textContent = '🎵 Musique… 8s';
-    const timer = setInterval(() => {
-      if(i >= notes.length * 2){ clearInterval(timer); if(btn) btn.textContent = '🎵 Musique'; return; }
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'triangle'; o.frequency.value = notes[i % notes.length];
-      g.gain.setValueAtTime(0.0001, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.05);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(); o.stop(ctx.currentTime + 0.55);
-      i++;
-    }, 450);
-  }catch(e){ showToast('Musique impossible sur ce navigateur.'); }
-}
 // V48 : Chef transmet DIRECT à l'IA externe la plus adéquate.
 // Pour une IMAGE : Chef Gemini -> Employé Banana 2 (Gemini 3 Pro Image / Nano Banana 2), direct via ton API Gemini.
 // Si pas de clé Gemini ou Banana 2 indisponible, on retombe sur Puter (qui transmet à son employé image), puis Pollinations.
@@ -1988,16 +1958,16 @@ const NEXUS_CLES_DEF = [
 // ⚠️ NE PARTAGE JAMAIS ce fichier avec tes clés dedans. Tout le monde pourrait les utiliser et vider ton quota.
 // Si tu veux partager NEXUS, partage la version sans clés (V41).
 const NEXUS_CLES_EN_DUR = {
-  groq: "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",       // <-- colle ta clé Groq entre les guillemets, ex : "gsk_..."
-  gemini: "AQ.Ab8RN6IQMzoSZrwlyootNDU4OjiirJhVUJLOiiCMNPYw-FBUZg",     // <-- colle ta clé Gemini
-  openrouter: "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", // <-- colle ta clé OpenRouter
+  groq: "",       // <-- colle ta clé Groq entre les guillemets, ex : "gsk_..."
+  gemini: "",     // <-- colle ta clé Gemini
+  openrouter: "", // <-- colle ta clé OpenRouter
 };
 
 // ===== V62 AJOUT UNIQUEMENT : CONNEXION PUTER + COPIES API EN PERMANENT - RIEN D'AUTRE MODIFIE =====
 // Tu mets ton pseudo Puter ici, en local, comme pour les cles API, une seule fois.
 // Ne mets jamais ton mot de passe ici.
 const NEXUS_PUTER_COMPTE = {
-  username: "NEXUS_AI", // <-- colle ton pseudo Puter entre les guillemets, ex : "ton_pseudo"
+  username: "", // <-- colle ton pseudo Puter entre les guillemets, ex : "ton_pseudo"
 };
 function nexusPuterPermanentAppliquer(){
   try{
@@ -3247,19 +3217,7 @@ setInterval(()=>{ try{ nexusDiagRafraichir(); }catch(e){} }, 5000);
 // ===== V45 NEXUS PLATEFORME : le grand patron, par où passer pour tout avoir =====
 // Tu passes par NEXUS pour tout avoir. NEXUS commande, les chefs distribuent, les employés exécutent.
 // NEXUS (Patron) -> PUTER + GROQ + GEMINI + OPENROUTER (Chefs) -> ChatGPT, Claude, Meta AI, Perplexity, Suno, Midjourney, Runway, Kling, Grok (Employés)
-function nexusBanniereConcert(){
-  try{
-    if(document.getElementById('nexus-banniere-concert')) return;
-    const chat = document.getElementById('chat');
-    if(!chat) return;
-    const div = document.createElement('div');
-    div.id = 'nexus-banniere-concert';
-    div.style.cssText = 'margin:10px 12px 0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2,var(--surface));font-size:12px;line-height:1.5';
-    div.innerHTML = '<b>👑 NEXUS — Tout automatisé.</b><br><span style="color:var(--text-muted)">Tu demandes → NEXUS transmet aux chefs (Groq, Gemini, OpenRouter, Puter) → Le chef choisit l’IA la plus adaptée → Il fait le prompt qui correspond → L’IA travaille → NEXUS te rend le résultat. T’as rien à faire. Regarde sous chaque réponse : NEXUS → Chef → Employé.</span>';
-    chat.parentNode.insertBefore(div, chat);
-  }catch(e){}
-}
-setTimeout(()=>{ try{ nexusBanniereConcert(); }catch(e){} }, 800);
+function nexusBanniereConcert(){ return; /* Bannière explicative retirée */ }
 function nexusAppliquerDiscret(){
   try{
     const barre = document.getElementById('nexus-barre-raccourcis');
