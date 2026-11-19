@@ -366,7 +366,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 #nexusHorlogeBar b{color:var(--text);font-weight:600}
 #nexusHorlogeHeure{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
-<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">10:36:29</span></span></div>
+<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">11:37:05</span></span></div>
 
 
 <main>
@@ -396,7 +396,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795080989892)"><span class="conv-del" onclick="deleteConversation(1795080989892,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795084625085)"><span class="conv-del" onclick="deleteConversation(1795084625085,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -422,7 +422,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
 <div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔑 MES IA GRATUITES (CLÉS)</div>
-<div class="field"><small style="margin-bottom:12px">Colle une clé : elle est enregistrée toute seule, sur cet appareil uniquement. NEXUS les utilise en premier, puis Puter, puis le secours. Pour les retrouver sur un autre appareil, utilise la sauvegarde chiffrée plus bas.</small><div id="nexusClesListe"><div style="margin-bottom:14px"><label>Groq <span id="kst-groq" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-groq" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('groq')">Supprimer</button></div><small>Clé gratuite : console.groq.com</small></div><div style="margin-bottom:14px"><label>Google Gemini <span id="kst-gemini" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-gemini" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('gemini')">Supprimer</button></div><small>Clé gratuite : aistudio.google.com</small></div><div style="margin-bottom:14px"><label>Mistral <span id="kst-mistral" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-mistral" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('mistral')">Supprimer</button></div><small>Clé gratuite : console.mistral.ai</small></div><div style="margin-bottom:14px"><label>OpenRouter <span id="kst-openrouter" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-openrouter" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('openrouter')">Supprimer</button></div><small>Clé gratuite : openrouter.ai</small></div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusClesTester()">Tester mes IA</button><button class="btn btn-danger" style="flex:1" onclick="nexusClesToutSupprimer()">🗑 Tout supprimer</button></div></div>
+<div class="field"><small style="margin-bottom:12px">Colle une clé : elle est enregistrée toute seule, sur cet appareil uniquement. NEXUS les utilise en premier, puis Puter, puis le secours. Pour les retrouver sur un autre appareil, utilise la sauvegarde chiffrée plus bas.</small><div id="nexusClesListe"><div style="margin-bottom:14px"><label>Groq <span id="kst-groq" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-groq" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('groq')">Supprimer</button></div><small>Clé gratuite : console.groq.com</small></div><div style="margin-bottom:14px"><label>Google Gemini <span id="kst-gemini" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-gemini" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('gemini')">Supprimer</button></div><small>Clé gratuite : aistudio.google.com</small></div><div style="margin-bottom:14px"><label>Mistral <span id="kst-mistral" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-mistral" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('mistral')">Supprimer</button></div><small>Clé gratuite : console.mistral.ai</small></div><div style="margin-bottom:14px"><label>OpenRouter <span id="kst-openrouter" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-openrouter" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('openrouter')">Supprimer</button></div><small>Clé gratuite : openrouter.ai</small></div><div style="margin-bottom:14px"><label>Hugging Face <span id="kst-huggingface" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-huggingface" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('huggingface')">Supprimer</button></div><small>Clé gratuite : huggingface.co - token gratuit, sans carte</small></div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusClesTester()">Tester mes IA</button><button class="btn btn-danger" style="flex:1" onclick="nexusClesToutSupprimer()">🗑 Tout supprimer</button></div></div>
 <div class="field"><label>☁️ Sauvegarde chiffrée de mes clés</label><small style="margin-bottom:8px">Tes clés sont brouillées avec un mot de passe avant d’aller sur ton compte Puter. Ce mot de passe n’est enregistré nulle part : si tu l’oublies, tu recrées simplement des clés gratuites.</small><input type="password" id="nexusMdpCles" placeholder="Mot de passe (8 caractères minimum)" autocomplete="off"><input type="password" id="nexusMdpCles2" placeholder="Confirmer (seulement pour sauvegarder)" autocomplete="off" style="margin-top:8px"><div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusCloudClesSauver()">☁️ Sauvegarder</button><button class="btn btn-secondary" style="flex:1" onclick="nexusCloudClesRecuperer()">⬇ Récupérer</button></div><button class="btn btn-danger" style="width:100%;margin-top:8px" onclick="nexusCloudClesEffacer()">Effacer la sauvegarde cloud</button><div id="nexusCloudClesStatut" style="font-size:12px;margin-top:8px"></div></div>
 <div id="api-settings" style="display:none">
 <div class="field"><label>🔑 Producteur (P) - URL API</label><input id="up" list="dl" placeholder="https://api.groq.com/openai/v1/chat/completions"><datalist id="dl"><option value="https://api.groq.com/openai/v1/chat/completions"></option><option value="https://api.mistral.ai/v1/chat/completions"></option><option value="https://openrouter.ai/api/v1/chat/completions"></option></datalist></div>
@@ -1038,15 +1038,51 @@ function nexusSecoursImagePollinations(prompt){
   // Maintenant modèle 'flux' (bien meilleur), 1024x1024, enhance=true (il améliore le prompt), nologo=true (pas de filigrane).
   return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=1024&height=1024&seed=' + Math.floor(Math.random()*1000000) + '&model=flux&enhance=true&nologo=true';
 }
-async function nexusGenerateImage(prompt, signal){
-  if(!window.puter || !puter.ai || !puter.ai.txt2img) throw new Error("Génération d'image non disponible. Vérifie que Puter est chargé.");
+async function nexusImageHuggingFace(prompt, signal){
+  // Image Hugging Face FLUX, gratuit avec token HF (même clé que le texte Hugging Face). Retourne une URL blob, pas une URL http.
+  const cle = (nexusClesLire() || {}).huggingface;
+  if(!cle) throw new Error('Pas de clé Hugging Face');
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 60000);
+  const off = () => ctrl.abort();
+  if(signal) signal.addEventListener('abort', off, { once: true });
   try{
-    const img = await puter.ai.txt2img(prompt, false, { model: "gpt-image-2.6-flare" });
-    return img && img.src ? img.src : String(img||'');
-  }catch(e){
-    // Plus de crédits Puter pour l'image ? On bascule sur l'image Pollinations, sans clé.
-    if(nexusEstErreurCredits(e)){ try{ window.__nexusDernierModele = 'secours'; }catch(e2){} return nexusSecoursImagePollinations(prompt); }
-    throw new Error(nexusTraduireErreur(e.message || e));
+    const r = await fetch('https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell', { method: 'POST', headers: { 'Authorization': 'Bearer ' + cle, 'Content-Type': 'application/json' }, body: JSON.stringify({ inputs: prompt }), signal: ctrl.signal });
+    if(!r.ok) throw new Error('Hugging Face image ' + r.status);
+    const blob = await r.blob();
+    if(!blob || !blob.size) throw new Error('Hugging Face image vide');
+    return URL.createObjectURL(blob);
+  }finally{ clearTimeout(timer); if(signal) signal.removeEventListener('abort', off); }
+}
+async function nexusGenerateImage(prompt, signal, t){
+  // IMAGE : meilleur en premier, reste en secours, que du gratuit.
+  // 1. Groq enrichit le prompt (texte -> prompt image détaillé en anglais). Si ça échoue, on garde le prompt d'origine.
+  let promptFinal = prompt;
+  try{
+    nexusSetEssai(t, 'Essai Groq');
+    const enrichi = await nexusClesAppeler([{ role: 'system', content: 'Tu es un expert prompt pour génération d\'image. Renvoie UNIQUEMENT un prompt image détaillé en anglais, visuel, concret, sans explication, sans guillemets, 1 seule phrase longue.' }, { role: 'user', content: String(prompt || '') }], signal, t);
+    if(enrichi && String(enrichi).trim().length > 10) promptFinal = String(enrichi).trim().slice(0, 1000);
+  }catch(e){}
+  // 2. Puter (meilleure qualité image)
+  nexusSetEssai(t, "Génération de l'image…");
+  try{
+    if(!window.puter || !puter.ai || !puter.ai.txt2img) throw new Error('Puter image indisponible');
+    const img = await puter.ai.txt2img(promptFinal, false, { model: "gpt-image-2.6-flare" });
+    const url = img && img.src ? img.src : String(img||'');
+    if(url) return url;
+    throw new Error('Puter image vide');
+  }catch(ePuter){
+    // 3. Hugging Face FLUX (secours gratuit, avec ta clé HF)
+    try{
+      nexusSetEssai(t, 'Essai Hugging Face');
+      const urlHF = await nexusImageHuggingFace(promptFinal, signal);
+      try{ window.__nexusDernierModele = 'Hugging Face FLUX.1-schnell'; }catch(e2){}
+      return urlHF;
+    }catch(eHF){}
+    // 4. Pollinations en TOUT DERNIER secours, sans clé, qualité la plus faible.
+    nexusSetEssai(t, 'Essai secours');
+    try{ window.__nexusDernierModele = 'secours'; }catch(e2){}
+    return nexusSecoursImagePollinations(promptFinal);
   }
 }
 
@@ -1582,7 +1618,8 @@ const NEXUS_CLES_DEF = [
   { id: 'groq', nom: 'Groq', url: 'https://api.groq.com/openai/v1/chat/completions', modeles: ['llama-3.1-8b-instant', 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b'], aide: 'console.groq.com' },
   { id: 'gemini', nom: 'Google Gemini', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', modeles: ['gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.8-flash'], aide: 'aistudio.google.com' },
   { id: 'mistral', nom: 'Mistral', url: 'https://api.mistral.ai/v1/chat/completions', modeles: ['mistral-small-latest', 'mistral-large-latest'], aide: 'console.mistral.ai' },
-  { id: 'openrouter', nom: 'OpenRouter', url: 'https://openrouter.ai/api/v1/chat/completions', modeles: ['openrouter/free'], aide: 'openrouter.ai' }
+  { id: 'openrouter', nom: 'OpenRouter', url: 'https://openrouter.ai/api/v1/chat/completions', modeles: ['openrouter/free'], aide: 'openrouter.ai' },
+  { id: 'huggingface', nom: 'Hugging Face', url: 'https://router.huggingface.co/hf-inference/v1/chat/completions', modeles: ['Qwen/Qwen2.5-72B-Instruct', 'meta-llama/Llama-3.3-70B-Instruct', 'deepseek-ai/DeepSeek-R1'], aide: 'huggingface.co - token gratuit, sans carte' }
 ];
 const NEXUS_CLES_CLE = 'nexus_cles_v1';
 function nexusClesLire(){ try{ return JSON.parse(localStorage.getItem(NEXUS_CLES_CLE) || '{}') || {}; }catch(e){ return {}; } }
@@ -1658,8 +1695,8 @@ async function nexusCleAppelerUn(def, cle, messages, signal){
 }
 async function nexusClesAppeler(messages, signal, t){
   const cles = nexusClesLire();
-  // Groq TOUJOURS en premier, même sans code : c'est le plus rapide, Gemini était trop lent et bloquait tout.
-  const ordre = ['groq', 'gemini', 'mistral', 'openrouter'].filter(id => cles[id]);
+  // Meilleur / plus fiable en premier, reste en secours : Groq -> Gemini -> Mistral -> Hugging Face -> OpenRouter.
+  const ordre = ['groq', 'gemini', 'mistral', 'huggingface', 'openrouter'].filter(id => cles[id]);
   for(const id of ordre){
     const def = NEXUS_CLES_DEF.find(d => d.id === id);
     try{
@@ -2539,7 +2576,7 @@ async function run(t){
       const _imgPrompt = nexusImagePrompt(t.demande);
       if(_imgPrompt && t.mode === "puter" && !t.image){
         t.step = "Génération de l'image…"; save(); render();
-        t.generatedImage = await nexusGenerateImage(_imgPrompt, currentController ? currentController.signal : undefined);
+        t.generatedImage = await nexusGenerateImage(_imgPrompt, currentController ? currentController.signal : undefined, t);
         t.result = "Voici ton image : " + _imgPrompt;
         t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
         t.step = ""; save(); render();
