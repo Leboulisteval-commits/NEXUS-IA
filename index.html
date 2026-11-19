@@ -84,7 +84,7 @@
 }
 </style>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>NEXUS AI</title>
 <meta name="description" content="NEXUS AI : Vérification croisée par IA.">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -294,7 +294,28 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
   margin-bottom:4px;
 }
 </style>
-<meta name="theme-color" content="#0a0a10"></head>
+<meta name="theme-color" content="#0a0a10"><style>
+/* ===== AMÉLIORATIONS VISUELLES (ajout) ===== */
+.md-h{font-weight:700;font-size:16px;margin:12px 0 4px;color:var(--primary)}
+.md-li{padding-left:6px;margin:2px 0}
+.bubble{box-shadow:0 2px 14px rgba(0,0,0,.14)}
+.msg.user .bubble{border-radius:18px 18px 4px 18px}
+.msg.ai .bubble{border-radius:18px 18px 18px 4px}
+.msg-actions button,.btn-regenerate{min-height:34px;padding:7px 14px}
+.sugg{padding:9px 14px}
+.input-wrapper{box-shadow:0 4px 24px rgba(0,0,0,.18);transition:border-color .2s,box-shadow .2s}
+.input-wrapper:focus-within{box-shadow:0 0 0 3px var(--primary-soft)}
+.input-btn{transition:transform .12s,opacity .2s}
+.input-btn:active{transform:scale(.93)}
+.icon-btn{transition:transform .12s,border-color .2s}
+.icon-btn:hover{border-color:var(--primary)}
+.ai-body pre{position:relative;border-left:3px solid var(--primary)}
+.ai-body{overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (min-width:900px){#chat{padding:24px 24px 12px}.bubble{font-size:16px}}
+</style>
+</head>
 <body style="top: 0px;" data-theme="nexus">
 
 <header>
@@ -364,7 +385,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <option value="cles">Mes clés API</option>
 </select>
 <small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
-<div class="check-row" style="border:1px solid var(--border);border-radius:12px;padding:12px;align-items:flex-start"><input type="checkbox" id="vf" checked="" onchange="nexusReglages_ToggleVerif()" style="width:28px;height:28px;min-width:28px;margin-top:2px;accent-color:var(--success);cursor:pointer"><div style="flex:1"><b>Vérification croisée — <span id="nexusVerifStatut">activée</span></b><br><small>Un 2e modèle vérifie chaque réponse et la corrige si besoin (max 3 tours).</small><br><button id="nexusVerifBouton" type="button" onclick="nexusVerif_Bouton()" style="margin-top: 10px; width: 100%; padding: 12px; border-radius: 999px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); font-size: 15px; font-weight: 700; cursor: pointer;">⏻ Désactiver la vérification</button></div></div>
+<div class="check-row" style="display:none;border:1px solid var(--border);border-radius:12px;padding:12px;align-items:flex-start"><input type="checkbox" id="vf" checked="" onchange="nexusReglages_ToggleVerif()" style="width:28px;height:28px;min-width:28px;margin-top:2px;accent-color:var(--success);cursor:pointer"><div style="flex:1"><b>Vérification croisée — <span id="nexusVerifStatut">activée</span></b><br><small>Un 2e modèle vérifie chaque réponse et la corrige si besoin (max 3 tours).</small><br><button id="nexusVerifBouton" type="button" onclick="nexusVerif_Bouton()" style="margin-top: 10px; width: 100%; padding: 12px; border-radius: 999px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); font-size: 15px; font-weight: 700; cursor: pointer;">⏻ Désactiver la vérification</button></div></div>
 <div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
 <div id="api-settings" style="display:none">
 <div class="field"><label>🔑 Producteur (P) - URL API</label><input id="up" list="dl" placeholder="https://api.groq.com/openai/v1/chat/completions"><datalist id="dl"><option value="https://api.groq.com/openai/v1/chat/completions"></option><option value="https://api.mistral.ai/v1/chat/completions"></option><option value="https://openrouter.ai/api/v1/chat/completions"></option></datalist></div>
@@ -439,8 +460,11 @@ function formatMarkdown(text){
     return '\u0000BLOCK' + (blocks.length - 1) + '\u0000';
   });
   safe = safe.replace(/`([^`]+)`/g, '<code>$1</code>');
+  safe = safe.replace(/^#{1,4}[ \t]+(.+)$/gm, '<div class="md-h">$1</div>');
+  safe = safe.replace(/^[ \t]*[-*][ \t]+(.+)$/gm, '<div class="md-li">• $1</div>');
   safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   safe = safe.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  safe = safe.replace(/<\/div>\n/g, '</div>');
   safe = safe.replace(/\n/g, '<br>');
   safe = safe.replace(/\u0000BLOCK(\d+)\u0000/g, (m, i) => blocks[Number(i)]);
   return safe;
@@ -948,7 +972,7 @@ function nexusConvert(val, from, to){
 }
 function nexusToolContext(demande){
   const s=(demande||'').toLowerCase(); const parts=[]; const now=nexusNow();
-  if(/(heure|date|quel jour|on est|aujourd)/.test(s)) parts.push('HORLOGE : Nous sommes le '+now.dateFR+'. Il est '+now.heure+' (heure locale du navigateur).');
+  if(/(\bheure\b|\bdate\b|quel jour|on est|aujourd)/.test(s)) parts.push('HORLOGE : Nous sommes le '+now.dateFR+'. Il est '+now.heure+' (heure locale du navigateur).');
   if(/(calendrier|agenda|demain|apres-demain|après-demain|semaine|prochain)/.test(s)) parts.push('CALENDRIER (7 prochains jours) :\n'+nexusCalendar());
   const mc = s.match(/(?:calcule|calcul|combien\s+(?:font|fait|vaut)|resultat\s+de|résultat\s+de)\s*[:=]?\s*([0-9][0-9\s+\-*/().%x×÷,]*)/) || s.match(/^\s*([0-9][0-9\s+\-*/().%x×÷,]{1,40})\s*\?*\s*$/);
   if(mc){ const c=nexusCalc(mc[1]); if(c) parts.push('CALCULATRICE : '+c.expr+' = '+c.value); }
@@ -1286,7 +1310,13 @@ async function nexusAppelerModele(messages, signal, image, modele){
 // modèles : kilo-auto/free (il choisit tout seul un modèle gratuit), openrouter/free, Nemotron, etc.
 // Testée en live il y a 2 jours (17/17 tests OK sur kilo-auto/free).
 // Attention : comme toutes les routes gratuites, Kilo peut journaliser les prompts. Ne pas y envoyer de données confidentielles.
+function nexusSansMemoire(messages){
+  return (messages || []).map(m => m && m.role === 'system'
+    ? { role: m.role, content: String(m.content || '').replace(/\n\nMÉMOIRE NEXUS[\s\S]*?(?=\n\nPROJET ACTUEL|\n\nRÉSULTATS WEB|$)/, '').replace(/\n\nPROJET ACTUEL[\s\S]*?(?=\n\nRÉSULTATS WEB|$)/, '') }
+    : m);
+}
 async function nexusSecoursKilo(messages){
+  messages = nexusSansMemoire(messages);
   try{ window.__nexusKiloErreur = ''; }catch(e){}
   // KILO POUSSÉ AU MAX (seule fonction Kilo touchée) :
   // - 5 modèles en cascade (au lieu de 3), adaptés à la demande
@@ -1375,6 +1405,7 @@ async function nexusSecoursKilo(messages){
 }
 
 async function nexusSecoursPollinations(messages){
+  messages = nexusSansMemoire(messages);
   // POLLINATIONS CORRIGÉ v4 (causes vues sur ta capture + docs) :
   // Cause 402 : le tier ANONYME rejette tout message "system" avec 402 Payment Required. Avant on envoyait &system=... -> 402 à chaque fois.
   //   -> Maintenant : PAS de paramètre system. Le système est fusionné DANS le prompt utilisateur.
@@ -1979,7 +2010,21 @@ async function nexusIDB_AuDemarrage(){
   // On n'écrase JAMAIS un localStorage qui a déjà des conversations, pour ne pas perdre des données plus récentes.
   try{
     const localVide = !state || !Array.isArray(state.convs) || state.convs.every(c => !c.messages || !c.messages.length);
-    if(!localVide) return;
+    if(!localVide){
+      const recImg = await nexusIDB_Charger(K);
+      if(recImg && recImg.valeur && Array.isArray(recImg.valeur.convs)){
+        let modif = false;
+        state.convs.forEach(c => (c.messages || []).forEach(m => {
+          if(m.imageEnvoyee && !m.image){
+            const cs = recImg.valeur.convs.find(x => x.id === c.id);
+            const ms = cs && (cs.messages || []).find(x => x.id === m.id);
+            if(ms && ms.image){ m.image = ms.image; modif = true; }
+          }
+        }));
+        if(modif){ try{ render(); }catch(e){} }
+      }
+      return;
+    }
     const rec = await nexusIDB_Charger(K);
     if(rec && rec.valeur && Array.isArray(rec.valeur.convs) && rec.valeur.convs.some(c => c.messages && c.messages.length)){
       state = rec.valeur;
@@ -2092,6 +2137,7 @@ function nexusCloud_Planifier(){
 async function nexusCloud_Sauvegarder(){
   // Sauvegarde auto silencieuse : jamais de popup, jamais de blocage. Si pas connecté, on reste en local, c'est tout.
   if(nexusCloud_EnCours) return;
+  if(!state || !state.convs || !state.convs.some(c => c.messages && c.messages.length)) return;
   try{
     if(!window.puter || !puter.fs || typeof puter.fs.write !== 'function') return;
     const connecte = await nexusCloud_EstConnecte();
@@ -2495,7 +2541,7 @@ function start(){
     v: null,
     round: 0,
     mode: $("#mo").value,
-    verif: $("#vf").checked,
+    verif: false,
     tier: r.tier,
     status: "en_cours",
     step: "",
@@ -2532,7 +2578,7 @@ function regenerate(id){
   conv.messages = conv.messages.slice(0, idx + 1);
   const t = conv.messages[idx];
   t.result = null; t.generatedImage = null; t.tool = null; t.pModel = null; t.v = null; t.round = 0; t.status = "en_cours"; t.step = ""; t.err = ""; t.pProvider = null; t.vProvider = null;
-  t.mode = $("#mo").value; t.verif = $("#vf").checked;
+  t.mode = $("#mo").value; t.verif = false;
   save(); render();
   run(t);
 }
@@ -2613,12 +2659,12 @@ function render(){
     const _estSecours = !!(t.pModel && String(t.pModel).includes('secours'));
     const _banniereSecours = _estSecours ? '<div class="msg-system err" style="margin-bottom:8px; font-weight:700;">🔻 Mode données réduites</div>' : '';
     h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI' + (t.step ? ' • ' + esc(t.step) : '') + '</div><div class="ai-body">' + _banniereSecours + formatMarkdown(t.result || "") + (t.generatedImage ? '<img class="msg-image" src="' + t.generatedImage + '" style="margin-top:8px" onerror="this.outerHTML=\'<div class=\\\'msg-system err\\\'>⚠ L\\\'image de secours Pollinations n\\\'a pas pu être générée (service gratuit saturé ou clé requise). Réessaie dans quelques instants, ou attends tes crédits Puter.</div>\'">' : '') + (t.tool ? '<div class="msg-system" style="margin-top:8px">⏱ ' + esc(t.tool.label) + ' : <span class="nexus-tool-live" data-tool-type="' + esc(t.tool.type) + '" data-until="' + (t.tool.until||0) + '" data-start="' + (t.tool.start||0) + '" data-running="' + (t.tool.running?1:0) + '" data-elapsed="' + (t.tool.elapsed||0) + '">' + esc(t.tool.type==='timer' ? nexusFmtMs(Math.max(0,(t.tool.until||0)-Date.now())) : nexusFmtMs(t.tool.running ? Date.now()-(t.tool.start||Date.now()) : (t.tool.elapsed||0))) + '</span></div>' : '') + '</div>';
-    h += '<div class="msg-meta"><span>' + niveau(t.verif ? t.v : null) + '</span>';
+    h += '<div class="msg-meta">';
     if(t.pProvider) h += '<span>Prod : ' + providerLabel(t.pProvider) + (t.pModel ? ' • ' + esc(String(t.pModel).includes('secours') ? 'Secours' : t.pModel) : '') + '</span>';
     if(t.vProvider) h += '<span>Vérif : ' + providerLabel(t.vProvider) + '</span>';
     if(t.round) h += '<span>' + t.round + ' tour(s)</span>';
     h += '<span>' + new Date(t.id).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) + '</span></div>';
-    if(t.verif && t.v){
+    if(false){
       h += '<div class="verif-block"><button type="button" class="verif-head" onclick="toggleVerif(this)" aria-expanded="false">🛡 Vérification croisée ' + niveau(t.v) + '<span class="verif-chev">▾</span></button><div class="verif-body">';
       if(t.v.criteres && t.v.criteres.length) h += '<b>Critères :</b><ul>' + t.v.criteres.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>';
       if(t.v.ecarts && t.v.ecarts.length) h += '<b style="color:var(--danger)">Écarts :</b><ul>' + t.v.ecarts.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>';
