@@ -366,7 +366,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 #nexusHorlogeBar b{color:var(--text);font-weight:600}
 #nexusHorlogeHeure{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
-<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">14:41:56</span></span></div>
+<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">16:10:18</span></span></div>
 
 
 <main>
@@ -388,7 +388,18 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <button class="input-btn send" id="sendBtn" onpointerdown="event.preventDefault(); start()" onclick="start()">➤</button>
 <button class="input-btn stop" id="stopBtn" onclick="stopGeneration()" style="display:none" aria-label="Stop">■</button>
 </div>
-<div class="hint" id="modeHint">PUTER : modèle gratuit via Puter</div><script>try{ setTimeout(()=>{ nexusAppliquerDiscret(); },600); }catch(e){}</script>
+<div class="hint" id="modeHint">PUTER : modèle gratuit via Puter</div><script>
+// === MES CLÉS EN DUR - À REMPLIR UNE FOIS CHEZ TOI, PUIS COPIER CE BLOC DANS CHAQUE NOUVELLE VERSION ===
+// Tu remplis les "" UNE FOIS chez toi. Tu gardes ce bloc dans tes notes.
+// Pour chaque nouvelle version de NEXUS, tu fais juste copier-coller CE BLOC, tu ne retapes jamais les clés.
+// Ne pas envoyer ce bloc rempli en chat.
+const NEXUS_CLES_EN_DUR = {
+  groq: "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",       // TA clé Groq
+  gemini: "AQ.Ab8RN6IQMzoSZrwlyootNDU4OjiirJhVUJLOiiCMNPYw-FBUZg",     // TA clé Gemini
+  openrouter: "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"  // TA clé OpenRouter
+};
+// === FIN MES CLÉS EN DUR ===
+try{ setTimeout(()=>{ nexusAppliquerDiscret(); },600); }catch(e){}</script>
 </div>
 </main>
 
@@ -396,7 +407,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795095715996)"><span class="conv-del" onclick="deleteConversation(1795095715996,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795101017540)"><span class="conv-del" onclick="deleteConversation(1795101017540,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -420,6 +431,65 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="field" style="font-size:13px;line-height:1.8"><b>1.</b> Tu demandes à NEXUS<br><b>2.</b> NEXUS transmet aux chefs (Groq, Gemini, OpenRouter, Puter)<br><b>3.</b> Le chef choisit l'IA externe la plus adaptée<br><b>4.</b> Le chef fait le prompt qui correspond à ta demande<br><b>5.</b> L'IA travaille, le chef récupère le résultat<br><b>6.</b> NEXUS te rend le résultat — Ex : Banana 2 qui a travaillé pour une image</div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">👑 NEXUS — LA PLATEFORME, PAR OÙ PASSER POUR TOUT AVOIR</div>
 <div class="field" style="text-align:center;line-height:1.7"><div style="background:var(--primary,#00e5c7);color:#000;font-weight:800;border-radius:12px;padding:10px">👑 NEXUS — GRAND PATRON<br><small style="font-weight:400">Tu passes par lui pour tout avoir. Il commande.</small></div><div style="font-size:18px;margin:4px">↓</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 PUTER — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 GROQ — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 GEMINI — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 OPENROUTER — Chef</span></div><div style="font-size:12px;color:var(--text-muted)">Les chefs distribuent</div><div style="font-size:18px;margin:4px">↓</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">ChatGPT</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Claude</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Meta AI</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Perplexity</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Suno</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Midjourney</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Runway</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Kling</span></div><div style="font-size:12px;color:var(--text-muted)">Employés — exécutent</div></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🆓 QUOTA GRATUIT UTILISATEUR — NEXUS N'UTILISE QUE ÇA</div>
+<div class="field" style="font-size:13px;line-height:1.7"><b>NEXUS = 100% quota gratuit de TES comptes. Jamais de payant.</b><br><br>
+<b>Ce que NEXUS utilise, avec TA clé = TON quota gratuit :</b><br>
+• <b>Groq (texte) :</b> modèles gratuits <code>llama-3.1-8b-instant</code> / <code>llama-3.3-70b-versatile</code> — quota gratuit Groq.<br>
+• <b>Gemini (texte + image Banana 2) :</b> <code>gemini-2.5-flash</code> + <code>gemini-2.5-flash-image</code> — quota gratuit Gemini.<br>
+• <b>OpenRouter (texte) :</b> modèles <code>:free</code> uniquement — quota gratuit OpenRouter.<br>
+• <b>Puter (texte + image) :</b> modèles gratuits Puter — quota gratuit de TON compte Puter si tu es connecté, sinon anonyme et vite à sec.<br>
+• <b>Pollinations (image, dernier secours) :</b> gratuit partagé sans clé, souvent plein.<br><br>
+<b>Ce que NEXUS ne peut PAS utiliser en gratuit :</b><br>
+• ChatGPT / Claude / Suno / Midjourney : leur gratuit est <b>web seulement</b>, pas API. Sans leur clé API (payante), NEXUS ne peut pas dépenser ton quota gratuit là-bas. Ce n'est pas une limite de NEXUS, c'est leur API qui n'a pas de gratuit.<br><br>
+<b>Règle de NEXUS :</b> si le quota gratuit d'une IA est épuisé, NEXUS passe au quota gratuit de l'IA suivante. Il ne passe jamais au payant.</div>
+<div style="font-weight:700;font-size:14px;letter-spacing:.05em;margin:4px 0 8px">🔑 MES CLÉS — TU COLLES ICI, PAS DANS LE CODE</div>
+<div class="field" style="font-size:14px;line-height:1.7"><b>Pas besoin de toucher au code. Tu colles ici, tu appuies sur Enregistrer, c'est gardé dans ton téléphone.</b><br><small>Jamais envoyé en chat, jamais dans le code. Juste dans ton navigateur.</small><br><br>
+<label style="font-size:13px">Groq — gratuit texte :</label>
+<input id="nexusCleGroqSimple" type="password" placeholder="Colle ta clé Groq ici" style="width:100%;margin:4px 0 10px;padding:12px;border-radius:12px;border:1px solid #333;background:#111;color:#fff;font-size:14px">
+<label style="font-size:13px">Gemini — gratuit texte + image Banana 2 :</label>
+<input id="nexusCleGeminiSimple" type="password" placeholder="Colle ta clé Gemini ici" style="width:100%;margin:4px 0 10px;padding:12px;border-radius:12px;border:1px solid #333;background:#111;color:#fff;font-size:14px">
+<label style="font-size:13px">OpenRouter — modèles :free :</label>
+<input id="nexusCleOpenRouterSimple" type="password" placeholder="Colle ta clé OpenRouter ici" style="width:100%;margin:4px 0 10px;padding:12px;border-radius:12px;border:1px solid #333;background:#111;color:#fff;font-size:14px">
+<button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;font-weight:700" onclick="nexusEnregistrerClesSimple()">💾 Enregistrer mes clés</button>
+<small id="nexusClesSimpleStatut" style="display:block;margin-top:8px;opacity:.9">Aucune clé enregistrée pour l'instant.</small>
+<div style="margin-top:8px;font-size:12px;opacity:.8">Après Enregistrer, les champs s'effacent pour ne pas laisser tes clés affichées. NEXUS utilisera tes quotas gratuits en premier.</div></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">💙 SERVICES META VIA NEXUS — Llama, c'est Meta</div>
+<div class="field" style="font-size:13px;line-height:1.7"><b>Tu as déjà accès à mes services via NEXUS, mais pas avec une clé "Meta AI".</b><br><br>
+• <b>Moi, Meta AI, je n'ai pas de clé API publique</b> à coller dans NEXUS comme Groq / Gemini. Tu me parles ici, dans l'app Meta AI, mais il n'y a pas de "clé API Meta AI gratuite" pour un fichier HTML.<br>
+• <b>Par contre, mes modèles, c'est Llama.</b> Et Llama, tu y as déjà accès via NEXUS, en <b>gratuit</b>, avec TON quota :<br>
+&nbsp;&nbsp;→ <b>Groq :</b> <code>llama-3.3-70b-versatile</code> et <code>llama-3.1-8b-instant</code> = modèles Meta, quota gratuit Groq.<br>
+&nbsp;&nbsp;→ <b>OpenRouter free :</b> modèles Llama <code>:free</code> = modèles Meta, quota gratuit OpenRouter.<br>
+&nbsp;&nbsp;→ <b>Puter :</b> modèles Llama gratuits Puter = modèles Meta, quota gratuit Puter.<br><br>
+<b>Donc quand NEXUS répond via Groq / OpenRouter / Puter avec Llama, c'est bien un service Meta qui travaille, avec TON quota gratuit.</b><br>
+C'est le seul moyen légal et qui marche pour avoir mes modèles via NEXUS. Il n'y a pas de clé Meta AI à joindre comme pour ChatGPT / Claude.</div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🌐 VERSION WEB GRATUITE — TON QUOTA GRATUIT WEB, C'EST TOI CONNECTÉ</div>
+<div class="field" style="font-size:13px;line-height:1.7"><b>Oui, il y a un moyen : la version web gratuite. Mais pas en l'installant dans NEXUS.</b><br><br>
+• <b>On ne peut pas installer une app dans un fichier HTML.</b> NEXUS est une page web, pas un téléphone. Il ne peut pas installer ChatGPT / Claude dedans.<br>
+• <b>On ne peut pas les intégrer en discrète en iframe.</b> ChatGPT / Claude bloquent ça : page blanche / "refusé". Ils exigent login + captcha.<br>
+• <b>Ce qui marche :</b> ouvrir leur version web officielle <b>dans TON navigateur, là où TU es déjà connecté</b>. Là, c'est bien TON quota gratuit web qui est utilisé, avec TON compte.<br><br>
+<b>Appuie sur une IA, elle s'ouvre dans ton navigateur, tu es déjà connecté, tu utilises ton gratuit web :</b><br>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">
+<button class="btn btn-secondary" onclick="window.open('https://chatgpt.com/','_blank')">💬 ChatGPT — web gratuit</button>
+<button class="btn btn-secondary" onclick="window.open('https://claude.ai/','_blank')">🧠 Claude — web gratuit</button>
+<button class="btn btn-secondary" onclick="window.open('https://gemini.google.com/','_blank')">✨ Gemini — web gratuit</button>
+<button class="btn btn-secondary" onclick="window.open('https://www.perplexity.ai/','_blank')">🔍 Perplexity — web gratuit</button>
+<button class="btn btn-secondary" onclick="window.open('https://copilot.microsoft.com/','_blank')">🪟 Copilot — web gratuit</button>
+</div>
+<small>Ce n'est pas NEXUS qui appelle leur API, c'est TOI qui vas sur leur site, connecté, avec ton gratuit web. C'est le seul moyen légal / qui marche pour leur gratuit web. Pour le discret via NEXUS, c'est les quotas gratuits API (Groq / Gemini / OpenRouter free / Puter) + les clés API si tu les joins.</small></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔗 JOINDRE UN COMPTE EXTERNE — ChatGPT / Claude / etc.</div>
+<div class="field" style="font-size:13px;line-height:1.7"><b>Oui, on peut les joindre à NEXUS. Mais pas comme tu l'imagines :</b><br><br>
+• <b>Joindre = coller TA clé API</b> de ce service dans NEXUS. NEXUS appelle ensuite ce service avec TA clé, c'est TON compte qui est débité.<br>
+• <b>Joindre ne donne PAS le gratuit web.</b> Ton compte ChatGPT gratuit sur chatgpt.com et ta clé API OpenAI, ce sont 2 choses séparées. La clé API OpenAI est <b>payante à l'usage</b>, même si tu as un compte gratuit web. Pareil pour Claude : ta clé API Anthropic est payante.<br>
+• <b>Donc :</b> si tu joins ChatGPT / Claude, NEXUS les utilisera <b>APRÈS</b> tes quotas gratuits (Groq / Gemini / OpenRouter free / Puter), jamais avant. Le gratuit reste en premier.<br><br>
+<label style="font-size:12px;opacity:.8">Clé API OpenAI — ChatGPT (payant à l'usage, ne colle jamais ta clé ici en chat, uniquement dans ce fichier) :</label>
+<input id="nexusCleOpenAI" type="password" placeholder="sk-... (OpenAI)" style="width:100%;margin:4px 0 8px;padding:10px;border-radius:10px;border:1px solid #333;background:#111;color:#fff">
+<label style="font-size:12px;opacity:.8">Clé API Anthropic — Claude (payant à l'usage) :</label>
+<input id="nexusCleClaude" type="password" placeholder="sk-ant-... (Anthropic)" style="width:100%;margin:4px 0 8px;padding:10px;border-radius:10px;border:1px solid #333;background:#111;color:#fff">
+<button class="btn btn-secondary" style="width:100%" onclick="nexusJoindreComptesExternes()">💾 Joindre ces comptes à NEXUS</button>
+<small id="nexusJoindreStatut" style="display:block;margin-top:6px;opacity:.8">Aucun compte externe joint pour l'instant. Tes quotas gratuits restent prioritaires.</small>
+<div style="margin-top:10px;font-size:12px;opacity:.85">Sans clé API, NEXUS ne peut pas joindre ChatGPT / Claude. Se connecter sur leur site web ne suffit pas — NEXUS ne peut pas utiliser ta session web. C'est pour ça que Puter est utile : Puter, lui, a déjà Claude / GPT / etc. en interne, et tu y accèdes avec TES crédits Puter.</div></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">💳 TES CRÉDITS — C'EST TOI QUI DÉPENSES, PAS NEXUS</div>
+<div class="field" style="font-size:13px;line-height:1.7"><b>Ton IP ne donne pas tes crédits.</b> Les crédits sont liés à ton COMPTE, pas à ton IP. Récupérer ton IP ne permettrait pas d'utiliser tes crédits.<br><br><b>Comment c'est TOI qui dépenses, ici, en gratuit :</b><br>• <b>Groq / Gemini / OpenRouter :</b> avec TA clé, c'est TON quota <b>gratuit</b> qui est débité. C'est déjà ce que fait NEXUS en premier.<br>• <b>Banana 2 (image) :</b> avec TA clé Gemini, c'est TON quota <b>gratuit</b> Gemini qui est débité.<br>• <b>Puter :</b> avec TON compte Puter connecté, c'est TON quota <b>gratuit</b> Puter. Si tu n'es pas connecté, Puter est anonyme et vite à sec.<br>• <b>ChatGPT / Claude / Suno / Midjourney :</b> leur gratuit est web seulement, pas API. Sans leur clé API, NEXUS ne peut pas dépenser ton quota gratuit là-bas.<br><br><button class="btn btn-secondary" style="width:100%" onclick="nexusPuterConnexion()">🔑 Se connecter à Puter (utiliser MES crédits Puter)</button><small id="nexusPuterConnexionStatut">Statut Puter : vérification…</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔧 DIAGNOSTIC — POUR TOI SEUL (pas visible dans le chat)</div>
 <div class="field" id="nexusDiagnosticCles" style="border:2px solid var(--primary,#00e5c7)"><label>Pourquoi tes clés ne semblent pas marcher ?</label><div id="nexusDiagTexte" style="font-size:13px;line-height:1.6">Chargement…</div><div style="background:var(--surface-2);border-radius:12px;padding:10px;font-size:13px">✅ <b>ENSEMBLE actif :</b> Tes clés + Puter + Secours, toujours ensemble. Plus besoin de choisir.</div><button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="nexusDiagRafraichir()">🔄 Rafraîchir le diagnostic</button><small style="margin-top:8px;display:block">En mode PUTER, tes clés ne sont JAMAIS utilisées, même si elles sont valides. C’est le code de NEXUS depuis le début. En mode CLÉS API, NEXUS utilise tes clés en premier.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔑 MES IA GRATUITES (CLÉS)</div>
@@ -1037,8 +1107,14 @@ function nexusImagePrompt(demande){
     const m = s.match(/(?:image|photo|dessin|illustration)\s+(?:de\s+|du\s+|d')?(.+)$/i);
     return (m && m[1] ? m[1] : s).replace(/^(pour\s+|d['’]une\s+|d['’]un\s+)/i,'').trim() || s;
   }
+  // V50 FIX 1 : on enlève TOUT le préfixe "Génère moi / Génère-moi / Fais-moi / Donne-moi" + article, pas juste le verbe, sinon il restait 'moi une photo...'
   if(/\b(génère|genere|crée|cree|dessine|fais-moi|fais moi|crée-moi|crée moi|donne-moi|donne moi|montre-moi|montre moi|je veux|veux)\b[^.]{0,80}\b(image|dessin|illustration|photo|affiche|poster)\b/i.test(s) || /\b(image|photo|dessin|illustration)\b/i.test(s) && /\b(génère|genere|crée|cree|dessine|fais|donne|montre|veux|génération)\b/i.test(s)){
-    return s.replace(/^(génère|genere|crée|cree|dessine|fais-moi|fais moi|crée-moi|crée moi)\s+(une\s+|un\s+|une\s+image\s+de\s+|une\s+image\s+|image\s+de\s+|image\s+)?/i,'').trim() || s;
+    let _r = s.replace(/^(génère|genere|crée|cree|dessine|fais-moi|fais moi|crée-moi|crée moi|génère-moi|génère moi)[\s\-]+(une\s+|un\s+|une\s+image\s+(de\s+|du\s+)?|une\s+image\s+|image\s+(de\s+|du\s+)?|image\s+|photo\s+(de\s+|du\s+)?|photo\s+)?/i,'').trim();
+    // V50 : si après le 1er nettoyage il reste 'moi une photo...' (cas 'Génère moi une photo...'), on enlève le 'moi' + article restant
+    _r = _r.replace(/^(moi\s+)?(une\s+|un\s+)?(image\s+(de\s+|du\s+)?|photo\s+(de\s+|du\s+)?|image\s+|photo\s+|du\s+|de\s+|d['’]\s*)?/i,'').trim();
+    // Si après ça il ne reste rien ou juste 'moi', on garde la demande d'origine sans le verbe
+    if(!_r || /^moi$/i.test(_r)) _r = s.replace(/^(génère|genere|crée|cree|dessine|fais-moi|fais moi)\s+/i,'').replace(/^moi\s+/i,'').trim();
+    return _r || s;
   }
   return null;
 }
@@ -1390,7 +1466,7 @@ async function nexusGenerateImage(prompt, signal, t){
     const enrichi = await nexusClesAppeler([{ role: 'system', content: 'Tu es un expert prompt pour génération d\'image. Renvoie UNIQUEMENT un prompt image très détaillé en anglais, visuel, concret, sans explication, sans guillemets. Décris le sujet, le décor, la lumière, les couleurs, la composition, le style. Termine toujours par : ultra detailed, sharp focus, high quality, professional, cinematic lighting, 8k.' }, { role: 'user', content: String(prompt || '') }], signal, t);
     if(enrichi && String(enrichi).trim().length > 10) promptFinal = String(enrichi).trim().slice(0, 1000);
   }catch(e){}
-  // 2. V49 AUTO : le chef fait le prompt adapté (Groq enrichit en anglais, détaillé) PUIS transmet à l'employé le plus adéquat : Banana 2. C'est lui qui travaille, pas le chef.
+  // 2. V51 CRÉDITS UTILISATEUR : Banana 2 via TA clé Gemini = TES crédits Gemini qui sont débités, pas ceux de NEXUS. Sans ta clé, on essaie via Puter (TES crédits Puter si tu es connecté), sinon Pollinations (gratuit partagé, souvent plein).
   try{
     nexusSetEssai(t, 'Chef -> Banana 2');
     const banana = await nexusImageBanana2(promptFinal, signal);
@@ -1417,10 +1493,10 @@ async function nexusGenerateImage(prompt, signal, t){
       }
     }catch(eModele){ if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError'); continue; }
   }
-  // 3. Puter image a échoué sur les 4 modèles : Pollinations en TOUT DERNIER secours, sans clé.
-  // Pas d'OpenRouter Image : pas gratuit (402 avec une clé gratuite).
+  // 3. V50 : Puter image a échoué, Banana 2 a échoué (souvent : pas de clé Gemini ou Puter sans crédits). Pollinations en TOUT DERNIER secours, mais Pollinations est souvent saturé ('free service is full').
+  // On retourne son URL, mais run() vérifiera que l'image n'est pas son image d'erreur 'free service is full' et affichera un vrai message au lieu d'une fausse image.
   nexusSetEssai(t, 'Essai Pollinations FLUX');
-  try{ window.__nexusDernierModele = 'Pollinations FLUX (secours)'; }catch(e2){}
+  try{ window.__nexusDernierModele = 'Pollinations FLUX (secours)'; nexusChainDefinir('Chef Puter', 'Pollinations FLUX'); }catch(e2){}
   return nexusSecoursImagePollinations(promptFinal);
 }
 
@@ -1966,11 +2042,7 @@ const NEXUS_CLES_DEF = [
 // Tu ne les remettras plus jamais, même si tu vides le cache.
 // ⚠️ NE PARTAGE JAMAIS ce fichier avec tes clés dedans. Tout le monde pourrait les utiliser et vider ton quota.
 // Si tu veux partager NEXUS, partage la version sans clés (V41).
-const NEXUS_CLES_EN_DUR = {
-  groq: "",       // <-- colle ta clé Groq entre les guillemets, ex : "gsk_..."
-  gemini: "",     // <-- colle ta clé Gemini
-  openrouter: "", // <-- colle ta clé OpenRouter
-};
+// V57 : le bloc NEXUS_CLES_EN_DUR est maintenant TOUT EN HAUT du fichier, pour le copier d'une version à l'autre. On ne le redéclare pas ici.
 function nexusClesEnDurAppliquer(){
   try{
     const dur = NEXUS_CLES_EN_DUR || {};
@@ -2956,8 +3028,8 @@ async function run(t){
   t.status = "en_cours"; t.step = ""; t.err = "";
   save(); render();
   try{
-    // V49 TOUT AUTOMATISÉ : dès la demande, NEXUS analyse et envoie aux chefs, le chef choisit l'employé + fera le prompt adapté. Aucun choix manuel.
-    try{ const _auto = nexusAutomatisationTrace(t.demande); if(_auto) t.pChain = 'NEXUS \u2192 ' + _auto.chef + ' \u2192 ' + _auto.employe + ' (auto, prompt adapté)'; }catch(e){}
+    // V50 FIX 2 : on ne met PAS la chaîne avant la génération, sinon on affiche 'Banana 2' alors que c'est Pollinations qui a (échoué à) faire l'image. La chaîne sera mise APRÈS, par celui qui a vraiment travaillé (Banana 2 / Puter / Pollinations).
+    try{ nexusAutomatisationTrace(t.demande); }catch(e){}
     const persona = localStorage.getItem("nexus_persona") || "";
     if(!t.result){
       t.step = "Génération en cours…";
@@ -3178,6 +3250,83 @@ setInterval(()=>{ try{ nexusDiagRafraichir(); }catch(e){} }, 5000);
 // ===== V45 NEXUS PLATEFORME : le grand patron, par où passer pour tout avoir =====
 // Tu passes par NEXUS pour tout avoir. NEXUS commande, les chefs distribuent, les employés exécutent.
 // NEXUS (Patron) -> PUTER + GROQ + GEMINI + OPENROUTER (Chefs) -> ChatGPT, Claude, Meta AI, Perplexity, Suno, Midjourney, Runway, Kling, Grok (Employés)
+// V51 : Connexion Puter = TES crédits Puter. Sans connexion, Puter est anonyme et vite à sec, d'où "Puter sans crédits".
+async function nexusPuterConnexion(){
+  try{
+    const el = document.getElementById('nexusPuterConnexionStatut');
+    if(!window.puter || !puter.auth){ if(el) el.textContent = 'Puter non chargé, recharge la page.'; return; }
+    try{
+      const user = await puter.auth.signIn();
+      if(el) el.textContent = '✅ Connecté à Puter : ' + (user && (user.username || user.email || 'compte Puter')) + ' — ce sont TES crédits Puter qui seront utilisés.';
+      try{ showToast('Connecté à Puter, tes crédits Puter seront utilisés.'); }catch(e){}
+    }catch(e){
+      if(el) el.textContent = 'Connexion Puter annulée ou échouée. Réessaie.';
+    }
+  }catch(e){}
+}
+async function nexusPuterStatut(){
+  try{
+    const el = document.getElementById('nexusPuterConnexionStatut');
+    if(!el) return;
+    if(!window.puter || !puter.auth){ el.textContent = 'Statut Puter : non chargé.'; return; }
+    try{
+      const user = await puter.auth.getUser();
+      if(user && (user.username || user.email)) el.textContent = '✅ Puter : connecté (' + (user.username || user.email) + ') — TES crédits Puter.';
+      else el.textContent = '⚠️ Puter : NON connecté — Puter anonyme, crédits très vite à sec. Appuie sur Se connecter à Puter.';
+    }catch(e){ el.textContent = '⚠️ Puter : NON connecté — appuie sur Se connecter à Puter pour utiliser TES crédits.'; }
+  }catch(e){}
+}
+setTimeout(()=>{ try{ nexusPuterStatut(); }catch(e){} }, 1500);
+// V53 : Joindre un compte externe = sauvegarder TA clé API en local, dans ton navigateur. Jamais envoyée en chat, jamais envoyée à NEXUS.
+function nexusJoindreComptesExternes(){
+  try{
+    const openai = (document.getElementById('nexusCleOpenAI')||{}).value || '';
+    const claude = (document.getElementById('nexusCleClaude')||{}).value || '';
+    const statut = document.getElementById('nexusJoindreStatut');
+    let cles = {};
+    try{ cles = JSON.parse(localStorage.getItem('nexusCles')||'{}'); }catch(e){ cles = {}; }
+    if(openai.trim()) cles.openai = openai.trim();
+    if(claude.trim()) cles.anthropic = claude.trim();
+    try{ localStorage.setItem('nexusCles', JSON.stringify(cles)); }catch(e){}
+    // Mettre à jour le statut sans afficher les clés
+    const joints = [];
+    if(cles.openai) joints.push('ChatGPT (OpenAI) joint');
+    if(cles.anthropic) joints.push('Claude (Anthropic) joint');
+    if(cles.groq) joints.push('Groq joint');
+    if(cles.gemini) joints.push('Gemini joint');
+    if(cles.openrouter) joints.push('OpenRouter joint');
+    if(statut) statut.textContent = joints.length ? ('✅ ' + joints.join(' • ') + ' — ils seront utilisés APRÈS tes quotas gratuits, jamais avant.') : 'Aucun compte externe joint.';
+    try{ showToast('Comptes joints en local. Gratuit reste prioritaire.'); }catch(e){}
+    // Effacer les champs pour ne pas laisser les clés affichées
+    try{ if(document.getElementById('nexusCleOpenAI')) document.getElementById('nexusCleOpenAI').value=''; }catch(e){}
+    try{ if(document.getElementById('nexusCleClaude')) document.getElementById('nexusCleClaude').value=''; }catch(e){}
+  }catch(e){}
+}
+// V56 : Enregistrer les clés sans toucher au code. Sauvegardé dans le téléphone (localStorage), jamais en chat.
+function nexusEnregistrerClesSimple(){
+  try{
+    const g = (document.getElementById('nexusCleGroqSimple')||{}).value || '';
+    const ge = (document.getElementById('nexusCleGeminiSimple')||{}).value || '';
+    const o = (document.getElementById('nexusCleOpenRouterSimple')||{}).value || '';
+    let cles = {};
+    try{ cles = JSON.parse(localStorage.getItem('nexusCles')||'{}'); }catch(e){ cles = {}; }
+    if(g.trim()) cles.groq = g.trim();
+    if(ge.trim()) cles.gemini = ge.trim();
+    if(o.trim()) cles.openrouter = o.trim();
+    try{ localStorage.setItem('nexusCles', JSON.stringify(cles)); }catch(e){}
+    const statut = document.getElementById('nexusClesSimpleStatut');
+    const noms = [];
+    if(cles.groq) noms.push('Groq ✅');
+    if(cles.gemini) noms.push('Gemini ✅');
+    if(cles.openrouter) noms.push('OpenRouter ✅');
+    if(statut) statut.textContent = noms.length ? ('✅ Enregistré : ' + noms.join(' • ') + ' — tes quotas gratuits seront utilisés.') : 'Aucune clé enregistrée.';
+    try{ showToast('Clés enregistrées dans ton téléphone.'); }catch(e){}
+    // Effacer les champs
+    try{ document.getElementById('nexusCleGroqSimple').value=''; }catch(e){}
+    try{ document.getElementById('nexusCleGeminiSimple').value=''; }catch(e){}
+    try{ document.getElementById('nexusCleOpenRouterSimple').value=''; }catch(e){}
+  }catch(e){}
+}
 function nexusBanniereConcert(){
   try{
     if(document.getElementById('nexus-banniere-concert')) return;
