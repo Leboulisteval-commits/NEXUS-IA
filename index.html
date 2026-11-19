@@ -82,11 +82,32 @@
 :where(code, pre, kbd, samp) {
   font-family: "Optimistic Mono", ui-monospace, monospace;
 }
+</style><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
 </style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>NEXUS AI</title>
-<meta name="description" content="NEXUS AI : Vérification croisée par IA.">
+<meta name="description" content="NEXUS AI : Réponse directe par IA.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NEXUS AI">
@@ -174,15 +195,6 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;position:relative;z-
 .msg-actions button:hover{border-color:var(--primary);color:var(--primary)}
 .btn-regenerate{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 12px;border-radius:999px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
 .btn-regenerate:hover{border-color:var(--primary);color:var(--primary)}
-.verif-block{margin-top:12px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.verif-head{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;background:var(--surface-2);font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text);border:0;cursor:pointer;text-align:left}
-.verif-head:active{opacity:.85}
-.verif-chev{margin-left:auto;transition:transform .2s ease}
-.verif-block.open .verif-chev{transform:rotate(180deg)}
-.verif-body{display:none;padding:10px 12px;font-size:13px;color:var(--text-muted)}
-.verif-block.open .verif-body{display:block}
-.verif-body ul{padding-left:18px;margin-top:6px}
-.verif-body li{margin-bottom:4px}
 .niveau{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.06em}
 .niveau.ok{background:rgba(0,230,118,.15);color:var(--success)}
 .niveau.no{background:rgba(255,92,122,.15);color:var(--danger)}
@@ -354,7 +366,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 #nexusHorlogeBar b{color:var(--text);font-weight:600}
 #nexusHorlogeHeure{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
-<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">02:25:00</span></span></div>
+<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">10:36:29</span></span></div>
 
 
 <main>
@@ -384,7 +396,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795051500884)"><span class="conv-del" onclick="deleteConversation(1795051500884,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795080989892)"><span class="conv-del" onclick="deleteConversation(1795080989892,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -394,11 +406,11 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="modal-body">
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:4px 0 8px">🎨 APPARENCE</div>
 <div class="field"><label>Thème — 5 choix</label><div id="nexusThemes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<button type="button" data-theme-btn="nexus" onclick="nexusChoisirTheme('nexus')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--primary); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: 0 0 0 2px var(--primary-soft);"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#00e5c7"></span><span style="width:14px;height:14px;border-radius:50%;background:#b46bff"></span></span><span><b>NEXUS</b><br><small style="color:var(--text-muted)">Turquoise + violet</small></span></button>
-<button type="button" data-theme-btn="foret" onclick="nexusChoisirTheme('foret')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#4ade80"></span><span style="width:14px;height:14px;border-radius:50%;background:#a3e635"></span></span><span><b>Forêt</b><br><small style="color:var(--text-muted)">Vert</small></span></button>
-<button type="button" data-theme-btn="ocean" onclick="nexusChoisirTheme('ocean')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#38bdf8"></span><span style="width:14px;height:14px;border-radius:50%;background:#818cf8"></span></span><span><b>Océan</b><br><small style="color:var(--text-muted)">Bleu</small></span></button>
-<button type="button" data-theme-btn="soleil" onclick="nexusChoisirTheme('soleil')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#fb923c"></span><span style="width:14px;height:14px;border-radius:50%;background:#f472b6"></span></span><span><b>Soleil</b><br><small style="color:var(--text-muted)">Orange + rose</small></span></button>
-<button type="button" data-theme-btn="minimal" onclick="nexusChoisirTheme('minimal')" style="grid-column-start: span 2; grid-column-end: auto; display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#ffffff;border:1px solid var(--border)"></span><span style="width:14px;height:14px;border-radius:50%;background:#a3a3a3"></span></span><span><b>Minimal</b><br><small style="color:var(--text-muted)">Noir / blanc, épuré</small></span></button>
+<button type="button" data-theme-btn="nexus" onclick="nexusChoisirTheme('nexus')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-color: var(--primary); background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: 0 0 0 2px var(--primary-soft);"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#00e5c7"></span><span style="width:14px;height:14px;border-radius:50%;background:#b46bff"></span></span><span><b>NEXUS</b><br><small style="color:var(--text-muted)">Turquoise + violet</small></span></button>
+<button type="button" data-theme-btn="foret" onclick="nexusChoisirTheme('foret')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-color: var(--border); background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#4ade80"></span><span style="width:14px;height:14px;border-radius:50%;background:#a3e635"></span></span><span><b>Forêt</b><br><small style="color:var(--text-muted)">Vert</small></span></button>
+<button type="button" data-theme-btn="ocean" onclick="nexusChoisirTheme('ocean')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-color: var(--border); background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#38bdf8"></span><span style="width:14px;height:14px;border-radius:50%;background:#818cf8"></span></span><span><b>Océan</b><br><small style="color:var(--text-muted)">Bleu</small></span></button>
+<button type="button" data-theme-btn="soleil" onclick="nexusChoisirTheme('soleil')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-color: var(--border); background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#fb923c"></span><span style="width:14px;height:14px;border-radius:50%;background:#f472b6"></span></span><span><b>Soleil</b><br><small style="color:var(--text-muted)">Orange + rose</small></span></button>
+<button type="button" data-theme-btn="minimal" onclick="nexusChoisirTheme('minimal')" style="grid-column-start: span 2; grid-column-end: auto; display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-color: var(--border); background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#ffffff;border:1px solid var(--border)"></span><span style="width:14px;height:14px;border-radius:50%;background:#a3a3a3"></span></span><span><b>Minimal</b><br><small style="color:var(--text-muted)">Noir / blanc, épuré</small></span></button>
 </div><small>Le thème change les couleurs. Le bouton en haut à droite ne change que Jour / Nuit.</small></div>
 <div class="field"><label>Jour / Nuit</label><button id="nexusJourNuitBouton" class="btn btn-secondary" onclick="toggleTheme()">🌙 Mode nuit</button><small>Aussi en haut à droite.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🤖 INTELLIGENCE</div>
@@ -408,21 +420,15 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <option value="cles">Mes clés API</option>
 </select>
 <small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
-<div class="check-row" style="display:none;border:1px solid var(--border);border-radius:12px;padding:12px;align-items:flex-start"><input type="checkbox" id="vf" checked="" onchange="nexusReglages_ToggleVerif()" style="width:28px;height:28px;min-width:28px;margin-top:2px;accent-color:var(--success);cursor:pointer"><div style="flex:1"><b>Vérification croisée — <span id="nexusVerifStatut">activée</span></b><br><small>Un 2e modèle vérifie chaque réponse et la corrige si besoin (max 3 tours).</small><br><button id="nexusVerifBouton" type="button" onclick="nexusVerif_Bouton()" style="margin-top: 10px; width: 100%; padding: 12px; border-radius: 999px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); font-size: 15px; font-weight: 700; cursor: pointer;">⏻ Désactiver la vérification</button></div></div>
 <div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔑 MES IA GRATUITES (CLÉS)</div>
-<div class="field"><small style="margin-bottom:12px">Colle une clé : elle est enregistrée toute seule, sur cet appareil uniquement. NEXUS les utilise en premier, puis Puter, puis le secours. Pour les retrouver sur un autre appareil, utilise la sauvegarde chiffrée plus bas.</small><div id="nexusClesListe"></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusClesTester()">Tester mes IA</button><button class="btn btn-danger" style="flex:1" onclick="nexusClesToutSupprimer()">🗑 Tout supprimer</button></div></div>
+<div class="field"><small style="margin-bottom:12px">Colle une clé : elle est enregistrée toute seule, sur cet appareil uniquement. NEXUS les utilise en premier, puis Puter, puis le secours. Pour les retrouver sur un autre appareil, utilise la sauvegarde chiffrée plus bas.</small><div id="nexusClesListe"><div style="margin-bottom:14px"><label>Groq <span id="kst-groq" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-groq" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('groq')">Supprimer</button></div><small>Clé gratuite : console.groq.com</small></div><div style="margin-bottom:14px"><label>Google Gemini <span id="kst-gemini" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-gemini" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('gemini')">Supprimer</button></div><small>Clé gratuite : aistudio.google.com</small></div><div style="margin-bottom:14px"><label>Mistral <span id="kst-mistral" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-mistral" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('mistral')">Supprimer</button></div><small>Clé gratuite : console.mistral.ai</small></div><div style="margin-bottom:14px"><label>OpenRouter <span id="kst-openrouter" style="font-size: 12px; text-transform: none; color: var(--success);"></span></label><div style="display:flex;gap:8px"><input type="password" id="kin-openrouter" placeholder="Colle ta clé ici" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1"><button class="btn btn-danger" onclick="nexusCleSupprimer('openrouter')">Supprimer</button></div><small>Clé gratuite : openrouter.ai</small></div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusClesTester()">Tester mes IA</button><button class="btn btn-danger" style="flex:1" onclick="nexusClesToutSupprimer()">🗑 Tout supprimer</button></div></div>
 <div class="field"><label>☁️ Sauvegarde chiffrée de mes clés</label><small style="margin-bottom:8px">Tes clés sont brouillées avec un mot de passe avant d’aller sur ton compte Puter. Ce mot de passe n’est enregistré nulle part : si tu l’oublies, tu recrées simplement des clés gratuites.</small><input type="password" id="nexusMdpCles" placeholder="Mot de passe (8 caractères minimum)" autocomplete="off"><input type="password" id="nexusMdpCles2" placeholder="Confirmer (seulement pour sauvegarder)" autocomplete="off" style="margin-top:8px"><div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusCloudClesSauver()">☁️ Sauvegarder</button><button class="btn btn-secondary" style="flex:1" onclick="nexusCloudClesRecuperer()">⬇ Récupérer</button></div><button class="btn btn-danger" style="width:100%;margin-top:8px" onclick="nexusCloudClesEffacer()">Effacer la sauvegarde cloud</button><div id="nexusCloudClesStatut" style="font-size:12px;margin-top:8px"></div></div>
 <div id="api-settings" style="display:none">
 <div class="field"><label>🔑 Producteur (P) - URL API</label><input id="up" list="dl" placeholder="https://api.groq.com/openai/v1/chat/completions"><datalist id="dl"><option value="https://api.groq.com/openai/v1/chat/completions"></option><option value="https://api.mistral.ai/v1/chat/completions"></option><option value="https://openrouter.ai/api/v1/chat/completions"></option></datalist></div>
 <div class="field"><label>Clé API Producteur</label><input id="kp" type="password" placeholder="sk-..."></div>
 <div class="field"><label>Modèle Producteur</label><input id="mp2" placeholder="llama-3.3-70b-versatile"></div>
 <div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="saveProvider('p');testP('p')">Tester P</button><span id="tp" style="font-family:var(--font-mono);font-size:12px;align-self:center"></span></div>
-<hr style="border:none;border-top:1px solid var(--border)">
-<div class="field"><label>🛡 Vérificateur (V) - URL API</label><input id="uv" list="dl" placeholder="https://api.groq.com/openai/v1/chat/completions"></div>
-<div class="field"><label>Clé API Vérificateur</label><input id="kv" type="password" placeholder="sk-..."></div>
-<div class="field"><label>Modèle Vérificateur</label><input id="mv" placeholder="llama-3.3-70b-versatile"></div>
-<div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="saveProvider('v');testP('v')">Tester V</button><span id="tv" style="font-family:var(--font-mono);font-size:12px;align-self:center"></span></div>
 </div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🧠 MÉMOIRE / PROJETS / WEB</div>
 <div class="field"><label>Statut</label><div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--text-muted)"><span id="nexusMemoireProjet">📁 Aucun projet</span><span id="nexusMemoireFaits">🧠 0 souvenir</span><span id="nexusMemoireWeb">🌐 Web : auto si actu</span></div></div>
@@ -438,20 +444,9 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div id="toast"></div>
 
 <script>
-const VP = `Tu es un VÉRIFICATEUR. Tu n'inventes rien.
-Consignes :
-- Tu compares la RÉPONSE à la DEMANDE.
-- Tu ne connais que ce qui est écrit dans la réponse.
-- Tu es tolérant pour le style, strict pour les faits vérifiables.
-Règles de verdict :
-- OUI : la réponse répond bien, sans erreur factuelle détectable.
-- NON : erreur factuelle, hors-sujet, ou réponse incomplète sur un point important.
-- NON_TRANCHABLE : impossible de trancher avec la seule réponse, ou fait non vérifiable sans source externe.
-Renvoie EXCLUSIVEMENT ce JSON, sans aucune phrase avant ou après :
-{"verdict":"OUI|NON|NON_TRANCHABLE","criteres":["..."],"ecarts":["..."],"suggestion":"..."}`;
 const MODE_HINTS = {
   puter: "PUTER : modèle gratuit via Puter",
-  cles: "MES CLÉS : P produit • V vérifie"
+  cles: "MES CLÉS : P produit"
 };
 const K = "nexus_v10";
 const KP = "nexus_prov";
@@ -468,14 +463,6 @@ let pendingDocText = null; // contenu texte d'un document joint
 
 const $ = s => document.querySelector(s);
 function esc(s){ return String(s ?? "").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-// Vérification croisée : repliée par défaut, 1 clic = détail, 2e clic = repliée
-function toggleVerif(btn){
-  const block = btn.closest('.verif-block');
-  if(!block) return;
-  const open = block.classList.toggle('open');
-  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-}
 
 function formatMarkdown(text){
   if(!text) return "";
@@ -799,9 +786,7 @@ function toggleSettings(){
 function saveModeVerif(){
   try{
     localStorage.setItem("nexus_mode", $("#mo").value);
-    localStorage.setItem("nexus_verif", $("#vf").checked ? "1" : "0");
   }catch(e){}
-  try{ nexusMajBoutonVerif(); }catch(e){}
 }
 function loadModeVerif(){
   try{
@@ -810,8 +795,6 @@ function loadModeVerif(){
     if(m === "hybride" || m === "keyless" || !m) m = "puter";
     if(m !== "puter" && m !== "cles") m = "puter";
     $("#mo").value = m;
-    $("#vf").checked = localStorage.getItem("nexus_verif") !== "0";
-    try{ nexusMajBoutonVerif(); }catch(e){}
   }catch(e){}
 }
 
@@ -838,26 +821,23 @@ function PVAll(){
 function PV(k){ return PVAll()[k] || {}; }
 function saveProvider(k){
   const o = PVAll();
-  o[k] = { url: $("#u" + k).value.trim(), key: $("#k" + k).value.trim(), modele: $(k === "p" ? "#mp2" : "#mv").value.trim() };
+  o[k] = { url: $("#u" + k).value.trim(), key: $("#k" + k).value.trim(), modele: $("#mp2").value.trim() };
   try{ localStorage.setItem(KP, JSON.stringify(o)); }catch(e){}
 }
-function saveAllProviders(){ saveProvider("p"); saveProvider("v"); }
+function saveAllProviders(){ saveProvider("p"); }
 function setPV(k){ if(k) saveProvider(k); else saveAllProviders(); }
 function fillS(){
   const o = PVAll();
   $("#up").value = (o.p && o.p.url) || "";
   $("#kp").value = (o.p && o.p.key) || "";
   $("#mp2").value = (o.p && o.p.modele) || "";
-  $("#uv").value = (o.v && o.v.url) || "";
-  $("#kv").value = (o.v && o.v.key) || "";
-  $("#mv").value = (o.v && o.v.modele) || "";
   $("#persona").value = localStorage.getItem("nexus_persona") || "";
 }
 
 async function callCustom(k, prompt, signal, image = null){
   const p = PV(k);
   if(!p.url || !p.key || !p.modele) {
-    throw new Error("Configuration " + (k === "p" ? "Producteur" : "Vérificateur") + " incomplète. Ouvre les Réglages et remplis URL + clé + modèle.");
+    throw new Error("Configuration Producteur incomplète. Ouvre les Réglages et remplis URL + clé + modèle.");
   }
   const messages = [{ role: "user", content: prompt }];
   if(image) messages[0].content = [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: image } }];
@@ -1155,7 +1135,7 @@ async function nexusTranslate(texte, lang, mode, tObj, signal){
     ? 'Tu es un traducteur professionnel, précis et fidèle.\\nRègles strictes :\\n- Détecte toi-même la langue du texte.\\n- Si le texte est en français, traduis-le en anglais. Sinon, traduis-le en français.\\n- Renvoie UNIQUEMENT la traduction, sans explication, sans introduction, sans dire quelle langue tu as détectée, sans guillemets ajoutés, sans commentaire.\\n- Conserve la mise en forme, les sauts de ligne et le ton du texte original.\\n- Ne corrige pas le sens, ne résume pas, ne rajoute rien.'
     : 'Tu es un traducteur professionnel, précis et fidèle.\\nRègles strictes :\\n- Détecte toi-même la langue du texte, on ne te la donne pas.\\n- Traduis le texte en ' + lang + '.\\n- Renvoie UNIQUEMENT la traduction, sans explication, sans introduction, sans dire quelle langue tu as détectée, sans guillemets ajoutés, sans commentaire.\\n- Conserve la mise en forme, les sauts de ligne et le ton du texte original.\\n- Ne corrige pas le sens, ne résume pas, ne rajoute rien.';
   if(mode === 'puter'){
-    return await callPuterProducteur([{ role:'system', content: sys }, { role:'user', content: texte }], signal, null);
+    return await callPuterProducteur([{ role:'system', content: sys }, { role:'user', content: texte }], signal, null, tObj);
   }
   const prompt = '[INSTRUCTIONS]\\n' + sys + '\\n\\n[TEXTE À TRADUIRE]\\n' + texte + '\\n\\nRenvoie UNIQUEMENT la traduction.';
   return await ask(tObj, 'Producteur', prompt, tObj.tier, false, null);
@@ -1599,8 +1579,8 @@ async function nexusCloudClesEffacer(){
 }
 // ===== MES IA GRATUITES : clés saisies dans NEXUS, sauvegardées seules sur cet appareil =====
 const NEXUS_CLES_DEF = [
-  { id: 'groq', nom: 'Groq', url: 'https://api.groq.com/openai/v1/chat/completions', modeles: ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'llama-3.1-8b-instant'], aide: 'console.groq.com' },
-  { id: 'gemini', nom: 'Google Gemini', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', modeles: ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'], aide: 'aistudio.google.com' },
+  { id: 'groq', nom: 'Groq', url: 'https://api.groq.com/openai/v1/chat/completions', modeles: ['llama-3.1-8b-instant', 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b'], aide: 'console.groq.com' },
+  { id: 'gemini', nom: 'Google Gemini', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', modeles: ['gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.8-flash'], aide: 'aistudio.google.com' },
   { id: 'mistral', nom: 'Mistral', url: 'https://api.mistral.ai/v1/chat/completions', modeles: ['mistral-small-latest', 'mistral-large-latest'], aide: 'console.mistral.ai' },
   { id: 'openrouter', nom: 'OpenRouter', url: 'https://openrouter.ai/api/v1/chat/completions', modeles: ['openrouter/free'], aide: 'openrouter.ai' }
 ];
@@ -1641,6 +1621,14 @@ function nexusClesInit(){
   });
   nexusClesStatuts();
 }
+// LIVE ESSAI : un seul texte en direct qui se REMPLACE, pas une liste qui s'empile.
+// On ne fait QUE render(), jamais save() ici : le texte vit en mémoire dans t.step,
+// il est effacé à la fin (t.step = "") et n'est jamais ajouté comme message dans la conversation.
+function nexusSetEssai(t, txt){
+  if(!t) return;
+  try{ t.step = txt || ""; }catch(e){}
+  try{ render(); }catch(e){}
+}
 async function nexusCleAppelerUn(def, cle, messages, signal){
   let derniere = 'échec'; const histo = [];
   for(const modele of def.modeles){
@@ -1668,14 +1656,14 @@ async function nexusCleAppelerUn(def, cle, messages, signal){
   }
   throw new Error(derniere);
 }
-async function nexusClesAppeler(messages, signal){
+async function nexusClesAppeler(messages, signal, t){
   const cles = nexusClesLire();
-  const dern = String((messages.filter(m => m.role === 'user').slice(-1)[0] || {}).content || '').toLowerCase();
-  const code = /\b(code|python|javascript|html|css|sql|bug|fonction|script|debug)\b/.test(dern);
-  const ordre = (code ? ['groq', 'gemini', 'mistral', 'openrouter'] : ['gemini', 'groq', 'mistral', 'openrouter']).filter(id => cles[id]);
+  // Groq TOUJOURS en premier, même sans code : c'est le plus rapide, Gemini était trop lent et bloquait tout.
+  const ordre = ['groq', 'gemini', 'mistral', 'openrouter'].filter(id => cles[id]);
   for(const id of ordre){
     const def = NEXUS_CLES_DEF.find(d => d.id === id);
     try{
+      nexusSetEssai(t, 'Essai ' + def.nom);
       const r = await nexusCleAppelerUn(def, cles[id], messages, signal);
       try{ window.__nexusDernierModele = def.nom + ' ' + r.modele; }catch(e){}
       return r.text;
@@ -1696,17 +1684,19 @@ async function nexusClesTester(){
     }catch(e){ if(el){ el.style.color = 'var(--danger)'; el.textContent = '❌ ' + (e.message || 'échec'); } }
   }
 }
-async function callPuterProducteur(messages, signal, image = null){
+async function callPuterProducteur(messages, signal, image = null, t){
   // Tes IA gratuites (clés saisies dans les Réglages) d'abord. Aucune clé ou toutes en échec : Puter, puis secours, comme avant.
   if(!image){
-    try{ const w = await nexusClesAppeler(messages, signal); if(w) return w; }
+    try{ const w = await nexusClesAppeler(messages, signal, t); if(w) return w; }
     catch(e){ if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError'); }
   }
+  nexusSetEssai(t, 'Essai Puter');
   if(!window.puter || !puter.ai) throw new Error("Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.");
   if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
   // Puter déjà HS : on va directement aux secours, sans rappeler Puter (sinon sa popup réapparaît).
   if(typeof window !== 'undefined' && window.__nexusPuterHS){
     try{ if(typeof window !== 'undefined') window.__nexusSecoursErreurs = ''; }catch(e2){}
+    nexusSetEssai(t, 'Essai secours');
     try{ return await nexusSecoursKilo(messages); }
     catch(eKilo){
       try{ return await nexusSecoursPollinations(messages); }
@@ -1755,6 +1745,7 @@ async function callPuterProducteur(messages, signal, image = null){
   }
   // Puter a échoué (crédits / funding / Low Balance / autre) ? On bascule sur les secours sans clé.
   if(derniereErreur){
+    nexusSetEssai(t, 'Essai secours');
     // Secours 1 : Kilo (plus de modèles, plus fiable que Pollinations)
     try{
       const secours = await nexusSecoursKilo(messages);
@@ -1777,7 +1768,6 @@ async function callPuterProducteur(messages, signal, image = null){
 
 async function ask(t, role, prompt, tier, json, image = null){
   const signal = currentController ? currentController.signal : undefined;
-  const isVerifier = role.startsWith("Vérif");
   // Plus d'injection d'identité forcée
   const finalPrompt = prompt;
   let txt, usedProvider;
@@ -1786,13 +1776,12 @@ async function ask(t, role, prompt, tier, json, image = null){
     txt = await callPuter(finalPrompt, signal, image);
     usedProvider = "puter";
   } else {
-    // Mode "cles"
-    txt = await callCustom(isVerifier ? "v" : "p", finalPrompt, signal, image);
-    usedProvider = isVerifier ? "custom-v" : "custom-p";
+    // Mode "cles" - producteur uniquement
+    txt = await callCustom("p", finalPrompt, signal, image);
+    usedProvider = "custom-p";
   }
 
-  if(isVerifier) t.vProvider = usedProvider;
-  else t.pProvider = usedProvider;
+  t.pProvider = usedProvider;
 
   if(json){
     const o = pj(txt);
@@ -1801,17 +1790,6 @@ async function ask(t, role, prompt, tier, json, image = null){
   return txt;
 }
 
-async function verifier(t){
-  const persona = localStorage.getItem("nexus_persona") || "";
-  const promptV = VP + "\n\nDEMANDE :\n" + t.demande + "\n\nRÉPONSE À VÉRIFIER :\n" + t.result + "\n\n" + (t.image ? "[Image jointe à la demande, elle fait partie du contexte.]" : "[Aucune image.]") + (persona ? "\n[Persona demandée : " + persona + "]" : "");
-  const o = await ask(t, "Vérificateur", promptV, t.tier, true, t.image || null);
-  if(!o) return { verdict: "NON_TRANCHABLE", criteres: [], ecarts: ["Réponse du vérificateur illisible."], suggestion: "" };
-  if(!o.verdict) o.verdict = "NON_TRANCHABLE";
-  if(!Array.isArray(o.criteres)) o.criteres = [];
-  if(!Array.isArray(o.ecarts)) o.ecarts = [];
-  if(typeof o.suggestion !== 'string') o.suggestion = "";
-  return o;
-}
 
 function setBusy(b){
   busy = b;
@@ -2472,39 +2450,6 @@ function nexusReglages_ConnecterCloud(){
 }
 
 
-// ===== VÉRIFICATION : uniquement dans Réglages. Case + gros bouton ON/OFF en-dessous, les deux sont synchronisés. =====
-function nexusMajBoutonVerif(){
-  try{
-    const on = !!document.getElementById('vf') && document.getElementById('vf').checked;
-    const st = document.getElementById('nexusVerifStatut');
-    if(st) st.textContent = on ? 'activée' : 'désactivée';
-    const btn = document.getElementById('nexusVerifBouton');
-    if(btn){
-      btn.textContent = on ? '⏻ Désactiver la vérification' : '⏻ Activer la vérification';
-      btn.style.background = on ? 'var(--surface-2)' : 'var(--primary-soft)';
-      btn.style.borderColor = on ? 'var(--border)' : 'var(--primary)';
-    }
-  }catch(e){}
-}
-function nexusReglages_ToggleVerif(){
-  // Appelé par la case : la case a déjà basculé, on sauve juste.
-  try{ saveModeVerif(); }catch(e){}
-  try{ nexusMajBoutonVerif(); }catch(e){}
-  try{
-    const on = document.getElementById('vf').checked;
-    showToast(on ? 'Vérification activée.' : 'Vérification désactivée.');
-  }catch(e){}
-}
-function nexusVerif_Bouton(){
-  // Appelé par le gros bouton : on bascule la case nous-mêmes, puis on sauve.
-  try{
-    const cb = document.getElementById('vf');
-    if(!cb) return;
-    cb.checked = !cb.checked;
-    nexusReglages_ToggleVerif();
-  }catch(e){}
-}
-
 
 // ===== THÈMES : 5 choix dans Réglages. Le bouton en haut à droite ne fait que Jour / Nuit (classe .light). =====
 const NEXUS_THEMES = ['nexus', 'foret', 'ocean', 'soleil', 'minimal'];
@@ -2581,14 +2526,14 @@ async function run(t){
       // MÉMOIRE + PROJETS (commandes locales, sans IA, sans vérification — comme les outils directs).
       const _memProjet = nexusCommandesMemoireProjet(t.demande);
       if(_memProjet){
-        t.result = _memProjet; t.pProvider = "puter"; t.verif = false;
+        t.result = _memProjet; t.pProvider = "puter";
         t.step = ""; save(); render(); nexusMemoireRender();
       } else {
       const _trad = nexusTranslatorParse(t.demande);
       if(_trad){
         t.step = "Traduction en cours…"; save(); render();
         t.result = await nexusTranslate(_trad.texte, _trad.lang, t.mode, t, currentController ? currentController.signal : undefined);
-        t.pProvider = t.mode === "puter" ? "puter" : t.pProvider; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined; t.verif = false;
+        t.pProvider = t.mode === "puter" ? "puter" : t.pProvider; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
         t.step = ""; save(); render();
       } else {
       const _imgPrompt = nexusImagePrompt(t.demande);
@@ -2596,12 +2541,12 @@ async function run(t){
         t.step = "Génération de l'image…"; save(); render();
         t.generatedImage = await nexusGenerateImage(_imgPrompt, currentController ? currentController.signal : undefined);
         t.result = "Voici ton image : " + _imgPrompt;
-        t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined; t.verif = false;
+        t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
         t.step = ""; save(); render();
       } else {
       const _tc = nexusTimerChronoCommand(t.demande);
       if(_tc){
-        t.result = _tc.text; if(_tc.tool) t.tool = _tc.tool; t.pProvider = "puter"; t.verif = false;
+        t.result = _tc.text; if(_tc.tool) t.tool = _tc.tool; t.pProvider = "puter";
         t.step = ""; save(); render();
       } else {
       // PUISSANCE v5b : contexte, CORRIGÉ. En v5, on plafonnait TOUT l'historique à 1500 caractères. Problème : si tu dis « corrige le code d'avant », le modèle ne voyait que le début du code, il avait perdu la fin.
@@ -2660,7 +2605,7 @@ Règles importantes :
         if(/^\s*(quelles? (ia|intelligences?|modèles?|modeles?)|liste des (ia|modèles?|modeles?)|quels modèles?|quelles ia (sont )?disponibles?)\s*\??\s*$/i.test(t.demande)){
           t.result = nexusListeModelesTexte(); t.pProvider = "puter"; t.pModel = "liste";
         } else {
-        t.result = await callPuterProducteur(messagesP, currentController ? currentController.signal : undefined, t.image);
+        t.result = await callPuterProducteur(messagesP, currentController ? currentController.signal : undefined, t.image, t);
         t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
         }
       } else {
@@ -2678,29 +2623,6 @@ Règles importantes :
       } // fin else traducteur
       } // fin else memoire/projet
       t.step = ""; save(); render();
-    }
-    if(t.verif){
-      t.round = 0;
-      while(t.round < 3){
-        t.round++;
-        t.step = "Vérification croisée (tour " + t.round + "/3)...";
-        save(); render();
-        const v = await verifier(t);
-        t.v = v;
-        t.step = ""; save(); render();
-        if(v.verdict !== "NON" || t.round >= 3) break;
-        t.step = "Correction en cours...";
-        save(); render();
-        let corrSystem = "Tu es un correcteur précis. Tu ne dois jamais inventer d'informations.";
-        if(persona) corrSystem += "\nRôle à respecter : " + persona;
-        const promptC = `[INSTRUCTIONS]\n${corrSystem}\n\n` +
-          `Demande originale :\n${t.demande}\n\n` +
-          `Écarts à corriger :\n- ${v.ecarts.join("\n- ")}\n\n` +
-          `Réponse à corriger :\n${t.result}\n\n` +
-          `Renvoie UNIQUEMENT la réponse corrigée complète, sans expliquer les modifications.`;
-        t.result = await ask(t, "Correcteur", promptC, t.tier, false, null);
-        t.step = ""; save(); render();
-      }
     }
     t.status = "fini"; t.step = ""; t.err = "";
   }catch(e){
@@ -2757,16 +2679,12 @@ function start(){
     demande: fullDemande,
     image: pendingImage,
     result: null,
-    v: null,
-    round: 0,
     mode: $("#mo").value,
-    verif: false,
     tier: r.tier,
     status: "en_cours",
     step: "",
     err: "",
     pProvider: null,
-    vProvider: null
   };
 
   conv.messages.push(t);
@@ -2796,8 +2714,8 @@ function regenerate(id){
   if(idx === -1) return;
   conv.messages = conv.messages.slice(0, idx + 1);
   const t = conv.messages[idx];
-  t.result = null; t.generatedImage = null; t.tool = null; t.pModel = null; t.v = null; t.round = 0; t.status = "en_cours"; t.step = ""; t.err = ""; t.pProvider = null; t.vProvider = null;
-  t.mode = $("#mo").value; t.verif = false;
+  t.result = null; t.generatedImage = null; t.tool = null; t.pModel = null; t.status = "en_cours"; t.step = ""; t.err = ""; t.pProvider = null;
+  t.mode = $("#mo").value;
   save(); render();
   run(t);
 }
@@ -2823,16 +2741,9 @@ async function copyMsg(id){
     document.body.removeChild(ta);
   }
 }
-function niveau(v){
-  if(!v) return '<span class="niveau na">Non vérifié</span>';
-  if(v.verdict === "OUI") return '<span class="niveau ok">✓ Vérifié OUI</span>';
-  if(v.verdict === "NON") return '<span class="niveau no">✕ NON</span>';
-  return '<span class="niveau partiel">~ Partiel</span>';
-}
 function providerLabel(p){
   if(p === "puter") return "PUTER";
   if(p === "custom-p") return "API P";
-  if(p === "custom-v") return "API V";
   return "";
 }
 function renderSidebar(){
@@ -2880,17 +2791,7 @@ function render(){
     h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI' + (t.step ? ' • ' + esc(t.step) : '') + '</div><div class="ai-body">' + _banniereSecours + formatMarkdown(t.result || "") + (t.generatedImage ? '<img class="msg-image" src="' + t.generatedImage + '" style="margin-top:8px" onerror="this.outerHTML=\'<div class=\\\'msg-system err\\\'>⚠ L\\\'image de secours Pollinations n\\\'a pas pu être générée (service gratuit saturé ou clé requise). Réessaie dans quelques instants, ou attends tes crédits Puter.</div>\'">' : '') + (t.tool ? '<div class="msg-system" style="margin-top:8px">⏱ ' + esc(t.tool.label) + ' : <span class="nexus-tool-live" data-tool-type="' + esc(t.tool.type) + '" data-until="' + (t.tool.until||0) + '" data-start="' + (t.tool.start||0) + '" data-running="' + (t.tool.running?1:0) + '" data-elapsed="' + (t.tool.elapsed||0) + '">' + esc(t.tool.type==='timer' ? nexusFmtMs(Math.max(0,(t.tool.until||0)-Date.now())) : nexusFmtMs(t.tool.running ? Date.now()-(t.tool.start||Date.now()) : (t.tool.elapsed||0))) + '</span></div>' : '') + '</div>';
     h += '<div class="msg-meta">';
     if(t.pProvider) h += '<span>Prod : ' + (t.pModel && /^(Groq|Google Gemini|Mistral|OpenRouter) /.test(String(t.pModel)) ? 'MES IA' : providerLabel(t.pProvider)) + (t.pModel ? ' • ' + esc(String(t.pModel).includes('secours') ? 'Secours' : t.pModel) : '') + '</span>';
-    if(t.vProvider) h += '<span>Vérif : ' + providerLabel(t.vProvider) + '</span>';
-    if(t.round) h += '<span>' + t.round + ' tour(s)</span>';
     h += '<span>' + new Date(t.id).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) + '</span></div>';
-    if(false){
-      h += '<div class="verif-block"><button type="button" class="verif-head" onclick="toggleVerif(this)" aria-expanded="false">🛡 Vérification croisée ' + niveau(t.v) + '<span class="verif-chev">▾</span></button><div class="verif-body">';
-      if(t.v.criteres && t.v.criteres.length) h += '<b>Critères :</b><ul>' + t.v.criteres.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>';
-      if(t.v.ecarts && t.v.ecarts.length) h += '<b style="color:var(--danger)">Écarts :</b><ul>' + t.v.ecarts.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>';
-      if(t.v.suggestion) h += '<div style="margin-top:6px"><b>Suggestion :</b> ' + esc(t.v.suggestion) + '</div>';
-      if(!t.v.criteres.length && !t.v.ecarts.length) h += '<span>Aucun détail.</span>';
-      h += '</div></div>';
-    }
     h += '<div class="msg-actions"><button onclick="copyMsg(' + t.id + ')">⧉ Copier</button><button onclick="regenerate(' + t.id + ')">↻ Régénérer</button></div>';
     h += '</div></div>';
   });
@@ -2928,7 +2829,6 @@ $("#q").addEventListener("blur", () => {
 });
 $("#persona").addEventListener("input", e => { try{ localStorage.setItem("nexus_persona", e.target.value); }catch(_){} });
 ["up","kp","mp2"].forEach(id => document.getElementById(id).addEventListener("input", () => saveProvider("p")));
-["uv","kv","mv"].forEach(id => document.getElementById(id).addEventListener("input", () => saveProvider("v")));
 document.addEventListener("keydown", e => { if(e.key === "Escape"){ closeSidebar(); } });
 document.getElementById('settingsModal').addEventListener('close', () => { saveAllProviders(); saveModeVerif(); });
 async function testP(k){
@@ -2939,7 +2839,6 @@ async function testP(k){
 }
 updateThemeIcon();
 loadModeVerif();
-try{ nexusMajBoutonVerif(); }catch(e){}
 try{ nexusMajBoutonsTheme(); }catch(e){}
 load();
 render();
@@ -2948,4 +2847,4 @@ toggleSettings();
 nexusClesInit();
 </script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
+</body></html>
