@@ -366,11 +366,11 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 #nexusHorlogeBar b{color:var(--text);font-weight:600}
 #nexusHorlogeHeure{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
-<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">14:17:56</span></span></div>
+<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">14:41:56</span></span></div>
 
 
 <main>
-<div id="nexus-banniere-concert" style="margin: 10px 12px 0px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2,var(--surface)); font-size: 12px; line-height: 1.5;"><b>👑 NEXUS — La plateforme par où passer pour tout avoir.</b><br><span style="color:var(--text-muted)">Tu demandes à NEXUS, NEXUS s’occupe de tout et te rend la réponse.</span></div><div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Salut 👋</h2><p>On discute de quoi ?<br>Pose une question, envoie une photo ou un document, je suis là.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
+<div id="nexus-banniere-concert" style="margin: 10px 12px 0px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2,var(--surface)); font-size: 12px; line-height: 1.5;"><b>👑 NEXUS — Tout automatisé.</b><br><span style="color:var(--text-muted)">Tu demandes → NEXUS transmet aux chefs (Groq, Gemini, OpenRouter, Puter) → Le chef choisit l’IA la plus adaptée → Il fait le prompt qui correspond → L’IA travaille → NEXUS te rend le résultat. T’as rien à faire. Regarde sous chaque réponse : NEXUS → Chef → Employé.</span></div><div id="chat"><div class="empty"><div class="empty-logo">NEXUS AI</div><h2>Salut 👋</h2><p>On discute de quoi ?<br>Pose une question, envoie une photo ou un document, je suis là.</p><div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button><button class="sugg" onclick="useSuggestion('Vérifie ce fait : Paris est la capitale de la France')">Vérifie un fait</button></div></div></div>
 <div id="suggestions">
 <button class="sugg" onclick="useSuggestion('Explique la relativité simplement')">Relativité simple</button>
 <button class="sugg" onclick="useSuggestion('Écris un poème sur la mer')">Poème sur la mer</button>
@@ -396,7 +396,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795094269886)"><span class="conv-del" onclick="deleteConversation(1795094269886,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795095715996)"><span class="conv-del" onclick="deleteConversation(1795095715996,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -416,6 +416,8 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🤖 INTELLIGENCE</div>
 <div class="field"><label>Mode de fonctionnement — ENSEMBLE, plus de choix</label><div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:13px;line-height:1.6"><b>✅ TOUT EN CONCERT : tout travaille ensemble.</b><br>Tes clés (Groq, Gemini, OpenRouter) + Puter + Secours, en même temps, dans la même réponse. Texte + Image + Vidéo + Musique + Son, sans choisir. NEXUS orchestre tout, il prend le meilleur de chaque à chaque fois.</div><select id="mo" onchange="toggleSettings();saveModeVerif()" style="display:none"><option value="puter" selected="">Puter (recommandé)</option><option value="cles">Mes clés API</option></select><small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
 <div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
+<div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">👑 NEXUS — TOUT AUTOMATISÉ</div>
+<div class="field" style="font-size:13px;line-height:1.8"><b>1.</b> Tu demandes à NEXUS<br><b>2.</b> NEXUS transmet aux chefs (Groq, Gemini, OpenRouter, Puter)<br><b>3.</b> Le chef choisit l'IA externe la plus adaptée<br><b>4.</b> Le chef fait le prompt qui correspond à ta demande<br><b>5.</b> L'IA travaille, le chef récupère le résultat<br><b>6.</b> NEXUS te rend le résultat — Ex : Banana 2 qui a travaillé pour une image</div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">👑 NEXUS — LA PLATEFORME, PAR OÙ PASSER POUR TOUT AVOIR</div>
 <div class="field" style="text-align:center;line-height:1.7"><div style="background:var(--primary,#00e5c7);color:#000;font-weight:800;border-radius:12px;padding:10px">👑 NEXUS — GRAND PATRON<br><small style="font-weight:400">Tu passes par lui pour tout avoir. Il commande.</small></div><div style="font-size:18px;margin:4px">↓</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 PUTER — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 GROQ — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 GEMINI — Chef</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">🧑‍🍳 OPENROUTER — Chef</span></div><div style="font-size:12px;color:var(--text-muted)">Les chefs distribuent</div><div style="font-size:18px;margin:4px">↓</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">ChatGPT</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Claude</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Meta AI</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Perplexity</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Suno</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Midjourney</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Runway</span><span style="background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px">Kling</span></div><div style="font-size:12px;color:var(--text-muted)">Employés — exécutent</div></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🔧 DIAGNOSTIC — POUR TOI SEUL (pas visible dans le chat)</div>
@@ -437,7 +439,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div class="field"><label>Raccourcis</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('projet')">📁 Projet…</button><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('memoire')">🧠 Mémoire…</button><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('web')">🌐 Web…</button></div><small>Ces boutons remplissent ta zone de texte, tu n'as plus qu'à compléter et envoyer.</small></div>
 <div class="field"><label>Effacer la mémoire</label><button class="btn btn-secondary" onclick="nexusReglages_OublieTout()">🧹 Oublie tout (mémoire seulement)</button><small>Supprime souvenirs + projets. Tes conversations ne sont pas touchées.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">☁️ STOCKAGE &amp; CLOUD</div>
-<div class="field"><label>Synchro auto</label><div id="nexusCloudStatut" style="font-size:12px;color:var(--text-muted)">☁️ Cloud : Puter pas chargé, local à jour</div><button id="nexusCloudBouton" class="btn btn-secondary" style="display:none;width:100%;margin-top:8px" onclick="nexusReglages_ConnecterCloud()">☁️ Activer la synchro auto (1 clic)</button><small>1 clic une fois, puis tout automatique. IndexedDB sauve déjà en local, sans rien faire.</small></div>
+<div class="field"><label>Synchro auto</label><div id="nexusCloudStatut" style="font-size:12px;color:var(--text-muted)">☁️ Cloud : vérification…</div><button id="nexusCloudBouton" class="btn btn-secondary" style="display:none;width:100%;margin-top:8px" onclick="nexusReglages_ConnecterCloud()">☁️ Activer la synchro auto (1 clic)</button><small>1 clic une fois, puis tout automatique. IndexedDB sauve déjà en local, sans rien faire.</small></div>
 <div class="field"><label>Sauvegarde manuelle (secours)</label><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="nexusExportJSON()">⬇ Exporter</button><button class="btn btn-secondary" style="flex:1" onclick="document.getElementById('nexusImportFile').click()">⬆ Importer</button></div><input type="file" id="nexusImportFile" accept=".json,application/json" style="display:none" onchange="nexusImportJSON(event)"><small>Tu n'es plus censé t'en servir au quotidien. C'est juste si le cloud est indisponible.</small></div>
 <button class="btn btn-primary" onclick="closeSettings()">Fermer</button>
 </div>
@@ -1029,7 +1031,13 @@ function nexusTimerChronoCommand(demande){
 function nexusImagePrompt(demande){
   const s=(demande||'').trim();
   if(/^\/image\b/i.test(s)) return s.replace(/^\/image\b/i,'').trim();
-  if(/\b(génère|genere|crée|cree|dessine|fais-moi|fais moi|crée-moi|crée moi)\b[^.]*\b(image|dessin|illustration|photo)\b/i.test(s)){
+  // V47 : même "donne-moi un prompt pour une image de ..." = tu veux l'IMAGE, pas un texte à copier ailleurs. On génère l'image direct.
+  if(/\b(prompt\b[^.]{0,60}\b(image|photo|dessin|illustration)\b|image\b[^.]{0,60}\bprompt\b)/i.test(s)){
+    // On extrait le sujet après "image de / photo de / pour ..." sinon on garde toute la demande
+    const m = s.match(/(?:image|photo|dessin|illustration)\s+(?:de\s+|du\s+|d')?(.+)$/i);
+    return (m && m[1] ? m[1] : s).replace(/^(pour\s+|d['’]une\s+|d['’]un\s+)/i,'').trim() || s;
+  }
+  if(/\b(génère|genere|crée|cree|dessine|fais-moi|fais moi|crée-moi|crée moi|donne-moi|donne moi|montre-moi|montre moi|je veux|veux)\b[^.]{0,80}\b(image|dessin|illustration|photo|affiche|poster)\b/i.test(s) || /\b(image|photo|dessin|illustration)\b/i.test(s) && /\b(génère|genere|crée|cree|dessine|fais|donne|montre|veux|génération)\b/i.test(s)){
     return s.replace(/^(génère|genere|crée|cree|dessine|fais-moi|fais moi|crée-moi|crée moi)\s+(une\s+|un\s+|une\s+image\s+de\s+|une\s+image\s+|image\s+de\s+|image\s+)?/i,'').trim() || s;
   }
   return null;
@@ -1290,6 +1298,89 @@ function nexusMusique(btn){
     }, 450);
   }catch(e){ showToast('Musique impossible sur ce navigateur.'); }
 }
+// V48 : Chef transmet DIRECT à l'IA externe la plus adéquate.
+// Pour une IMAGE : Chef Gemini -> Employé Banana 2 (Gemini 3 Pro Image / Nano Banana 2), direct via ton API Gemini.
+// Si pas de clé Gemini ou Banana 2 indisponible, on retombe sur Puter (qui transmet à son employé image), puis Pollinations.
+async function nexusImageBanana2(prompt, signal){
+  const cles = nexusClesLire();
+  const cleGemini = String(cles.gemini || '').trim();
+  // 1. Via ta clé Gemini, direct : Banana 2 (gemini-3-pro-image-preview)
+  if(cleGemini){
+    try{
+      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': cleGemini },
+        body: JSON.stringify({ contents: [{ parts: [{ text: String(prompt||'') }] }], generationConfig: { responseModalities: ['IMAGE'] } }),
+        signal
+      });
+      if(r.ok){
+        const j = await r.json();
+        const parts = (j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [];
+        for(const p of parts){
+          if(p.inlineData && p.inlineData.data){
+            try{ window.__nexusDernierModele = 'Banana 2'; nexusChainDefinir('Chef Gemini', 'Banana 2'); }catch(e){}
+            return 'data:' + (p.inlineData.mimeType || 'image/png') + ';base64,' + p.inlineData.data;
+          }
+        }
+      }
+    }catch(e){ if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError'); }
+  }
+  // 2. Via OpenRouter, direct : google/gemini-3-pro-image-preview (Banana 2) si tu as une clé OpenRouter
+  const cleOR = String(cles.openrouter || '').trim();
+  if(cleOR){
+    try{
+      const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cleOR },
+        body: JSON.stringify({ model: 'google/gemini-3-pro-image-preview', messages: [{ role: 'user', content: String(prompt||'') }], modalities: ['image','text'] }),
+        signal
+      });
+      if(r.ok){
+        const j = await r.json();
+        const msg = j.choices && j.choices[0] && j.choices[0].message;
+        const imgs = msg && msg.images;
+        if(imgs && imgs[0] && imgs[0].image_url && imgs[0].image_url.url){
+          try{ window.__nexusDernierModele = 'Banana 2'; nexusChainDefinir('Chef OpenRouter', 'Banana 2'); }catch(e){}
+          return imgs[0].image_url.url;
+        }
+      }
+    }catch(e){ if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError'); }
+  }
+  // 3. Via Puter : Puter transmet à Banana 2 (si Puter le propose)
+  if(window.puter && puter.ai && puter.ai.txt2img){
+    for(const mBanana of ['gemini-3-pro-image', 'nano-banana-2', 'banana-2']){
+      try{
+        const img = await puter.ai.txt2img(String(prompt||''), false, { model: mBanana });
+        const url = img && img.src ? img.src : String(img||'');
+        if(url && url.length > 20){
+          try{ window.__nexusDernierModele = 'Banana 2'; nexusChainDefinir('Chef Puter', 'Banana 2'); }catch(e){}
+          return url;
+        }
+      }catch(e){ if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError'); continue; }
+    }
+  }
+  return null;
+}
+// V49 TOUT AUTOMATISÉ : Utilisateur -> NEXUS -> Chefs -> Chef choisit l'IA la plus adaptée -> Chef fait le prompt adapté -> Employé travaille -> NEXUS -> Utilisateur
+// Rien à choisir, rien à copier, tout est auto.
+function nexusAutomatisationChoisir(demande){
+  const s = String(demande||'').toLowerCase();
+  // Quel type de boulot ? Image / Musique / Vidéo / Texte
+  if(/\b(image|photo|dessin|illustration|affiche|poster)\b/.test(s) || /\b(génère|genere|crée|cree|dessine).*\b(image|photo)\b/.test(s)) return { type: 'image', chef: 'Chef Gemini', employe: 'Banana 2', pourquoi: 'Image -> Banana 2 la plus adaptée' };
+  if(/\b(musique|chanson|son|mélodie|beat)\b/.test(s)) return { type: 'musique', chef: 'Chef Puter', employe: 'Suno', pourquoi: 'Musique -> Suno la plus adaptée' };
+  if(/\b(vidéo|video|clip|film)\b/.test(s)) return { type: 'video', chef: 'Chef Puter', employe: 'Runway', pourquoi: 'Vidéo -> Runway la plus adaptée' };
+  if(/\b(code|python|javascript|html|bug|fonction)\b/.test(s)) return { type: 'texte', chef: 'Chef Puter', employe: 'ChatGPT', pourquoi: 'Code -> ChatGPT le plus adapté' };
+  if(/\b(rédaction|lettre|dissertation|article|écrire|ecrire)\b/.test(s)) return { type: 'texte', chef: 'Chef Puter', employe: 'Claude', pourquoi: 'Rédaction -> Claude la plus adaptée' };
+  if(/\b(traduction|traduis|translate)\b/.test(s)) return { type: 'texte', chef: 'Chef Groq', employe: 'Llama', pourquoi: 'Traduction rapide -> Llama le plus adapté' };
+  return { type: 'texte', chef: 'Chef Groq', employe: 'Llama', pourquoi: 'Question générale -> Llama le plus adapté, rapide' };
+}
+function nexusAutomatisationTrace(demande){
+  try{
+    const a = nexusAutomatisationChoisir(demande);
+    window.__nexusAutomatisation = a;
+    return a;
+  }catch(e){ return null; }
+}
 async function nexusGenerateImage(prompt, signal, t){
   // IMAGE : meilleur en premier, reste en secours, que du gratuit.
   // 1. Groq enrichit le prompt (texte -> prompt image détaillé en anglais). Si ça échoue, on garde le prompt d'origine.
@@ -1299,7 +1390,16 @@ async function nexusGenerateImage(prompt, signal, t){
     const enrichi = await nexusClesAppeler([{ role: 'system', content: 'Tu es un expert prompt pour génération d\'image. Renvoie UNIQUEMENT un prompt image très détaillé en anglais, visuel, concret, sans explication, sans guillemets. Décris le sujet, le décor, la lumière, les couleurs, la composition, le style. Termine toujours par : ultra detailed, sharp focus, high quality, professional, cinematic lighting, 8k.' }, { role: 'user', content: String(prompt || '') }], signal, t);
     if(enrichi && String(enrichi).trim().length > 10) promptFinal = String(enrichi).trim().slice(0, 1000);
   }catch(e){}
-  // 2. Puter (meilleure qualité image) en cascade : 3 vrais modèles, au lieu d'1 seul modèle qui n'existe pas.
+  // 2. V49 AUTO : le chef fait le prompt adapté (Groq enrichit en anglais, détaillé) PUIS transmet à l'employé le plus adéquat : Banana 2. C'est lui qui travaille, pas le chef.
+  try{
+    nexusSetEssai(t, 'Chef -> Banana 2');
+    const banana = await nexusImageBanana2(promptFinal, signal);
+    if(banana && banana.length > 20){
+      try{ t.pChain = window.__nexusDernierChain || 'NEXUS \u2192 Chef Gemini \u2192 Banana 2'; }catch(e){}
+      return banana;
+    }
+  }catch(e){ if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError'); }
+  // 3. Sinon Puter (ses employés image) en cascade : 3 vrais modèles, au lieu d'1 seul modèle qui n'existe pas.
   // Avant : 1 seul modèle "gpt-image-2.6-flare" -> introuvable -> tombait direct sur Pollinations, d'où la qualité médiocre.
   // Maintenant : gpt-image-1 -> dall-e-3 -> flux -> sans modèle, on ne va sur Pollinations que si les 4 échouent.
   nexusSetEssai(t, "Génération de l'image…");
@@ -1966,6 +2066,29 @@ async function nexusCleAppelerUn(def, cle, messages, signal){
   }
   throw new Error(derniere);
 }
+// V46 : à quel employé le chef a transmis ? Puter gpt-5.5 = ChatGPT, Puter claude = Claude, Groq llama = Llama, etc.
+function nexusEmployePourModele(modele){
+  const m = String(modele||'').toLowerCase();
+  if(m.includes('gpt') || m.includes('o1') || m.includes('o3')) return 'ChatGPT';
+  if(m.includes('claude')) return 'Claude';
+  if(m.includes('gemini')) return 'Gemini';
+  if(m.includes('llama')) return 'Llama';
+  if(m.includes('kimi')) return 'Kimi';
+  if(m.includes('grok')) return 'Grok';
+  if(m.includes('deepseek')) return 'DeepSeek';
+  if(m.includes('qwen')) return 'Qwen';
+  if(m.includes('mistral')) return 'Mistral';
+  if(m.includes('flux')) return 'FLUX';
+  return String(modele||'Employé');
+}
+function nexusChainDefinir(chef, modele){
+  try{
+    const employe = nexusEmployePourModele(modele);
+    window.__nexusDernierChain = 'NEXUS \u2192 ' + chef + ' \u2192 ' + employe;
+    window.__nexusDernierEmploye = employe;
+    window.__nexusDernierChef = chef;
+  }catch(e){}
+}
 async function nexusClesAppeler(messages, signal, t){
   const cles = nexusClesLire();
   // Meilleur / plus fiable en premier, reste en secours : Groq -> Gemini -> Mistral -> Hugging Face -> OpenRouter.
@@ -1976,6 +2099,8 @@ async function nexusClesAppeler(messages, signal, t){
       nexusSetEssai(t, 'Essai ' + def.nom);
       const r = await nexusCleAppelerUn(def, cles[id], messages, signal);
       try{ window.__nexusDernierModele = def.nom + ' ' + r.modele; }catch(e){}
+      // V46 : le chef n'a pas fait le boulot seul, il a TRANSMIS à son employé. Ex : Chef Groq -> Employé Llama
+      try{ nexusChainDefinir('Chef ' + def.nom, r.modele); }catch(e){}
       return r.text;
     }catch(e){ if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError'); }
   }
@@ -2017,8 +2142,8 @@ async function callPuterProducteur(messages, signal, image = null, t){
   }
   // ROUTEUR INTELLIGENT v7 : on attend le classement (mots-clés instantané, ou petite IA si ambigu). Si le classement échoue, il retombe tout seul sur les mots-clés.
   const modeleChoisi = await nexusRouteurIntelligent(messages, image);
-  // Mémorise le modèle utilisé pour l'afficher dans la conversation (Prod : PUTER • gpt-5.5, etc.)
-  try{ window.__nexusDernierModele = modeleChoisi; }catch(e){}
+  // V46 : Chef Puter TRANSMET à son employé (ex : Puter -> ChatGPT). On mémorise la chaîne complète.
+  try{ window.__nexusDernierModele = modeleChoisi; nexusChainDefinir('Chef Puter', modeleChoisi); }catch(e){}
   const essais = [modeleChoisi, 'gpt-5.5', 'claude-sonnet-5.5', null].filter((v,i,a) => a.indexOf(v) === i);
   let derniereErreur = null;
   for(const modele of essais){
@@ -2094,7 +2219,7 @@ async function ask(t, role, prompt, tier, json, image = null){
     usedProvider = 'puter';
   }
 
-  t.pProvider = usedProvider;
+  t.pProvider = usedProvider; try{ t.pChain = window.__nexusDernierChain || t.pChain || ''; }catch(e){}
   try{ localStorage.setItem('nexus_dernier_provider', String(usedProvider)); }catch(e){}
 
   if(json){
@@ -2831,6 +2956,8 @@ async function run(t){
   t.status = "en_cours"; t.step = ""; t.err = "";
   save(); render();
   try{
+    // V49 TOUT AUTOMATISÉ : dès la demande, NEXUS analyse et envoie aux chefs, le chef choisit l'employé + fera le prompt adapté. Aucun choix manuel.
+    try{ const _auto = nexusAutomatisationTrace(t.demande); if(_auto) t.pChain = 'NEXUS \u2192 ' + _auto.chef + ' \u2192 ' + _auto.employe + ' (auto, prompt adapté)'; }catch(e){}
     const persona = localStorage.getItem("nexus_persona") || "";
     if(!t.result){
       t.step = "Génération en cours…";
@@ -2920,7 +3047,25 @@ Règles importantes :
           t.result = nexusListeModelesTexte(); t.pProvider = "puter"; t.pModel = "liste";
         } else {
         t.result = await callPuterProducteur(messagesP, currentController ? currentController.signal : undefined, t.image, t);
-        t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
+        t.pProvider = "puter"; try{ t.pChain = window.__nexusDernierChain || ''; }catch(e){}
+        // V47 FILET : si le chef texte a quand même répondu "Je ne peux pas créer l'image, copiez ce prompt dans Midjourney / DALL-E...", on ne laisse PAS l'utilisateur copier ailleurs.
+        // NEXUS transmet à l'employé IMAGE et génère l'image lui-même.
+        try{
+          const _r = String(t.result || '');
+          if(/je ne peux pas cr[ée]er.*(image|directement)|copier-coller.*(midjourney|dall|stable diffusion|g[ée]n[ée]rateur d['’]images)|prompt.*copier/i.test(_r)){
+            const _sujet = String(t.demande || '').replace(/^(donne-moi|donne moi|fais-moi|fais moi|génère|genere|crée|cree|dessine|montre-moi|montre moi|je veux|veux)\b[^.]*?(prompt\s+pour\s+|prompt\s+d['’])?/i,'').trim() || String(t.demande||'');
+            // On extrait le prompt anglais du texte si présent (le bloc entre guillemets ou le bloc Mont Saint-Michel...), sinon on utilise la demande
+            let _promptImg = _sujet;
+            const _m = _r.match(/Mont Saint-Michel[^\n]{0,500}/i) || _r.match(/([A-Z][^\n]{40,400}twilight[^\n]{0,300})/i);
+            if(_m) _promptImg = _m[0].trim();
+            t.step = "Le chef texte voulait te faire copier ailleurs — NEXUS transmet à l'employé image…"; save(); render();
+            try{
+              t.generatedImage = await nexusGenerateImage(_promptImg, currentController ? currentController.signal : undefined, t);
+              t.result = "Voici ton image : " + _promptImg + "\n\n(NEXUS a généré l'image lui-même, pas besoin de copier un prompt ailleurs.)";
+              try{ t.pChain = 'NEXUS \u2192 Chef Puter \u2192 Employé Image (FLUX)'; }catch(e){}
+            }catch(eImg){}
+          }
+        }catch(eFilet){} t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
         }
       } else {
         // V43 ENSEMBLE : même si une vieille conversation dit "cles", on fait quand même ENSEMBLE (clés + Puter), plus de choix.
@@ -3041,7 +3186,7 @@ function nexusBanniereConcert(){
     const div = document.createElement('div');
     div.id = 'nexus-banniere-concert';
     div.style.cssText = 'margin:10px 12px 0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2,var(--surface));font-size:12px;line-height:1.5';
-    div.innerHTML = '<b>👑 NEXUS — La plateforme par où passer pour tout avoir.</b><br><span style="color:var(--text-muted)">Tu demandes à NEXUS, NEXUS s’occupe de tout et te rend la réponse.</span>';
+    div.innerHTML = '<b>👑 NEXUS — Tout automatisé.</b><br><span style="color:var(--text-muted)">Tu demandes → NEXUS transmet aux chefs (Groq, Gemini, OpenRouter, Puter) → Le chef choisit l’IA la plus adaptée → Il fait le prompt qui correspond → L’IA travaille → NEXUS te rend le résultat. T’as rien à faire. Regarde sous chaque réponse : NEXUS → Chef → Employé.</span>';
     chat.parentNode.insertBefore(div, chat);
   }catch(e){}
 }
@@ -3304,7 +3449,9 @@ function render(){
     const _banniereSecours = _estSecours ? '<div class="msg-system" style="margin-bottom:8px;border-style:solid;border-color:transparent;background:var(--surface-2)">🌿 Mode léger : réponse via le secours gratuit</div>' : '';
     h += '<div class="msg ai"><div class="bubble"><div class="ai-header"><span class="ai-dot"></span>NEXUS AI' + (t.step ? ' • ' + esc(t.step) : '') + '</div><div class="ai-body">' + _banniereSecours + formatMarkdown(t.result || "") + (t.generatedImage ? '<img class="msg-image" src="' + t.generatedImage + '" style="margin-top:8px" onerror="this.outerHTML=\'<div class=\\\'msg-system err\\\'>⚠ L\\\'image de secours Pollinations n\\\'a pas pu être générée (service gratuit saturé ou clé requise). Réessaie dans quelques instants, ou attends tes crédits Puter.</div>\'">' : '') + (t.tool ? '<div class="msg-system" style="margin-top:8px">⏱ ' + esc(t.tool.label) + ' : <span class="nexus-tool-live" data-tool-type="' + esc(t.tool.type) + '" data-until="' + (t.tool.until||0) + '" data-start="' + (t.tool.start||0) + '" data-running="' + (t.tool.running?1:0) + '" data-elapsed="' + (t.tool.elapsed||0) + '">' + esc(t.tool.type==='timer' ? nexusFmtMs(Math.max(0,(t.tool.until||0)-Date.now())) : nexusFmtMs(t.tool.running ? Date.now()-(t.tool.start||Date.now()) : (t.tool.elapsed||0))) + '</span></div>' : '') + '</div>';
     h += '<div class="msg-meta">';
-    if(t.pProvider) h += '<span>Prod : ' + (t.pModel && /^(Groq|Google Gemini|Mistral|OpenRouter) /.test(String(t.pModel)) ? 'MES IA' : providerLabel(t.pProvider)) + (t.pModel ? ' • ' + esc(String(t.pModel).includes('secours') ? 'Secours' : t.pModel) : '') + '</span>';
+    // V46 : on affiche le transfert complet, pas juste le chef. La chaîne est mémorisée au moment de la réponse, on la sauve dans le message.
+    if(t.pChain) h += '<span title="' + esc(t.pChain) + '">' + esc(t.pChain) + '</span>';
+    else if(t.pProvider) h += '<span>Prod : ' + (t.pModel && /^(Groq|Google Gemini|Mistral|OpenRouter) /.test(String(t.pModel)) ? 'MES IA' : providerLabel(t.pProvider)) + (t.pModel ? ' • ' + esc(String(t.pModel).includes('secours') ? 'Secours' : t.pModel) : '') + '</span>';
     h += '<span>' + new Date(t.id).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) + '</span></div>';
     h += '<div class="msg-actions"><button onclick="copyMsg(' + t.id + ')">⧉ Copier</button><button onclick="regenerate(' + t.id + ')">↻ Régénérer</button></div>';
     h += '</div></div>';
