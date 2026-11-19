@@ -377,11 +377,26 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 <div id="overlay" onclick="closeSidebar()"></div>
 
 <style>
-.nexus-provider-row{display:grid;grid-template-columns:1fr auto;gap:7px 10px;padding:12px 0;border-bottom:1px solid var(--border)}
-.nexus-provider-row label{display:flex;align-items:center;gap:8px}.nexus-provider-row input[type=password]{grid-column:1/-1;width:100%;box-sizing:border-box;padding:10px;border-radius:9px;background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
-.nexus-provider-row small{grid-column:1/-1;color:var(--text-muted);font-size:11px}.nexus-ai-status{font-size:12px;color:var(--text-muted)}
-.nexus-credit{grid-column:1/-1;height:7px;background:var(--surface-2);border-radius:99px;overflow:hidden}.nexus-credit div{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);transition:width .25s}
-.nexus-provider-row input[type=checkbox]{accent-color:var(--primary)}
+/* Réglages : cartes compactes, retours à la ligne sûrs et statuts sans chevauchement. */
+#settingsModal{max-width:560px;width:min(94vw,560px);max-height:92dvh;overflow:hidden}
+#settingsModal .modal-body{max-height:calc(92dvh - 58px);padding:12px 16px;gap:10px;overscroll-behavior:contain}
+#settingsModal .field{min-width:0;gap:6px}
+#settingsModal .field>label{font-weight:650}
+#settingsModal .modal-body>small,#settingsModal .field small{line-height:1.4;overflow-wrap:anywhere;word-break:break-word;white-space:normal}
+#settingsModal .modal-body{min-width:0}
+#settingsModal .field,#settingsModal .field>*{min-width:0;max-width:100%;box-sizing:border-box}
+#settingsModal input,#settingsModal select,#settingsModal button{max-width:100%;box-sizing:border-box}
+.nexus-provider-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:4px 8px;padding:6px 9px;margin:0 0 5px;border:1px solid var(--border);border-radius:11px;background:var(--surface-2);min-width:0}
+.nexus-provider-row label{display:flex;align-items:center;gap:7px;min-width:0;font-size:13px}
+.nexus-provider-row label b{overflow-wrap:anywhere}
+.nexus-provider-row input[type=password]{grid-column:1/-1;width:100%;min-width:0;box-sizing:border-box;padding:7px 9px;border-radius:8px;background:var(--surface);color:var(--text);border:1px solid var(--border);font:inherit;font-size:12px}
+.nexus-provider-row small{grid-column:1/-1;color:var(--text-muted);font-size:10.5px;line-height:1.3;overflow-wrap:anywhere;min-width:0}
+.nexus-ai-status{display:block;min-width:0;max-width:100%;font-size:10.5px;line-height:1.3;text-align:right;color:var(--text-muted);overflow-wrap:anywhere;word-break:break-word;white-space:normal}
+.nexus-credit{grid-column:1/-1;height:5px;background:var(--surface);border-radius:99px;overflow:hidden;min-width:0}
+.nexus-credit div{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);transition:width .25s}
+.nexus-provider-row input[type=checkbox]{accent-color:var(--primary);flex:0 0 auto}
+#nexusAITestAll{min-height:38px;padding:8px 12px;font-size:13px}
+@media(max-width:480px){#settingsModal{width:96vw;max-height:94dvh}#settingsModal .modal-body{max-height:calc(94dvh - 58px);padding:10px 12px}.nexus-provider-row{padding:7px 8px;gap:5px 7px}.nexus-ai-status{font-size:10.5px}}
 </style>
 <dialog id="settingsModal">
 <div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
@@ -398,6 +413,7 @@ header{background:transparent;border-bottom-color:transparent;backdrop-filter:no
 </div><small>Le thème change les couleurs. Le bouton en haut à droite ne change que Jour / Nuit.</small></div>
 <div class="field"><label>Jour / Nuit</label><button id="nexusJourNuitBouton" class="btn btn-secondary" onclick="toggleTheme()">🌙 Mode nuit</button><small>Aussi en haut à droite.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🤖 FOURNISSEURS D’IA</div>
+<div class="field"><label for="nexusAIActiveProvider">Fournisseur utilisé pour les réponses</label><select id="nexusAIActiveProvider" onchange="nexusAI_Save()" style="width:100%;padding:10px;border-radius:10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border)"><option value="puter">Puter</option><option value="gemini">Google Gemini</option><option value="groq">Groq</option><option value="openrouter">OpenRouter</option></select><small>NEXUS utilisera uniquement ce fournisseur. Aucun basculement automatique vers une autre IA.</small></div>
 <div class="field"><div id="nexusProviders">
   <div class="nexus-provider-row"><label><input type="checkbox" id="nexusAI_puter" onchange="nexusAI_Save()"> <b>Puter</b></label><span id="nexusAIStatus_puter" class="nexus-ai-status">À tester</span><div class="nexus-credit"><div id="nexusCreditBar_puter"></div></div><small id="nexusCreditText_puter">Crédits : information non communiquée</small></div>
   <div class="nexus-provider-row"><label><input type="checkbox" id="nexusAI_gemini" onchange="nexusAI_Save()"> <b>Google Gemini</b></label><span id="nexusAIStatus_gemini" class="nexus-ai-status">À tester</span><div class="nexus-credit"><div id="nexusCreditBar_gemini"></div></div><input id="nexusKey_gemini" type="password" autocomplete="off" placeholder="Clé API Gemini" oninput="nexusAI_SaveKeys()"><small id="nexusCreditText_gemini">Crédits : solde non exposé par l’API</small></div>
@@ -864,16 +880,6 @@ function nexusImagePrompt(demande){
   }
   return null;
 }
-// Image Pollinations en secours : CORRIGÉ.
-// Depuis le 1er nov. 2026, la nouvelle API gen.pollinations.ai exige une clé (401 sans clé) et TOUS les modèles image exigent une authentification.
-// L'ancienne API image.pollinations.ai répond encore parfois sans clé, mais seulement sur le modèle "sana", en 768px max,
-// avec watermark, 1 requête / 15s, et des échecs fréquents (401 / 402 / 502). Donc : pas de nologo (exige une clé), pas de 1024px.
-// Si l'image ne charge pas, le onerror dans render() affichera un message en français au lieu d'une image cassée.
-function nexusSecoursImagePollinations(prompt){
-  // IMAGE POUSSÉE AU MAX : avant modèle 'sana' (petit, flou) en 768x768.
-  // Maintenant modèle 'flux' (bien meilleur), 1024x1024, enhance=true (il améliore le prompt), nologo=true (pas de filigrane).
-  return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=1024&height=1024&seed=' + Math.floor(Math.random()*1000000) + '&model=flux&enhance=true&nologo=true';
-}
 async function nexusGenerateImage(prompt, signal){
   if(!nexusAI_Read().puter) throw new Error('Active Puter dans Paramètres pour utiliser la génération d’images.');
   if(!window.puter || !puter.ai || !puter.ai.txt2img) throw new Error("Génération d'image non disponible. Vérifie que Puter est chargé.");
@@ -881,8 +887,6 @@ async function nexusGenerateImage(prompt, signal){
     const img = await puter.ai.txt2img(prompt, false, { model: "gpt-image-2.6-flare" });
     return img && img.src ? img.src : String(img||'');
   }catch(e){
-    // Plus de crédits Puter pour l'image ? On bascule sur l'image Pollinations, sans clé.
-    if(nexusEstErreurCredits(e)){ try{ window.__nexusDernierModele = 'secours'; }catch(e2){} return nexusSecoursImagePollinations(prompt); }
     throw new Error(nexusTraduireErreur(e.message || e));
   }
 }
@@ -1153,220 +1157,11 @@ async function nexusAppelerModele(messages, signal, image, modele){
 }
 
 
-// ===== SECOURS SANS CLÉ (AJOUT UNIQUEMENT) : quand Puter n'a plus de crédits =====
-// LLM7 : VÉRIFIÉ - l'ancien accès anonyme avec la clé "unused" n'est plus documenté.
-// Depuis novembre 2026, LLM7 demande un token gratuit depuis son dashboard. Donc on NE l'utilise PAS, comme tu l'as dit.
-// Pollinations : VÉRIFIÉ - l'ancienne API text.pollinations.ai répond encore sans clé (vérifiée le 16-17 nov 2026),
-// sur un seul modèle (GPT-OSS 20B). La nouvelle API gen.pollinations.ai, elle, demande une clé et renvoie 401 sans clé.
-// Donc secours = Pollinations legacy uniquement, sans clé, sans compte, sans crédit.
-
-// ===== SECOURS N°2 : Kilo Gateway, sans clé (AJOUT UNIQUEMENT) =====
-// On NE peut pas ajouter des passerelles À Pollinations : Pollinations est fermé.
-// Par contre on peut ajouter des passerelles À CÔTÉ, dans NEXUS, en cascade :
-// Puter (principal) -> Kilo (secours 1) -> Pollinations (secours 2)
-// Kilo : vérifié - passerelle OpenAI-compatible, sans clé, sans compte, ~200 req / heure par IP,
-// modèles : kilo-auto/free (il choisit tout seul un modèle gratuit), openrouter/free, Nemotron, etc.
-// Testée en live il y a 2 jours (17/17 tests OK sur kilo-auto/free).
-// Attention : comme toutes les routes gratuites, Kilo peut journaliser les prompts. Ne pas y envoyer de données confidentielles.
-function nexusSansMemoire(messages){
-  return (messages || []).map(m => m && m.role === 'system'
-    ? { role: m.role, content: String(m.content || '').replace(/\n\nMÉMOIRE NEXUS[\s\S]*?(?=\n\nPROJET ACTUEL|\n\nRÉSULTATS WEB|$)/, '').replace(/\n\nPROJET ACTUEL[\s\S]*?(?=\n\nRÉSULTATS WEB|$)/, '') }
-    : m);
-}
-async function nexusSecoursKilo(messages){
-  const a = nexusSecoursKiloSeul(messages), b = nexusSecoursPollinationsSeul(messages);
-  a.catch(() => {}); b.catch(() => {});
-  try{ return await Promise.any([a, b]); }
-  catch(e){ throw (e && e.errors && e.errors[0]) || e; }
-}
-async function nexusSecoursKiloSeul(messages){
-  messages = nexusSansMemoire(messages);
-  try{ window.__nexusKiloErreur = ''; }catch(e){}
-  // KILO POUSSÉ AU MAX (seule fonction Kilo touchée) :
-  // - 5 modèles en cascade (au lieu de 3), adaptés à la demande
-  // - Messages réduits aux 8 derniers + système renforcé (moins de tokens = plus rapide, moins d'erreurs)
-  // - max_tokens 4000 : les longs codes / traductions ne sont plus coupés
-  // - Contrôle qualité : réponse trop courte / refus / vide = on passe au modèle suivant, on n'affiche pas une mauvaise réponse
-  // - Retry 429 (2s), timeout 60s, température adaptée
-  const texteDemande = messages.map(m => String(m.content||'')).join('\n').toLowerCase();
-  const estCode = /code|fonction|python|javascript|html|css|bug|erreur|script|programme|algorithme|debug|sql|java|c\+\+|rust|php/.test(texteDemande);
-  const estTraduction = /traduis|traduire|translation|translate/.test(texteDemande);
-  const estEcriture = /rédige|écrire|ecrire|lettre|dissertation|histoire|poème|poeme|roman|article|mail|cv/.test(texteDemande);
-  let modeles;
-  if(estCode) modeles = ['cohere/north-mini-code:free', 'kilo-auto/free', 'openrouter/free'];
-  else if(estEcriture) modeles = ['kilo-auto/free', 'reflection/beam-free', 'openrouter/free'];
-  else modeles = ['kilo-auto/free', 'openrouter/free', 'nvidia/nemotron-3.5-super-vl:free'];
-  // Question factuelle (gagnant, date, nom, saison...) : température 0, le modèle ne doit pas deviner / inventer.
-  const estFactuel = /gagnant|gagnante|vainqueur|champion|remport|premier|première|premiere|saison|qui |quelle |quel |quand |combien|date|star academy|koh-lanta|the voice|miss france|eurovision/.test(texteDemande);
-  const temperature = estFactuel ? 0 : ((estCode || estTraduction) ? 0.2 : (estEcriture ? 0.8 : 0.7));
-  // Messages courts : on garde le système + les 8 derniers échanges. Kilo répond plus vite et plante moins.
-  const msgs = messages.length > 9 ? [messages[0]].concat(messages.slice(-8)) : messages.slice();
-  // Système renforcé : on ne laisse pas le secours devenir vague ou inventer.
-  const msgsRenforces = msgs.map((m,i) => i === 0 && m.role === 'system'
-    ? { role: 'system', content: String(m.content||'') + '\n\nRÈGLES SECOURS (à respecter à tout prix) : réponds de façon précise et complète. INTERDIT d\'inventer une source. Ne cite JAMAIS une source (archive, TF1, communiqué, étude, article) que tu n\'as pas vue dans cette conversation. Si tu n\'as pas de source, réponds quand même avec ce que tu sais en précisant « à vérifier ». Ne dis JAMAIS « Cette information provient des archives officielles de... » sans avoir vu la source. Si tu n\'es pas sûr d\'un nom / date / gagnant, donne ta meilleure réponse en précisant « à vérifier ». Pour du code : donne le code complet, qui marche, sans rien tronquer.' }
-    : { role: m.role, content: String(m.content||'') });
-  let derniereErreur = null;
-  for(const modele of modeles){
-    for(let tentative = 0; tentative < 2; tentative++){
-      try{
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 15000);
-        let res;
-        const kiloBody = JSON.stringify({ model: modele, messages: msgsRenforces, temperature: temperature, max_tokens: 4000, top_p: 0.95 });
-        const KILO_URL = 'https://api.kilo.ai/api/gateway/chat/completions';
-        // CORRIGÉ photo 1 : avant on ne testait que direct + corsproxy.io. Si les 2 tombaient, on retestait les 4 autres modèles avec le même réseau HS -> 5x "Load failed" et un mur d'erreur.
-        // Maintenant : chaîne de proxys (comme le web). Si AUCUN proxy ne passe pour le 1er modèle, c'est le réseau qui est HS, on arrête Kilo tout de suite au lieu de spammer 5 modèles.
-        const KILO_PROXYS = [
-          null,
-          u => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
-          u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
-          u => 'https://api.cors.lol/?url=' + encodeURIComponent(u)
-        ];
-        let derniereErreurReseau = null;
-        try{
-          for(const proxy of KILO_PROXYS){
-            if(ctrl.signal.aborted) break;
-            try{
-              const urlEssai = proxy ? proxy(KILO_URL) : KILO_URL;
-              res = await fetch(urlEssai, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: kiloBody, signal: ctrl.signal });
-              derniereErreurReseau = null;
-              break;
-            }catch(eProxy){
-              derniereErreurReseau = eProxy;
-              const msgProxy = String((eProxy && (eProxy.message || eProxy)) || '').toLowerCase();
-              const estReseau = msgProxy.includes('load failed') || (eProxy && eProxy.name === 'TypeError') || msgProxy.includes('failed to fetch') || msgProxy.includes('network');
-              if(!estReseau) throw eProxy;
-              // Sinon on passe au proxy suivant.
-              res = null;
-            }
-          }
-          if(!res && derniereErreurReseau) throw derniereErreurReseau;
-        } finally { clearTimeout(timer); }
-        if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 2000)); continue; }
-        if(!res.ok) throw new Error('Kilo ' + modele + ' indisponible (' + res.status + ')');
-        const data = await res.json();
-        const txt = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-        // Contrôle qualité : réponse vide / trop courte / refus = mauvaise réponse, on passe au modèle suivant.
-        if(!txt || txt.trim().length < 20 || /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txt.trim())) throw new Error('Kilo ' + modele + ' réponse insuffisante');
-        try{ window.__nexusDernierModele = 'secours'; }catch(e2){}
-        return txt;
-      }catch(e){
-        derniereErreur = e;
-        try{ window.__nexusSecoursErreurs = (window.__nexusSecoursErreurs || '') + ' [Kilo ' + modele + ' : ' + String(e.message || e) + ']'; }catch(e2){}
-        if(e && e.name === 'AbortError') break;
-        if(String(e.message||'').includes('429')) continue;
-        break;
-      }
-    }
-  }
-  try{ window.__nexusKiloErreur = String((derniereErreur && derniereErreur.message) || derniereErreur || 'Kilo indisponible').slice(0,120); }catch(e){}
-  // Si c'est le réseau (Load failed sur tous les proxys), on le dit en 1 phrase, pas en 5x le nom des modèles.
-  try{
-    const mErr = String((derniereErreur && (derniereErreur.message || derniereErreur)) || '').toLowerCase();
-    if(mErr.includes('load failed') || mErr.includes('failed to fetch') || mErr.includes('network')) throw new Error('Kilo injoignable (réseau / CORS)');
-  }catch(eSiReseau){ if(eSiReseau && eSiReseau.message === 'Kilo injoignable (réseau / CORS)') throw eSiReseau; }
-  throw derniereErreur || new Error('Kilo indisponible');
-}
-
-async function nexusSecoursPollinations(messages){
-  throw new Error('Pollinations déjà essayé en parallèle avec Kilo');
-}
-async function nexusSecoursPollinationsSeul(messages){
-  messages = nexusSansMemoire(messages);
-  // POLLINATIONS CORRIGÉ v4 (causes vues sur ta capture + docs) :
-  // Cause 402 : le tier ANONYME rejette tout message "system" avec 402 Payment Required. Avant on envoyait &system=... -> 402 à chaque fois.
-  //   -> Maintenant : PAS de paramètre system. Le système est fusionné DANS le prompt utilisateur.
-  // Cause 404 / 402 : openai-large, mistral, deepseek, qwen-coder sont des modèles PAYANTS (Flower/Nectar), pas anonymes.
-  //   -> Maintenant : seuls les 2 modèles ANONYMES : openai-fast puis openai (GPT-OSS 20B).
-  // + referrer=nexus-ai : Pollinations l'utilise pour identifier l'app navigateur sans clé.
-  // + 1 req / 30s en anonyme : on n'essaie que 2 modèles, et on attend 5s sur 429 au lieu de spammer.
-  const texteDemande = messages.map(m => String(m.content||'')).join('\n').toLowerCase();
-  const estCode = /code|fonction|python|javascript|html|css|bug|erreur|script|programme|algorithme|debug|sql|java|c\+\+|rust|php/.test(texteDemande);
-  const estTraduction = /traduis|traduire|translation|translate/.test(texteDemande);
-  // CORRIGÉ photo 1 : 'openai' fait 404, il n'existe plus en anonyme. On ne garde que 'openai-fast' (celui qui marche parfois).
-  const modeles = ['openai-fast'];
-  const estFactuelPoll = /gagnant|gagnante|vainqueur|champion|remport|premier|première|premiere|saison|qui |quelle |quel |quand |combien|date|star academy|koh-lanta|the voice|miss france|eurovision/.test(texteDemande);
-  const temperature = estFactuelPoll ? 0 : ((estCode || estTraduction) ? 0.2 : 0.7);
-  const msgs = messages.length > 9 ? [messages[0]].concat(messages.slice(-8)) : messages.slice();
-  // Système FUSIONNÉ dans le prompt, jamais en paramètre system (sinon 402).
-  const parties = [];
-  msgs.forEach(m => {
-    if(m.role === 'system') parties.push('[INSTRUCTIONS] ' + String(m.content||'') + '\nRÈGLES ANTI-INVENTION (à respecter à tout prix) : INTERDIT d\'inventer une source. Ne cite JAMAIS une source (archive, TF1, communiqué, étude, article) que tu n\'as pas vue dans cette conversation. Ne dis JAMAIS « Cette information provient des archives officielles de... » sans avoir vu la source. Si tu n\'as pas de source, réponds quand même avec ce que tu sais en précisant « à vérifier ». Si tu n\'es pas sûr d\'un nom / date / gagnant, donne ta meilleure réponse en précisant « à vérifier ». Pour du code : donne le code complet, qui marche, sans rien tronquer.');
-    else parties.push(String(m.content||''));
-  });
-  const prompt = (parties.join('\n\n') || 'Réponds.').slice(0, 4000);
-  let derniereErreur = null;
-  for(const modele of modeles){
-    for(let tentative = 0; tentative < 2; tentative++){
-      try{
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 15000);
-        let res;
-        let txt = '';
-        try{
-          // CORRIGÉ photo 1 : avant on mettait tout le prompt (8000 car.) dans l'URL en GET -> URL tronquée / réponse insuffisante.
-          // Maintenant : POST JSON à /openai (API officielle), le prompt est dans le corps, pas dans l'URL. GET en secours si POST échoue.
-          try{
-            res = await fetch('https://text.pollinations.ai/openai', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ model: modele, messages: [{ role: 'user', content: prompt }], temperature: temperature, max_tokens: 4000 }),
-              signal: ctrl.signal
-            });
-            if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 5000)); continue; }
-            if(!res.ok) throw new Error('POST ' + res.status);
-            const dataPost = await res.json().catch(() => null);
-            txt = (dataPost && dataPost.choices && dataPost.choices[0] && dataPost.choices[0].message && dataPost.choices[0].message.content) || '';
-            if(!txt) {
-              const brut = dataPost ? JSON.stringify(dataPost) : '';
-              if(brut && brut.length > 20 && brut.length < 8000) txt = brut;
-            }
-          }catch(ePost){
-            if(ePost && ePost.message && String(ePost.message).includes('429')) throw ePost;
-            // Secours GET (ancien chemin), avec prompt court pour ne pas dépasser la limite d'URL.
-            const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt.slice(0, 2000)) + '?model=' + encodeURIComponent(modele) + '&temperature=' + temperature + '&referrer=nexus-ai';
-            res = await fetch(url, { method: 'GET', signal: ctrl.signal });
-            if(res.status === 429 && tentative === 0){ await new Promise(r => setTimeout(r, 5000)); continue; }
-            if(!res.ok) throw new Error('Pollinations ' + modele + ' indisponible (' + res.status + ')');
-            txt = (await res.text() || '').trim();
-          }
-        } finally { clearTimeout(timer); }
-        if(!txt) throw new Error('Pollinations ' + modele + ' réponse insuffisante');
-        txt = String(txt).trim();
-        if(!txt || txt.length < 20 || /^(je ne peux pas|i can't|i cannot|désolé, je ne peux|as an ai)/i.test(txt)) throw new Error('Pollinations ' + modele + ' réponse insuffisante');
-        try{ const _k = String(window.__nexusKiloErreur || ''); window.__nexusDernierModele = 'secours'; }catch(e2){}
-        return txt;
-      }catch(e){
-        derniereErreur = e;
-        try{ window.__nexusSecoursErreurs = (window.__nexusSecoursErreurs || '') + ' [Pollinations ' + modele + ' : ' + String(e.message || e) + ']'; }catch(e2){}
-        if(e && e.name === 'AbortError') break;
-        if(String(e.message||'').includes('429')) continue;
-        break;
-      }
-    }
-  }
-  throw derniereErreur || new Error('Secours Pollinations indisponible');
-}
-
-function nexusEstErreurCredits(e){
-  // CORRIGÉ v2 (bug vu sur capture : Puter dit "not enough funding" / "Low Balance / Please upgrade") :
-  // Avant on ne lisait que e.message et on cherchait "credit" -> on ratait "funding", "upgrade", "Low Balance".
-  // Maintenant on lit TOUT l'objet erreur (message + error + reason + code + JSON complet), en anglais ET français.
-  let parts = [];
-  try{ parts.push(String((e && e.message) || '')); }catch(_){}
-  try{ parts.push(String((e && e.error && (e.error.message || e.error)) || '')); }catch(_){}
-  try{ parts.push(String((e && e.reason) || '')); }catch(_){}
-  try{ parts.push(String((e && e.code) || '')); }catch(_){}
-  try{ parts.push(JSON.stringify(e) || ''); }catch(_){}
-  try{ parts.push(String(e || '')); }catch(_){}
-  const s = parts.join(' ').toLowerCase();
-  return /credit|crédit|funding|low.?balance|upgrade|insufficient|quota|billing|payment|402|429|rate.?limit|too many|limit|exceeded|balance|out of|ran out|no more|daily|free tier|usage|plus assez|n.?a plus|plus de|not enough|doesn.?t have enough|does not have enough|not have enough/.test(s);
-}
-
+// Aucun basculement automatique vers un autre fournisseur.
 
 // ===== FOURNISSEURS IA CONFIGURABLES =====
 const NEXUS_AI_CONFIG_KEY = 'nexus_ai_providers_v1';
-const NEXUS_AI_DEFAULTS = { puter:true, gemini:false, groq:false, openrouter:false };
+const NEXUS_AI_DEFAULTS = { puter:true, gemini:false, groq:false, openrouter:false, activeProvider:'puter' };
 function nexusAI_Read(){
   try{ return Object.assign({},NEXUS_AI_DEFAULTS,JSON.parse(localStorage.getItem(NEXUS_AI_CONFIG_KEY)||'{}')); }
   catch(e){ return Object.assign({},NEXUS_AI_DEFAULTS); }
@@ -1374,6 +1169,7 @@ function nexusAI_Read(){
 function nexusAI_Save(){
   const c=nexusAI_Read();
   ['puter','gemini','groq','openrouter'].forEach(k=>{const el=document.getElementById('nexusAI_'+k); if(el)c[k]=!!el.checked;});
+  const active=document.getElementById('nexusAIActiveProvider');if(active)c.activeProvider=active.value;
   try{localStorage.setItem(NEXUS_AI_CONFIG_KEY,JSON.stringify(c));}catch(e){}
 }
 function nexusAI_SaveKeys(){
@@ -1385,7 +1181,9 @@ function nexusAI_Load(){
   const c=nexusAI_Read();
   ['puter','gemini','groq','openrouter'].forEach(k=>{const el=document.getElementById('nexusAI_'+k);if(el)el.checked=!!c[k];});
   ['gemini','groq','openrouter'].forEach(k=>{const el=document.getElementById('nexusKey_'+k);if(el)el.value=(c.keys&&c.keys[k])||'';});
+  const active=document.getElementById('nexusAIActiveProvider');if(active)active.value=c.activeProvider||'puter';
 }
+
 function nexusAI_Status(k,msg,ok){const e=document.getElementById('nexusAIStatus_'+k);if(e){e.textContent=msg;e.style.color=ok===true?'#16a34a':ok===false?'#ef4444':'var(--text-muted)';}}
 function nexusAI_Credit(k,pct,label){const b=document.getElementById('nexusCreditBar_'+k);const t=document.getElementById('nexusCreditText_'+k);if(b)b.style.width=(pct==null?0:Math.max(0,Math.min(100,pct)))+'%';if(t)t.textContent=label;}
 function nexusAI_GetKey(k){const c=nexusAI_Read();return c.keys&&c.keys[k]||'';}
@@ -1433,46 +1231,48 @@ async function nexusAI_TestOne(k){
       try{const cr=await fetch('https://openrouter.ai/api/v1/key',{headers:{Authorization:'Bearer '+nexusAI_GetKey(k)}});const d=await cr.json();const limit=d.data&&d.data.limit,remaining=d.data&&d.data.limit_remaining;if(cr.ok&&Number.isFinite(Number(limit))&&Number(limit)>0&&Number.isFinite(Number(remaining))){const pct=100*Number(remaining)/Number(limit);nexusAI_Credit(k,pct,'Plafond de cette clé restant : $'+Number(remaining).toFixed(2)+' / $'+Number(limit).toFixed(2)+' ('+(d.data.limit_reset||'sans réinitialisation')+')');}else if(cr.ok){nexusAI_Credit(k,null,'Clé sans plafond défini · consommation : $'+Number(d.data&&d.data.usage||0).toFixed(2));}else nexusAI_Credit(k,null,'Solde OpenRouter non disponible');}catch(e){nexusAI_Credit(k,null,'Solde OpenRouter non récupéré');}
     }else nexusAI_Credit(k,null,'Crédits : solde non communiqué par l’API');
     return true;
-  }catch(e){nexusAI_Status(k,'Échec · '+String(e.message||e).slice(0,110),false);return false;}
+  }catch(e){const msg=String(e&&e.message||e||'Erreur inconnue').replace(/[\r\n\t]+/g,' ').replace(/\s{2,}/g,' ').trim().slice(0,150);nexusAI_Status(k,'Échec · '+msg,false);return false;}
 }
 async function nexusAI_TestAll(){
-  const btn=document.getElementById('nexusAITestAll');if(btn){btn.disabled=true;btn.textContent='Tests en cours…';}
+  const btn=document.getElementById('nexusAITestAll');
+  if(btn){btn.disabled=true;btn.textContent='Tests en cours…';}
   nexusAI_Save();nexusAI_SaveKeys();
   const keys=['puter','gemini','groq','openrouter'];
-  for(const k of keys){await nexusAI_TestOne(k);if(!document.getElementById('nexusAI_'+k)?.checked){const st=document.getElementById('nexusAIStatus_'+k);if(st&&st.textContent.startsWith('Connectée'))st.textContent='Connectée · désactivée';}}
-  if(btn){btn.disabled=false;btn.textContent='🧪 Tester toutes les IA';}
+  try{
+    // Tests en parallèle : les quatre lignes affichent leur état au même moment.
+    await Promise.all(keys.map(async k=>{
+      await nexusAI_TestOne(k);
+      const checkbox=document.getElementById('nexusAI_'+k);
+      const st=document.getElementById('nexusAIStatus_'+k);
+      if(checkbox&&!checkbox.checked&&st&&st.textContent.startsWith('Connectée'))
+        nexusAI_Status(k,'Connectée · désactivée',true);
+    }));
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='🧪 Tester toutes les IA';}
+  }
 }
 async function callPuterProducteur(messages,signal,image=null){
   if(signal&&signal.aborted)throw new DOMException('Aborted','AbortError');
-  // L'image reste traitée par Puter pour préserver la compatibilité multimodale.
-  if(image)return await callPuterProducteurPuter(messages,signal,image);
-  const order=['gemini','groq','openrouter','puter'];
-  const config=nexusAI_Read();let lastError=null;
-  for(const provider of order){
-    if(!config[provider])continue;
-    try{
-      if(provider==='puter')return await callPuterProducteurPuter(messages,signal,null);
-      const answer=await nexusAI_Call(provider,messages,signal);
-      nexusAI_Status(provider,'Connectée · opérationnelle',true);
-      return answer;
-    }catch(e){if(e&&e.name==='AbortError')throw e;lastError=e;nexusAI_Status(provider,'Indisponible · '+String(e.message||e).slice(0,80),false);}
+  const config=nexusAI_Read();
+  const provider=String(config.activeProvider||'puter');
+  try{window.__nexusDernierFournisseur=provider;}catch(e){}
+  if(!['puter','gemini','groq','openrouter'].includes(provider))throw new Error('Fournisseur IA invalide. Vérifie les paramètres.');
+  if(!config[provider])throw new Error('Le fournisseur sélectionné ('+provider+') est désactivé. Active-le dans Paramètres.');
+  if(image&&provider!=='puter')throw new Error('Pour le moment, les images jointes sont prises en charge uniquement avec Puter. Sélectionne Puter dans Paramètres.');
+  if(provider==='puter'){
+    const answer=await callPuterProducteurPuter(messages,signal,image);
+    nexusAI_Status('puter','Connectée · réponse reçue',true);
+    return answer;
   }
-  if(lastError)throw new Error('Aucune IA activée n’a pu répondre. Dernière erreur : '+String(lastError.message||lastError));
-  throw new Error('Aucune IA activée. Active au moins un fournisseur dans Paramètres.');
+  const answer=await nexusAI_Call(provider,messages,signal);
+  nexusAI_Status(provider,'Connectée · réponse reçue',true);
+  return answer;
 }
 
 async function callPuterProducteurPuter(messages, signal, image = null){
   if(!window.puter || !puter.ai) throw new Error("Puter n'est pas encore chargé. Attends 2 secondes et réessaie, ou recharge la page.");
   if(signal && signal.aborted) throw new DOMException('Aborted', 'AbortError');
-  // Puter déjà HS : on va directement aux secours, sans rappeler Puter (sinon sa popup réapparaît).
-  if(typeof window !== 'undefined' && window.__nexusPuterHS){
-    try{ if(typeof window !== 'undefined') window.__nexusSecoursErreurs = ''; }catch(e2){}
-    try{ return await nexusSecoursKilo(messages); }
-    catch(eKilo){
-      try{ return await nexusSecoursPollinations(messages); }
-      catch(ePoll){ try{ console.warn('[NEXUS] Secours échoués :', String((typeof window !== 'undefined' && window.__nexusSecoursErreurs) || '')); }catch(eLog){} throw new Error("Puter sans crédits. Secours momentanément indisponibles. Attends 1-2 minutes puis touche Réessayer."); }
-    }
-  }
+  if(typeof window !== 'undefined' && window.__nexusPuterHS) throw new Error('Puter a déjà échoué lors de cette session. Vérifie ton compte ou réessaie plus tard.');
   // ROUTEUR INTELLIGENT v7 : on attend le classement (mots-clés instantané, ou petite IA si ambigu). Si le classement échoue, il retombe tout seul sur les mots-clés.
   const modeleChoisi = await nexusRouteurIntelligent(messages, image);
   // Mémorise le modèle utilisé pour l'afficher dans la conversation (Prod : PUTER • gpt-5.5, etc.)
@@ -1513,26 +1313,8 @@ async function callPuterProducteurPuter(messages, signal, image = null){
       continue;
     }
   }
-  // Puter a échoué (crédits / funding / Low Balance / autre) ? On bascule sur les secours sans clé.
-  if(derniereErreur){
-    // Secours 1 : Kilo (plus de modèles, plus fiable que Pollinations)
-    try{
-      const secours = await nexusSecoursKilo(messages);
-      // nexusSecoursKilo a déjà mémorisé le vrai modèle utilisé (ex : secours Kilo kilo-auto/free...), on ne l'écrase pas.
-      return secours;
-    }catch(eKilo){
-      // Kilo aussi indisponible : on essaie Pollinations.
-    }
-    // Secours 2 : Pollinations
-    try{
-      const secours = await nexusSecoursPollinations(messages);
-      // nexusSecoursPollinations a déjà mémorisé le vrai modèle utilisé, on ne l'écrase pas.
-      return secours;
-    }catch(eSecours){
-      // Les deux secours indisponibles : on retombe sur l'erreur Puter traduite en français, comme avant.
-    }
-  }
-  throw new Error(nexusTraduireErreur(derniereErreur ? derniereErreur.message : "échec de génération") + " [Secours échoués :" + String((typeof window !== 'undefined' && window.__nexusSecoursErreurs) || ' ?') + "]");
+  // Pas de basculement automatique : l'erreur du fournisseur sélectionné est affichée clairement.
+  throw new Error(nexusTraduireErreur(derniereErreur ? derniereErreur.message : 'échec de génération'));
 }
 
 function setBusy(b){
@@ -2271,14 +2053,14 @@ async function run(t){
       // Mémoire et projets : commandes locales traitées sans appel IA.
       const _memProjet = nexusCommandesMemoireProjet(t.demande);
       if(_memProjet){
-        t.result = _memProjet; t.pProvider = "puter";
+        t.result = _memProjet; t.pProvider = (window.__nexusDernierFournisseur || "puter");
         t.step = ""; save(); render(); nexusMemoireRender();
       } else {
       const _trad = nexusTranslatorParse(t.demande);
       if(_trad){
         t.step = "Traduction en cours…"; save(); render();
         t.result = await nexusTranslate(_trad.texte, _trad.lang, currentController ? currentController.signal : undefined);
-        t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
+        t.pProvider = (window.__nexusDernierFournisseur || "puter"); t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
         t.step = ""; save(); render();
       } else {
       const _imgPrompt = nexusImagePrompt(t.demande);
@@ -2286,12 +2068,12 @@ async function run(t){
         t.step = "Génération de l'image…"; save(); render();
         t.generatedImage = await nexusGenerateImage(_imgPrompt, currentController ? currentController.signal : undefined);
         t.result = "Voici ton image : " + _imgPrompt;
-        t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
+        t.pProvider = (window.__nexusDernierFournisseur || "puter"); t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
         t.step = ""; save(); render();
       } else {
       const _tc = nexusTimerChronoCommand(t.demande);
       if(_tc){
-        t.result = _tc.text; if(_tc.tool) t.tool = _tc.tool; t.pProvider = "puter";
+        t.result = _tc.text; if(_tc.tool) t.tool = _tc.tool; t.pProvider = (window.__nexusDernierFournisseur || "puter");
         t.step = ""; save(); render();
       } else {
       // PUISSANCE v5b : contexte, CORRIGÉ. En v5, on plafonnait TOUT l'historique à 1500 caractères. Problème : si tu dis « corrige le code d'avant », le modèle ne voyait que le début du code, il avait perdu la fin.
@@ -2346,10 +2128,10 @@ Règles importantes :
 
       // Génération via Puter, avec les services de secours si nécessaire.
       if(/^\s*(quelles? (ia|intelligences?|modèles?|modeles?)|liste des (ia|modèles?|modeles?)|quels modèles?|quelles ia (sont )?disponibles?)\s*\??\s*$/i.test(t.demande)){
-        t.result = nexusListeModelesTexte(); t.pProvider = "puter"; t.pModel = "liste";
+        t.result = nexusListeModelesTexte(); t.pProvider = (window.__nexusDernierFournisseur || "puter"); t.pModel = "liste";
       } else {
         t.result = await callPuterProducteur(messagesP, currentController ? currentController.signal : undefined, t.image);
-        t.pProvider = "puter"; t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
+        t.pProvider = (window.__nexusDernierFournisseur || "puter"); t.pModel = (typeof window !== 'undefined' && window.__nexusDernierModele) || undefined;
       }
       } // fin else minuteur/chrono
       } // fin else image
