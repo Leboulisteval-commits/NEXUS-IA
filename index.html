@@ -11,38 +11,15 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Arial' font-size='52' font-weight='bold' fill='white' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
   <title>NEXUS AI</title>
   <style>
-    :root{
-      --bg:#08080c;--bg-2:#101018;--bg-3:#181824;--bg-4:#222233;
-      --border:rgba(255,255,255,0.08);--text:#f0f0f5;--text-dim:#9a9ab0;
-      --accent:#6366f1;--accent-2:#a855f7;
-      --success:#10b981;--error:#ef4444;--warning:#f59e0b;
-      --radius:20px;
-      --safe-top:env(safe-area-inset-top,0px);
-      --safe-bottom:env(safe-area-inset-bottom,0px);
-      --safe-left:env(safe-area-inset-left,0px);
-      --safe-right:env(safe-area-inset-right,0px);
-    }
+    /* Le CSS est strictement identique à la v2 pour le moment */
+    :root{--bg:#08080c;--bg-2:#101018;--bg-3:#181824;--bg-4:#222233;--border:rgba(255,255,255,0.08);--text:#f0f0f5;--text-dim:#9a9ab0;--accent:#6366f1;--accent-2:#a855f7;--success:#10b981;--error:#ef4444;--warning:#f59e0b;--radius:20px;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px)}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;padding:0;height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:16px;
-      overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+    html,body{margin:0;padding:0;height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:16px;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
     input,textarea,.selectable{-webkit-user-select:text;user-select:text}
     #app{height:100dvh;display:flex;flex-direction:column;padding-left:var(--safe-left);padding-right:var(--safe-right);position:relative;z-index:1}
-    
-    /* Glassmorphism Background Effect */
-    #app::before {
-      content:'';position:absolute;top:-20%;left:-20%;width:140%;height:140%;
-      background:radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15) 0%, transparent 40%),
-                 radial-gradient(circle at 80% 70%, rgba(168,85,247,0.15) 0%, transparent 40%);
-      z-index:-1;pointer-events:none;
-    }
-
-    #topbar{display:flex;align-items:center;gap:12px;padding:calc(var(--safe-top) + 12px) 16px 12px;
-      background:rgba(16,16,24,0.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-      border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
-    .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;
-      box-shadow:0 4px 20px rgba(99,102,241,0.4);flex-shrink:0}
+    #app::before{content:'';position:absolute;top:-20%;left:-20%;width:140%;height:140%;background:radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15) 0%, transparent 40%),radial-gradient(circle at 80% 70%, rgba(168,85,247,0.15) 0%, transparent 40%);z-index:-1;pointer-events:none}
+    #topbar{display:flex;align-items:center;gap:12px;padding:calc(var(--safe-top) + 12px) 16px 12px;background:rgba(16,16,24,0.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
+    .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:white;box-shadow:0 4px 20px rgba(99,102,241,0.4);flex-shrink:0}
     .brand{display:flex;flex-direction:column;min-width:0}
     .brand h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-0.3px}
     .brand .status{font-size:11.5px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:2px}
@@ -50,108 +27,67 @@
     .dot.offline{background:var(--error);box-shadow:0 0 8px var(--error)}
     .dot.warning{background:var(--warning);box-shadow:0 0 8px var(--warning)}
     .spacer{flex:1}
-    .icon-btn{width:40px;height:40px;border-radius:50%;background:var(--bg-3);border:1px solid var(--border);
-      color:var(--text);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0;
-      transition:background 0.2s}
+    .icon-btn{width:40px;height:40px;border-radius:50%;background:var(--bg-3);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0;transition:background 0.2s}
     .icon-btn:active{background:var(--bg-4)}
-    
     #content{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column;min-height:0}
     .view{display:none;flex-direction:column;height:100%;min-height:0}
     .view.active{display:flex}
-    
-    /* Chat Area */
     #messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 24px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
     .msg{display:flex;gap:10px;width:100%;animation:fadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)}
     @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
     .msg.user{flex-direction:row-reverse}
-    
     .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
     .msg.user .avatar{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white}
     .msg.ai .avatar{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white}
-    
-    /* FIX: Texte vertical et largeur des bulles */
     .msg-content{display:flex;flex-direction:column;max-width:85%;min-width:0;}
-    .bubble{padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.5;
-      word-wrap:break-word;overflow-wrap:break-word;user-select:text;white-space:pre-wrap;
-      box-shadow:0 4px 15px rgba(0,0,0,0.1)}
+    .bubble{padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.5;word-wrap:break-word;overflow-wrap:break-word;user-select:text;white-space:pre-wrap;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
     .msg.user .bubble{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border-bottom-right-radius:4px}
     .msg.ai .bubble{background:rgba(26,26,36,0.8);backdrop-filter:blur(10px);border:1px solid var(--border);border-bottom-left-radius:4px}
-    
-    /* Markdown Styles */
     .bubble pre{background:rgba(0,0,0,0.4);padding:12px;border-radius:10px;overflow-x:auto;font-size:13px;margin:10px 0;border:1px solid var(--border);white-space:pre}
     .bubble code{font-family:'SF Mono',Menlo,Consolas,monospace;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:6px;font-size:13.5px}
     .bubble pre code{background:transparent;padding:0}
     .bubble a{color:#93c5fd;text-decoration:none;border-bottom:1px solid rgba(147,197,253,0.4)}
     .bubble strong{font-weight:700;color:white}
-    
     .meta{font-size:11px;color:var(--text-dim);margin-top:6px;padding:0 4px;display:flex;align-items:center;gap:6px}
     .msg.user .meta{justify-content:flex-end}
-    
-    /* Copy Button */
     .copy-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;padding:2px 6px;border-radius:6px;transition:all 0.2s;display:flex;align-items:center;gap:4px}
     .copy-btn:hover{background:var(--bg-4);color:var(--text)}
     .copy-btn.copied{color:var(--success)}
-    
-    /* Typing Indicator */
     .typing{display:inline-flex;gap:4px;align-items:center;padding:4px 0}
     .typing span{width:6px;height:6px;background:var(--text-dim);border-radius:50%;animation:bounce 1.2s infinite}
     .typing span:nth-child(2){animation-delay:.15s}
     .typing span:nth-child(3){animation-delay:.3s}
     @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
-    
-    /* Input Area */
-    #input-bar{padding:12px 16px;background:rgba(16,16,24,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-      border-top:1px solid var(--border);flex-shrink:0;z-index:10}
+    #input-bar{padding:12px 16px;background:rgba(16,16,24,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);flex-shrink:0;z-index:10}
     #input-bar.hidden{display:none}
-    .input-wrap{display:flex;align-items:flex-end;gap:10px;background:var(--bg-3);border:1px solid var(--border);
-      border-radius:24px;padding:6px 6px 6px 18px;transition:border-color 0.2s, box-shadow 0.2s}
+    .input-wrap{display:flex;align-items:flex-end;gap:10px;background:var(--bg-3);border:1px solid var(--border);border-radius:24px;padding:6px 6px 6px 18px;transition:border-color 0.2s, box-shadow 0.2s}
     .input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px rgba(99,102,241,0.2)}
-    #user-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:15px;
-      font-family:inherit;line-height:1.4;padding:10px 0;resize:none;max-height:120px;min-height:24px}
+    #user-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:15px;font-family:inherit;line-height:1.4;padding:10px 0;resize:none;max-height:120px;min-height:24px}
     #user-input::placeholder{color:var(--text-dim)}
-    #send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-      transition:all 0.2s;box-shadow:0 4px 12px rgba(99,102,241,0.3)}
+    #send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;box-shadow:0 4px 12px rgba(99,102,241,0.3)}
     #send-btn:disabled{opacity:0.4;box-shadow:none}
     #send-btn:active:not(:disabled){transform:scale(0.92)}
-    
-    /* Bottom Nav */
-    #bottom-nav{display:flex;background:rgba(16,16,24,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-      border-top:1px solid var(--border);padding-bottom:var(--safe-bottom);flex-shrink:0;z-index:10}
-    .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px 10px;
-      background:none;border:none;color:var(--text-dim);font-size:11px;font-family:inherit;cursor:pointer;font-weight:600;
-      transition:color 0.2s}
+    #bottom-nav{display:flex;background:rgba(16,16,24,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding-bottom:var(--safe-bottom);flex-shrink:0;z-index:10}
+    .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px 10px;background:none;border:none;color:var(--text-dim);font-size:11px;font-family:inherit;cursor:pointer;font-weight:600;transition:color 0.2s}
     .nav-btn .ico{font-size:22px;line-height:1;transition:transform 0.2s}
     .nav-btn.active{color:var(--accent)}
     .nav-btn.active .ico{transform:translateY(-2px)}
     .nav-btn:active{opacity:0.7}
-    
-    /* Settings & Test Views */
     .scroll-view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;padding-bottom:32px}
-    .card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;
-      box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+    .card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,0.2)}
     .card h2{font-size:15px;margin:0 0 10px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
     .card .sub{font-size:12.5px;color:var(--text-dim);margin:-6px 0 14px;line-height:1.4}
     .field{margin-bottom:14px}
     .field label{display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;font-weight:500}
-    .field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;
-      padding:12px 14px;color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:all 0.2s;
-      -webkit-user-select:text;user-select:text}
+    .field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:all 0.2s;-webkit-user-select:text;user-select:text}
     .field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(99,102,241,0.2)}
-    .btn{width:100%;padding:14px 16px;border-radius:14px;border:none;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;font-size:15px;font-weight:600;
-      font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-      transition:all 0.2s;box-shadow:0 4px 15px rgba(99,102,241,0.3)}
+    .btn{width:100%;padding:14px 16px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;box-shadow:0 4px 15px rgba(99,102,241,0.3)}
     .btn:active:not(:disabled){transform:scale(0.98)}
     .btn:disabled{opacity:0.5;cursor:not-allowed;box-shadow:none}
     .btn.secondary{background:var(--bg-3);border:1px solid var(--border);color:var(--text);box-shadow:none}
     .btn.danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--error);box-shadow:none}
-    
-    /* Test View Cards */
-    .provider-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;
-      margin-bottom:12px;display:flex;align-items:center;gap:14px;transition:transform 0.2s}
-    .provider-card .p-icon{width:44px;height:44px;border-radius:12px;background:var(--bg-3);
-      display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .provider-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;transition:transform 0.2s}
+    .provider-card .p-icon{width:44px;height:44px;border-radius:12px;background:var(--bg-3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
     .provider-card .p-info{flex:1;min-width:0}
     .provider-card .p-name{font-size:15px;font-weight:600;margin-bottom:4px}
     .provider-card .p-status{font-size:12px;color:var(--text-dim);word-break:break-word}
@@ -160,28 +96,17 @@
     .p-badge.ko{background:rgba(239,68,68,0.15);color:var(--error)}
     .p-badge.pending{background:rgba(245,158,11,0.15);color:var(--warning)}
     .p-badge.idle{background:var(--bg-3);color:var(--text-dim)}
-    
-    /* Toast */
-    .toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);
-      background:rgba(34,34,51,0.95);backdrop-filter:blur(10px);color:var(--text);padding:14px 24px;border-radius:16px;font-size:14px;
-      border:1px solid var(--border);opacity:0;pointer-events:none;transition:all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);z-index:1000;
-      max-width:90vw;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.5);font-weight:500}
+    .toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:rgba(34,34,51,0.95);backdrop-filter:blur(10px);color:var(--text);padding:14px 24px;border-radius:16px;font-size:14px;border:1px solid var(--border);opacity:0;pointer-events:none;transition:all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);z-index:1000;max-width:90vw;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.5);font-weight:500}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.error{border-color:var(--error);color:#fca5a5}
     .toast.success{border-color:var(--success);color:#6ee7b7}
-    
-    /* Welcome Screen */
     .welcome{text-align:center;padding:40px 20px;color:var(--text-dim);animation:fadeIn 0.5s ease}
-    .welcome .big-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:white;
-      box-shadow:0 10px 40px rgba(99,102,241,0.5)}
+    .welcome .big-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent-2));margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:white;box-shadow:0 10px 40px rgba(99,102,241,0.5)}
     .welcome h2{color:var(--text);font-size:22px;margin:0 0 10px;font-weight:700}
     .welcome p{font-size:14.5px;line-height:1.5;margin:0}
     .suggestions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;justify-content:center}
-    .suggestion{padding:10px 18px;background:var(--bg-3);border:1px solid var(--border);border-radius:24px;
-      color:var(--text);font-size:13.5px;cursor:pointer;font-weight:500;transition:all 0.2s}
+    .suggestion{padding:10px 18px;background:var(--bg-3);border:1px solid var(--border);border-radius:24px;color:var(--text);font-size:13.5px;cursor:pointer;font-weight:500;transition:all 0.2s}
     .suggestion:active{background:var(--bg-4);transform:scale(0.96)}
-    
     .hint{font-size:12px;color:var(--text-dim);line-height:1.4;margin-top:8px}
     .link{color:var(--accent);text-decoration:none;font-weight:500}
     .link:hover{text-decoration:underline}
@@ -203,12 +128,10 @@
     </header>
 
     <main id="content">
-      <!-- CHAT VIEW -->
       <section class="view active" id="view-chat">
         <div id="messages"></div>
       </section>
 
-      <!-- SETTINGS VIEW -->
       <section class="view" id="view-settings">
         <div class="scroll-view">
           <div class="card">
@@ -275,11 +198,10 @@
             <button class="btn danger" id="btn-reset">Effacer toutes les données locales</button>
           </div>
 
-          <p class="hint" style="text-align:center;margin:24px 0">NEXUS AI · v2.0 · Glassmorphism Edition</p>
+          <p class="hint" style="text-align:center;margin:24px 0">NEXUS AI · v2.1 · Smart Router Edition</p>
         </div>
       </section>
 
-      <!-- TEST VIEW -->
       <section class="view" id="view-test">
         <div class="scroll-view">
           <div class="card">
@@ -349,10 +271,8 @@
     toastTimer = setTimeout(()=>el.classList.remove('show'),3000);
   }
 
-  // Copier le texte
   function copyToClipboard(text, btn) {
     if (!navigator.clipboard) {
-      // Fallback pour les anciens navigateurs
       const ta = document.createElement('textarea');
       ta.value = text; document.body.appendChild(ta); ta.select();
       document.execCommand('copy'); document.body.removeChild(ta);
@@ -362,10 +282,7 @@
     const originalText = btn.innerHTML;
     btn.innerHTML = '✅ Copié !';
     btn.classList.add('copied');
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-      btn.classList.remove('copied');
-    }, 2000);
+    setTimeout(() => { btn.innerHTML = originalText; btn.classList.remove('copied'); }, 2000);
   }
 
   function renderMarkdown(text){
@@ -380,20 +297,69 @@
     return parts.map(p=>p.startsWith('<pre>')?p:p.replace(/\n/g,'<br>')).join('');
   }
 
-  function tryLocalResponse(text){
-    const t = text.trim().toLowerCase();
-    const raw = text.trim();
+  // Normalisation douce du texte
+  function normalizeText(text) {
+    return text.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Enlève les accents
+      .replace(/[^\w\s\+\-\*\/\(\)\.\,\?\!\:\;\=]/g, '') // Garde la ponctuation utile
+      .replace(/\s+/g, ' ').trim();
+  }
+
+  // Modules locaux
+  function tryLocalResponse(originalText){
+    const t = normalizeText(originalText);
+    const raw = originalText.trim();
+
+    // Dés
+    const matchDe = t.match(/^(?:lance|jet|jette|roule)\s+(?:un|1|le)?\s*(?:de|des|dé|dés)\s*(?:a|de)?\s*(\d+)?/);
+    if (matchDe) {
+      const faces = parseInt(matchDe[1]) || 6;
+      const result = Math.floor(Math.random() * faces) + 1;
+      return `🎲 J'ai lancé un dé à **${faces} faces** : **${result}** !`;
+    }
+
+    // Pile ou face
+    if (/(pile ou face|piece|pièce)/.test(t) && t.length < 25) {
+      return `🪙 **${Math.random() > 0.5 ? 'Pile' : 'Face'}** !`;
+    }
+
+    // Mot de passe
+    const matchMdp = t.match(/(?:genere|crée|creer|donne)[\s\w]*(?:mot de passe|mdp)[\s\w]*(?:de\s*)?(\d+)?/);
+    if (matchMdp) {
+      const length = Math.min(Math.max(parseInt(matchMdp[1]) || 16, 8), 64);
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+      let pwd = "";
+      for (let i = 0; i < length; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+      return `🔐 Voici un mot de passe de **${length} caractères** :\n\n\`${pwd}\`\n\n*(Cliquez sur Copier ou sélectionnez-le)*`;
+    }
+
+    // Dates futures
+    const matchDateFutur = t.match(/dans\s+(\d+)\s+(jour|jours|semaine|semaines|mois|an|ans)/);
+    if (matchDateFutur) {
+      const n = parseInt(matchDateFutur[1]);
+      const unit = matchDateFutur[2];
+      const d = new Date();
+      if (unit.includes('jour')) d.setDate(d.getDate() + n);
+      else if (unit.includes('semaine')) d.setDate(d.getDate() + (n * 7));
+      else if (unit.includes('mois')) d.setMonth(d.getMonth() + n);
+      else if (unit.includes('an')) d.setFullYear(d.getFullYear() + n);
+      
+      const dateStr = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      return `📅 Dans ${n} ${unit}, nous serons le **${dateStr}**.`;
+    }
+
+    // Salutations
     if(/^(bonjour|salut|hello|hi|hey|yo|coucou|bonsoir|cc|slt|hola)\b/.test(t) && t.length<40){
       return "Bonjour ! Je suis NEXUS 👋 Posez-moi une question, je choisirai la meilleure IA pour vous répondre.";
     }
-    if(/^(merci|thanks|thank you|thx|ok merci|super|génial|parfait|nickel)\b/.test(t) && t.length<40){
+    if(/^(merci|thanks|thank you|thx|ok merci|super|genial|parfait|nickel)\b/.test(t) && t.length<40){
       return "Avec plaisir ! N'hésitez pas si vous avez d'autres questions. 😊";
     }
-    if(/(qui es[- ]tu|qui est[- ]tu|ton nom|c'est quoi nexus|présente[- ]toi|t'es qui)/.test(t)){
+    if(/(qui es[- ]tu|qui est[- ]tu|ton nom|c'est quoi nexus|presente[- ]toi|t'es qui)/.test(t)){
       return "Je suis **NEXUS**, un assistant multi-IA. Je route intelligemment vos demandes vers la meilleure IA disponible (Groq, OpenRouter, Gemini, Puter, Kilo, Pollinations) — en privilégiant les options gratuites et adaptées.";
     }
-    if(/(que (peux|sais)[- ]tu faire|tes? (capacités|fonctions)|aide|help|commandes)/.test(t) && t.length<80){
-      return "Voici ce que je peux faire :\n\n- 💬 **Discuter** et répondre à des questions\n- 🧮 **Calculer** des expressions simples\n- 🕐 **Donner** l'heure et la date\n- 🔀 **Router** vers la meilleure IA selon le besoin\n- 🧪 **Tester** vos connexions API\n\nConfigurez vos clés dans ⚙️ Réglages.";
+    if(/(que (peux|sais)[- ]tu faire|tes? (capacites|fonctions)|aide|help|commandes)/.test(t) && t.length<80){
+      return "Voici ce que je peux faire :\n\n- 💬 **Discuter** et répondre à des questions\n- 🧮 **Calculer** des expressions simples\n- 🕐 **Donner** l'heure et la date\n- 🎲 **Lancer** des dés ou faire Pile ou Face\n- 🔐 **Générer** des mots de passe\n- 🔀 **Router** vers la meilleure IA selon le besoin\n- 🧪 **Tester** vos connexions API\n\nConfigurez vos clés dans ⚙️ Réglages.";
     }
     if(/(quelle heure|what time|l'heure|heure actuelle)/.test(t)){
       const n = new Date();
@@ -403,6 +369,8 @@
       const n = new Date();
       return `Nous sommes le **${n.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}**.`;
     }
+    
+    // Maths
     if(/^[\d\s\+\-\*\/\(\)\.]+[=\?]?$/.test(t) && /[\d]/.test(t) && /[\+\-\*\/]/.test(t)){
       try{
         const expr = raw.replace(/[=\?]/g,'').trim();
@@ -415,18 +383,74 @@
     return null;
   }
 
-  function detectQueryType(text){
-    const t = text.toLowerCase();
-    if(/^(bonjour|salut|hello|hi|hey|yo|coucou|bonsoir|merci|thanks|ok)\b/.test(t) && t.length<40) return 'social';
-    if(/(qui es[- ]tu|ton nom|présente[- ]toi)/.test(t)) return 'social';
-    if(/(quelle heure|quel jour|quel(le)? date)/.test(t)) return 'social';
-    if(/^[\d\s\+\-\*\/\(\)\.]+[=\?]?$/.test(t.trim()) && /[\+\-\*\/]/.test(t)) return 'social';
-    if(/(code|programme|fonction|function|debug|erreur|script|js|javascript|python|html|css|sql|api|bug|compile)/.test(t)) return 'code';
-    if(/(tradui|traduis|translate|traduction)/.test(t)) return 'translation';
-    if(/(raconte|histoire|poème|poem|poésie|créatif|écris[- ]moi|invente|imagine|scénario)/.test(t)) return 'creative';
-    if(text.length>500) return 'long-context';
-    if(/(résume|résumer|summarize|synthèse|analyse ce texte)/.test(t)) return 'long-context';
-    return 'general';
+  // Nouveau Routeur Intelligent (Scoring)
+  function analyzeIntent(text) {
+    const t = normalizeText(text);
+    const scores = { code: 0, creative: 0, translation: 0, long_context: 0, general: 1 }; // general = 1 par défaut
+    
+    // Mots clés -> Score
+    const kw = {
+      code: ['code','programme','fonction','function','debug','erreur','script','js','javascript','python','html','css','sql','api','bug','compile','developpe','class','algorithme'],
+      creative: ['raconte','histoire','poeme','poesie','creatif','ecris','invente','imagine','scenario','chanson','paroles','fiction'],
+      translation: ['tradui','traduis','translate','traduction','anglais','espagnol','allemand','italien','chinois','japonais'],
+      long_context: ['resume','resumer','summarize','synthese','analyse ce texte','corrige ce texte','long']
+    };
+
+    for (const [type, words] of Object.entries(kw)) {
+      if (words.some(w => t.includes(w))) scores[type] += 2;
+    }
+
+    if (text.length > 500) scores.long_context += 3;
+    if (/(\d+\s*[\+\-\*\/]\s*\d+)/.test(t)) scores.general += 1;
+
+    // Trouver l'intention dominante
+    let bestIntent = 'general';
+    let bestScore = -1;
+    for (const [intent, score] of Object.entries(scores)) {
+      if (score > bestScore) { bestScore = score; bestIntent = intent; }
+    }
+    return bestIntent;
+  }
+
+  function routeQuery(text) {
+    const intent = analyzeIntent(text);
+    
+    // Matrice de compatibilité (Fournisseur : Score pour chaque intention)
+    const providerScores = {
+      groq:        { code: 5, creative: 1, translation: 2, long_context: 1, general: 3 },
+      openrouter:  { code: 4, creative: 5, translation: 3, long_context: 4, general: 3 },
+      gemini:      { code: 3, creative: 3, translation: 5, long_context: 5, general: 3 },
+      kila:        { code: 4, creative: 2, translation: 2, long_context: 2, general: 2 }, // Kilo (alias kila pour éviter conflit)
+      puter:       { code: 3, creative: 3, translation: 3, long_context: 3, general: 3 },
+      pollinations:{ code: 2, creative: 2, translation: 2, long_context: 2, general: 4 }  // Fallback gratuit
+    };
+
+    const availProviders = Object.keys(PROVIDERS).filter(id => isProviderAvailable(id === 'kilo' ? 'kilo' : id));
+    
+    if (availProviders.length === 0) return { provider: null, reason: 'Aucun fournisseur disponible' };
+
+    let bestProvider = availProviders[0];
+    let highestScore = -1;
+
+    for (const p of availProviders) {
+      // Gestion spéciale pour Kilo
+      const scoreKey = p === 'kilo' ? 'kila' : p;
+      const score = (providerScores[scoreKey] && providerScores[scoreKey][intent]) || 1;
+      
+      if (score > highestScore) {
+        highestScore = score;
+        bestProvider = p;
+      }
+    }
+
+    return { provider: bestProvider, reason: `Intent: ${intent}` };
+  }
+
+  // Gestion des commandes Slash
+  function parseSlashCommand(text) {
+    const match = text.match(/^\/(groq|gemini|openrouter|kilo|puter|pollinations)\s+([\s\S]+)/i);
+    if (match) return { provider: match[1].toLowerCase(), text: match[2].trim() };
+    return null;
   }
 
   function isProviderAvailable(id){
@@ -434,84 +458,41 @@
     if(id==='groq') return !!k.groq;
     if(id==='openrouter') return !!k.openrouter;
     if(id==='gemini') return !!k.gemini;
-    if(id==='kilo') return true; // Toujours dispo grâce au mode anonyme
+    if(id==='kilo') return true;
     if(id==='pollinations') return k.pollinations !== false;
     if(id==='puter') return typeof puter!=='undefined' && puter.auth && puter.auth.isSignedIn && puter.auth.isSignedIn();
     return false;
   }
 
-  const ROUTES = {
-    social:['local','pollinations','groq','gemini','puter','openrouter','kilo'],
-    code:['groq','openrouter','gemini','kilo','pollinations','puter'],
-    translation:['gemini','groq','openrouter','pollinations','puter','kilo'],
-    creative:['openrouter','gemini','groq','puter','pollinations','kilo'],
-    'long-context':['gemini','openrouter','groq','pollinations','puter','kilo'],
-    general:['pollinations','groq','gemini','puter','openrouter','kilo']
-  };
-
-  function routeQuery(text){
-    const type = detectQueryType(text);
-    const prefs = ROUTES[type] || ROUTES.general;
-    for(const p of prefs){
-      if(p==='local') return {provider:'local',reason:'Réponse locale'};
-      if(isProviderAvailable(p)) return {provider:p,reason:`Type: ${type}`};
-    }
-    return {provider:null,reason:'Aucun fournisseur disponible'};
-  }
-
   async function callGroq(messages,key){
-    const res = await fetch(PROVIDERS.groq.endpoint,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages,temperature:0.7,max_tokens:2048})
-    });
+    const res = await fetch(PROVIDERS.groq.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages,temperature:0.7,max_tokens:2048})});
     if(!res.ok) throw new Error('Groq '+res.status+': '+(await res.text()).slice(0,200));
-    const d = await res.json();
-    return d.choices?.[0]?.message?.content || '';
+    const d = await res.json(); return d.choices?.[0]?.message?.content || '';
   }
 
   async function callOpenRouter(messages,key){
-    const res = await fetch(PROVIDERS.openrouter.endpoint,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+key,
-        'HTTP-Referer':location.origin||'https://nexus-ai.app',
-        'X-Title':'NEXUS AI'
-      },
-      body:JSON.stringify({model:'meta-llama/llama-3.3-70b-instruct:free',messages,temperature:0.7})
-    });
+    const res = await fetch(PROVIDERS.openrouter.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':location.origin||'https://nexus-ai.app','X-Title':'NEXUS AI'},body:JSON.stringify({model:'meta-llama/llama-3.3-70b-instruct:free',messages,temperature:0.7})});
     if(!res.ok) throw new Error('OpenRouter '+res.status+': '+(await res.text()).slice(0,200));
-    const d = await res.json();
-    return d.choices?.[0]?.message?.content || '';
+    const d = await res.json(); return d.choices?.[0]?.message?.content || '';
   }
 
   async function callGemini(messages,key){
-    const contents = [];
-    let system = null;
-    for(const m of messages){
-      if(m.role==='system'){system=m.content;continue}
-      contents.push({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]});
-    }
+    const contents = []; let system = null;
+    for(const m of messages){ if(m.role==='system'){system=m.content;continue} contents.push({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}); }
     const body = {contents,generationConfig:{temperature:0.7,maxOutputTokens:2048}};
     if(system) body.systemInstruction = {parts:[{text:system}]};
     const url = PROVIDERS.gemini.endpoint.replace('{model}','gemini-2.0-flash-exp')+'?key='+encodeURIComponent(key);
     const res = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok) throw new Error('Gemini '+res.status+': '+(await res.text()).slice(0,200));
-    const d = await res.json();
-    return d.candidates?.[0]?.content?.parts?.map(p=>p.text).join('') || '';
+    const d = await res.json(); return d.candidates?.[0]?.content?.parts?.map(p=>p.text).join('') || '';
   }
 
   async function callPuter(messages){
     if(typeof puter==='undefined' || !puter.ai) throw new Error('SDK Puter non chargé');
     if(!puter.auth.isSignedIn()) throw new Error('Non connecté à Puter');
-    const system = messages.find(m=>m.role==='system');
-    const chat = messages.filter(m=>m.role!=='system');
-    const opts = {model:'gpt-4o-mini'};
-    if(system) opts.systemPrompt = system.content;
-    let resp;
-    if(chat.length===1) resp = await puter.ai.chat(chat[0].content,opts);
-    else resp = await puter.ai.chat(chat,opts);
+    const system = messages.find(m=>m.role==='system'); const chat = messages.filter(m=>m.role!=='system');
+    const opts = {model:'gpt-4o-mini'}; if(system) opts.systemPrompt = system.content;
+    let resp = chat.length===1 ? await puter.ai.chat(chat[0].content,opts) : await puter.ai.chat(chat,opts);
     if(typeof resp==='string') return resp;
     if(resp?.message?.content) return resp.message.content;
     if(resp?.text) return resp.text;
@@ -519,30 +500,17 @@
   }
 
   async function callKilo(messages,key){
-    const k = getKeys();
-    const base = (k.kiloBase||'https://api.kilocode.ai/v1').replace(/\/$/,'');
-    // Si pas de clé, on utilise le mode anonyme (gratuit)
+    const k = getKeys(); const base = (k.kiloBase||'https://api.kilocode.ai/v1').replace(/\/$/,'');
     const finalKey = key.trim() === '' ? 'anonymous' : key;
-    
-    const res = await fetch(base+'/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+finalKey},
-      body:JSON.stringify({model:'kilo-default',messages,temperature:0.7})
-    });
+    const res = await fetch(base+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+finalKey},body:JSON.stringify({model:'kilo-default',messages,temperature:0.7})});
     if(!res.ok) throw new Error('Kilo '+res.status+': '+(await res.text()).slice(0,200));
-    const d = await res.json();
-    return d.choices?.[0]?.message?.content || '';
+    const d = await res.json(); return d.choices?.[0]?.message?.content || '';
   }
 
   async function callPollinations(messages){
-    const res = await fetch(PROVIDERS.pollinations.endpoint,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'openai',messages,temperature:0.7})
-    });
+    const res = await fetch(PROVIDERS.pollinations.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'openai',messages,temperature:0.7})});
     if(!res.ok) throw new Error('Pollinations '+res.status);
-    const d = await res.json();
-    return d.choices?.[0]?.message?.content || '';
+    const d = await res.json(); return d.choices?.[0]?.message?.content || '';
   }
 
   async function dispatch(provider,messages){
@@ -559,7 +527,8 @@
   }
 
   async function dispatchWithFallback(primary,messages){
-    const order = [primary,...ROUTES.general.filter(p=>p!=='local' && p!==primary)];
+    const allProviders = ['groq','openrouter','gemini','kilo','pollinations','puter'];
+    const order = [primary,...allProviders.filter(p=>p!==primary)];
     let lastErr = null;
     for(const p of order){
       if(!isProviderAvailable(p)) continue;
@@ -580,14 +549,12 @@
           <p>Votre assistant multi-IA intelligent.<br>Je choisis automatiquement la meilleure IA pour chaque demande.</p>
           <div class="suggestions">
             <button class="suggestion" data-q="Bonjour !">👋 Bonjour</button>
-            <button class="suggestion" data-q="Écris-moi une fonction JavaScript pour inverser une chaîne">💻 Code</button>
+            <button class="suggestion" data-q="/groq Écris-moi une fonction JavaScript pour inverser une chaîne">⚡ Forcer Groq</button>
             <button class="suggestion" data-q="Raconte-moi une courte histoire sur l'espace">✨ Créatif</button>
-            <button class="suggestion" data-q="Quelle heure est-il ?">🕐 Heure</button>
+            <button class="suggestion" data-q="Lance un dé à 20 faces">🎲 Lancer de dé</button>
           </div>
         </div>`;
-      messagesEl.querySelectorAll('.suggestion').forEach(b=>{
-        b.addEventListener('click',()=>{ inputEl.value=b.dataset.q; send() });
-      });
+      messagesEl.querySelectorAll('.suggestion').forEach(b=>{ b.addEventListener('click',()=>{ inputEl.value=b.dataset.q; send() }); });
       return;
     }
     messagesEl.innerHTML = '';
@@ -596,98 +563,75 @@
   }
 
   function appendMessageEl(role,content,provider){
-    const wrap = document.createElement('div');
-    wrap.className = 'msg '+(role==='user'?'user':'ai');
-    
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = role==='user'?'👤':'✦';
-    
-    const col = document.createElement('div');
-    col.className = 'msg-content';
-    
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble selectable';
-    
-    if(role==='assistant') {
-      bubble.innerHTML = renderMarkdown(content);
-    } else {
-      bubble.textContent = content;
-    }
-    
+    const wrap = document.createElement('div'); wrap.className = 'msg '+(role==='user'?'user':'ai');
+    const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = role==='user'?'👤':'✦';
+    const col = document.createElement('div'); col.className = 'msg-content';
+    const bubble = document.createElement('div'); bubble.className = 'bubble selectable';
+    if(role==='assistant') { bubble.innerHTML = renderMarkdown(content); } else { bubble.textContent = content; }
     col.appendChild(bubble);
-    
     if(role==='assistant'){
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      
+      const meta = document.createElement('div'); meta.className = 'meta';
       const label = provider==='local'?'Nexus · local':(PROVIDERS[provider]?.name||provider||'Nexus');
       const ico = provider==='local'?'🧠':(PROVIDERS[provider]?.icon||'✦');
-      
-      const metaText = document.createElement('span');
-      metaText.textContent = ico+' '+label;
-      
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'copy-btn';
-      copyBtn.innerHTML = '📋 Copier';
+      const metaText = document.createElement('span'); metaText.textContent = ico+' '+label;
+      const copyBtn = document.createElement('button'); copyBtn.className = 'copy-btn'; copyBtn.innerHTML = '📋 Copier';
       copyBtn.onclick = () => copyToClipboard(content, copyBtn);
-      
-      meta.appendChild(metaText);
-      meta.appendChild(copyBtn);
-      col.appendChild(meta);
+      meta.appendChild(metaText); meta.appendChild(copyBtn); col.appendChild(meta);
     }
-    
-    wrap.appendChild(avatar);
-    wrap.appendChild(col);
-    messagesEl.appendChild(wrap);
+    wrap.appendChild(avatar); wrap.appendChild(col); messagesEl.appendChild(wrap);
   }
 
   function scrollBottom(){ requestAnimationFrame(()=>{ messagesEl.scrollTop = messagesEl.scrollHeight }) }
 
   function appendTyping(){
-    const wrap = document.createElement('div');
-    wrap.className = 'msg ai';
-    wrap.id = 'typing-msg';
+    const wrap = document.createElement('div'); wrap.className = 'msg ai'; wrap.id = 'typing-msg';
     wrap.innerHTML = `<div class="avatar">✦</div><div class="msg-content"><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
-    messagesEl.appendChild(wrap);
-    scrollBottom();
+    messagesEl.appendChild(wrap); scrollBottom();
   }
   function removeTyping(){ const e = document.getElementById('typing-msg'); if(e) e.remove() }
 
   async function send(){
     if(state.isSending) return;
-    const text = inputEl.value.trim();
+    let text = inputEl.value.trim();
     if(!text) return;
-    state.isSending = true;
-    sendBtn.disabled = true;
-    inputEl.value = '';
-    inputEl.style.height = 'auto';
+
+    state.isSending = true; sendBtn.disabled = true; inputEl.value = ''; inputEl.style.height = 'auto';
     state.conversation.push({role:'user',content:text});
     renderMessages();
 
-    const local = tryLocalResponse(text);
-    if(local){
-      await sleep(280);
-      state.conversation.push({role:'assistant',content:local,provider:'local'});
-      renderMessages();
-      saveConversation();
-      state.isSending = false;
-      sendBtn.disabled = false;
-      updateStatus('Prêt');
-      return;
+    // 1. Commandes Slash (Forcer une IA)
+    const slashCmd = parseSlashCommand(text);
+    let route;
+
+    if (slashCmd) {
+      if (!isProviderAvailable(slashCmd.provider)) {
+        const errMsg = `⚠️ Le fournisseur **${slashCmd.provider}** n'est pas configuré ou disponible.`;
+        state.conversation.push({role:'assistant',content:errMsg,provider:'local'});
+        renderMessages(); saveConversation(); state.isSending = false; sendBtn.disabled = false; updateStatus('Configuration requise', 'warning');
+        return;
+      }
+      route = { provider: slashCmd.provider, reason: 'Commande forcée' };
+      text = slashCmd.text; // On retire le /commande pour l'envoi
+      updateStatus(`Forcé : ${PROVIDERS[slashCmd.provider]?.name || slashCmd.provider}`);
+    } else {
+      // 2. Modules Locaux
+      const local = tryLocalResponse(text);
+      if(local){
+        await sleep(300);
+        state.conversation.push({role:'assistant',content:local,provider:'local'});
+        renderMessages(); saveConversation(); state.isSending = false; sendBtn.disabled = false; updateStatus('Prêt');
+        return;
+      }
+
+      // 3. Routeur Intelligent (Score)
+      route = routeQuery(text);
+      updateStatus(route.provider?`Routé vers ${PROVIDERS[route.provider]?.name||route.provider}`:'Aucun fournisseur');
     }
 
-    const route = routeQuery(text);
-    updateStatus(route.provider?`Routé vers ${PROVIDERS[route.provider]?.name||route.provider}`:'Aucun fournisseur');
-
     if(!route.provider){
-      const errMsg = "⚠️ Aucun fournisseur n'est configuré. Rendez-vous dans ⚙️ **Réglages** pour ajouter une clé API ou activer Pollinations.";
+      const errMsg = "⚠️ Aucun fournisseur n'est configuré. Rendez-vous dans ⚙️ **Réglages**.";
       state.conversation.push({role:'assistant',content:errMsg,provider:'local'});
-      renderMessages();
-      saveConversation();
-      state.isSending = false;
-      sendBtn.disabled = false;
-      updateStatus('Configuration requise', 'warning');
+      renderMessages(); saveConversation(); state.isSending = false; sendBtn.disabled = false; updateStatus('Configuration requise', 'warning');
       return;
     }
 
@@ -699,20 +643,15 @@
       const result = await dispatchWithFallback(route.provider,messages);
       removeTyping();
       state.conversation.push({role:'assistant',content:result.content,provider:result.provider});
-      renderMessages();
-      saveConversation();
+      renderMessages(); saveConversation();
       updateStatus(`Prêt · ${PROVIDERS[result.provider]?.name||result.provider}`);
     }catch(e){
       removeTyping();
       const msg = "❌ Erreur : "+e.message;
       state.conversation.push({role:'assistant',content:msg,provider:'local'});
-      renderMessages();
-      saveConversation();
-      updateStatus('Erreur de connexion', 'offline');
-      toast(e.message,'error');
+      renderMessages(); saveConversation(); updateStatus('Erreur de connexion', 'offline'); toast(e.message,'error');
     }finally{
-      state.isSending = false;
-      sendBtn.disabled = false;
+      state.isSending = false; sendBtn.disabled = false;
     }
   }
 
@@ -722,186 +661,103 @@
 
   function updateStatus(text, type=''){
     $('#status-text').textContent = text;
-    const dot = $('#status-dot');
-    dot.className = 'dot';
-    if(type) dot.classList.add(type);
+    const dot = $('#status-dot'); dot.className = 'dot'; if(type) dot.classList.add(type);
   }
 
   function checkInitialStatus() {
     const k = getKeys();
-    if (k.groq || k.openrouter || k.gemini || k.kilo) {
-      updateStatus('Prêt');
-    } else if (k.pollinations) {
-      updateStatus('Mode gratuit (Pollinations)');
-    } else {
-      updateStatus('Configuration requise', 'warning');
-    }
+    if (k.groq || k.openrouter || k.gemini || k.kilo) updateStatus('Prêt');
+    else if (k.pollinations) updateStatus('Mode gratuit (Pollinations)');
+    else updateStatus('Configuration requise', 'warning');
   }
 
   function loadSettingsUI(){
     const k = getKeys();
-    $('#key-groq').value = k.groq;
-    $('#key-openrouter').value = k.openrouter;
-    $('#key-gemini').value = k.gemini;
-    $('#key-kilo').value = k.kilo;
-    $('#base-kilo').value = k.kiloBase;
-    $('#toggle-pollinations').checked = k.pollinations !== false;
+    $('#key-groq').value = k.groq; $('#key-openrouter').value = k.openrouter; $('#key-gemini').value = k.gemini;
+    $('#key-kilo').value = k.kilo; $('#base-kilo').value = k.kiloBase; $('#toggle-pollinations').checked = k.pollinations !== false;
     refreshPuterUI();
   }
 
   function saveSettings(){
-    store.set('key_groq',$('#key-groq').value.trim());
-    store.set('key_openrouter',$('#key-openrouter').value.trim());
-    store.set('key_gemini',$('#key-gemini').value.trim());
-    store.set('key_kilo',$('#key-kilo').value.trim());
-    store.set('base_kilo',$('#base-kilo').value.trim()||'https://api.kilocode.ai/v1');
-    store.set('pollinations_on',$('#toggle-pollinations').checked);
+    store.set('key_groq',$('#key-groq').value.trim()); store.set('key_openrouter',$('#key-openrouter').value.trim());
+    store.set('key_gemini',$('#key-gemini').value.trim()); store.set('key_kilo',$('#key-kilo').value.trim());
+    store.set('base_kilo',$('#base-kilo').value.trim()||'https://api.kilocode.ai/v1'); store.set('pollinations_on',$('#toggle-pollinations').checked);
     checkInitialStatus();
   }
 
   function refreshPuterUI(){
     const signedIn = typeof puter!=='undefined' && puter.auth && puter.auth.isSignedIn && puter.auth.isSignedIn();
-    $('#puter-status').textContent = signedIn
-      ? '✅ Connecté : '+(puter.auth.getUser?(puter.auth.getUser()?.username||'utilisateur'):'utilisateur')
-      : 'Non connecté';
-    $('#btn-puter-login').style.display = signedIn?'none':'block';
-    $('#btn-puter-logout').style.display = signedIn?'block':'none';
+    $('#puter-status').textContent = signedIn ? '✅ Connecté : '+(puter.auth.getUser?(puter.auth.getUser()?.username||'utilisateur'):'utilisateur') : 'Non connecté';
+    $('#btn-puter-login').style.display = signedIn?'none':'block'; $('#btn-puter-logout').style.display = signedIn?'block':'none';
   }
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
   function renderTestResults(){
-    const c = $('#test-results');
-    c.innerHTML = '';
+    const c = $('#test-results'); c.innerHTML = '';
     for(const id of Object.keys(PROVIDERS)){
-      const p = PROVIDERS[id];
-      const st = state.testResults[id] || {status:'idle',detail:'Non testé'};
-      const card = document.createElement('div');
-      card.className = 'provider-card';
+      const p = PROVIDERS[id]; const st = state.testResults[id] || {status:'idle',detail:'Non testé'};
+      const card = document.createElement('div'); card.className = 'provider-card';
       const bc = st.status==='ok'?'ok':st.status==='ko'?'ko':st.status==='pending'?'pending':'idle';
       const bt = st.status==='ok'?'OK':st.status==='ko'?'Erreur':st.status==='pending'?'…':'—';
-      card.innerHTML = `
-        <div class="p-icon">${p.icon}</div>
-        <div class="p-info">
-          <div class="p-name">${p.name}</div>
-          <div class="p-status">${escapeHtml(st.detail)}</div>
-        </div>
-        <div class="p-badge ${bc}">${bt}</div>`;
+      card.innerHTML = `<div class="p-icon">${p.icon}</div><div class="p-info"><div class="p-name">${p.name}</div><div class="p-status">${escapeHtml(st.detail)}</div></div><div class="p-badge ${bc}">${bt}</div>`;
       c.appendChild(card);
     }
   }
 
   async function testProvider(id,fn){
-    state.testResults[id] = {status:'pending',detail:'Test...'};
-    renderTestResults();
-    try{
-      const detail = await fn();
-      state.testResults[id] = {status:'ok',detail:'Prêt · '+(detail||'OK')};
-    }catch(e){
-      state.testResults[id] = {status:'ko',detail:e.message.slice(0,120)};
-    }
+    state.testResults[id] = {status:'pending',detail:'Test...'}; renderTestResults();
+    try{ const detail = await fn(); state.testResults[id] = {status:'ok',detail:'Prêt · '+(detail||'OK')}; }
+    catch(e){ state.testResults[id] = {status:'ko',detail:e.message.slice(0,120)}; }
     renderTestResults();
   }
 
   async function runTests(){
-    const btn = $('#btn-run-test');
-    btn.disabled = true;
-    btn.textContent = '⏳ Test en cours...';
+    const btn = $('#btn-run-test'); btn.disabled = true; btn.textContent = '⏳ Test en cours...';
     for(const id of Object.keys(PROVIDERS)) state.testResults[id] = {status:'pending',detail:'Test...'};
-    renderTestResults();
-    const k = getKeys();
+    renderTestResults(); const k = getKeys();
 
-    await testProvider('groq',async()=>{
-      if(!k.groq) throw new Error('Clé API manquante');
-      const out = await callGroq([{role:'user',content:'Réponds uniquement "OK".'}],k.groq);
-      return out.slice(0,40);
-    });
-    await testProvider('openrouter',async()=>{
-      if(!k.openrouter) throw new Error('Clé API manquante');
-      const out = await callOpenRouter([{role:'user',content:'Réponds uniquement "OK".'}],k.openrouter);
-      return out.slice(0,40);
-    });
-    await testProvider('gemini',async()=>{
-      if(!k.gemini) throw new Error('Clé API manquante');
-      const out = await callGemini([{role:'user',content:'Réponds uniquement "OK".'}],k.gemini);
-      return out.slice(0,40);
-    });
-    await testProvider('puter',async()=>{
-      if(typeof puter==='undefined') throw new Error('SDK non chargé');
-      if(!puter.auth.isSignedIn()) throw new Error('Non connecté');
-      const out = await callPuter([{role:'user',content:'Réponds uniquement "OK".'}]);
-      return out.slice(0,40);
-    });
-    await testProvider('kilo',async()=>{
-      // Test toujours valide car mode anonyme activé par défaut
-      const out = await callKilo([{role:'user',content:'Réponds uniquement "OK."'}], k.kilo);
-      return out.slice(0,40);
-    });
-    await testProvider('pollinations',async()=>{
-      if(!k.pollinations) throw new Error('Désactivé');
-      const out = await callPollinations([{role:'user',content:'Réponds uniquement "OK."'}]);
-      return out.slice(0,40);
-    });
+    await testProvider('groq',async()=>{ if(!k.groq) throw new Error('Clé API manquante'); return (await callGroq([{role:'user',content:'Réponds uniquement "OK".'}],k.groq)).slice(0,40); });
+    await testProvider('openrouter',async()=>{ if(!k.openrouter) throw new Error('Clé API manquante'); return (await callOpenRouter([{role:'user',content:'Réponds uniquement "OK".'}],k.openrouter)).slice(0,40); });
+    await testProvider('gemini',async()=>{ if(!k.gemini) throw new Error('Clé API manquante'); return (await callGemini([{role:'user',content:'Réponds uniquement "OK".'}],k.gemini)).slice(0,40); });
+    await testProvider('puter',async()=>{ if(typeof puter==='undefined') throw new Error('SDK non chargé'); if(!puter.auth.isSignedIn()) throw new Error('Non connecté'); return (await callPuter([{role:'user',content:'Réponds uniquement "OK".'}])).slice(0,40); });
+    await testProvider('kilo',async()=>{ return (await callKilo([{role:'user',content:'Réponds uniquement "OK."'}], k.kilo)).slice(0,40); });
+    await testProvider('pollinations',async()=>{ if(!k.pollinations) throw new Error('Désactivé'); return (await callPollinations([{role:'user',content:'Réponds uniquement "OK."'}])).slice(0,40); });
 
-    btn.disabled = false;
-    btn.textContent = '▶ Relancer le test complet';
-    toast('Test terminé','success');
+    btn.disabled = false; btn.textContent = '▶ Relancer le test complet'; toast('Test terminé','success');
   }
 
   function switchView(view){
     document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+view));
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
     inputBar.classList.toggle('hidden',view!=='chat');
-    if(view==='settings') loadSettingsUI();
-    if(view==='test') renderTestResults();
+    if(view==='settings') loadSettingsUI(); if(view==='test') renderTestResults();
   }
 
   document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>switchView(btn.dataset.view)));
   sendBtn.addEventListener('click',send);
-  inputEl.addEventListener('input',()=>{
-    inputEl.style.height = 'auto';
-    inputEl.style.height = Math.min(inputEl.scrollHeight,120)+'px';
-  });
+  inputEl.addEventListener('input',()=>{ inputEl.style.height = 'auto'; inputEl.style.height = Math.min(inputEl.scrollHeight,120)+'px'; });
   const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-  inputEl.addEventListener('keydown',e=>{
-    if(e.key==='Enter' && !e.shiftKey && !isCoarse){ e.preventDefault(); send() }
-  });
+  inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey && !isCoarse){ e.preventDefault(); send() } });
 
   $('#btn-new').addEventListener('click',()=>{
     if(state.conversation.length && !confirm('Démarrer une nouvelle conversation ?')) return;
-    state.conversation = [];
-    saveConversation();
-    renderMessages();
-    switchView('chat');
-    checkInitialStatus();
-    toast('Nouvelle conversation','success');
+    state.conversation = []; saveConversation(); renderMessages(); switchView('chat'); checkInitialStatus(); toast('Nouvelle conversation','success');
   });
 
   ['#key-groq','#key-openrouter','#key-gemini','#key-kilo','#base-kilo','#toggle-pollinations'].forEach(sel=>{
-    $(sel).addEventListener('change',saveSettings);
-    $(sel).addEventListener('blur',saveSettings);
+    $(sel).addEventListener('change',saveSettings); $(sel).addEventListener('blur',saveSettings);
   });
 
   $('#btn-reset').addEventListener('click',()=>{
     if(!confirm('Effacer toutes les clés API et conversations ?')) return;
     Object.keys(localStorage).filter(k=>k.startsWith('nexus_')).forEach(k=>localStorage.removeItem(k));
-    state.conversation = [];
-    loadSettingsUI();
-    renderMessages();
-    checkInitialStatus();
-    toast('Données effacées','success');
+    state.conversation = []; loadSettingsUI(); renderMessages(); checkInitialStatus(); toast('Données effacées','success');
   });
 
   $('#btn-puter-login').addEventListener('click',async()=>{
-    try{
-      if(typeof puter==='undefined') throw new Error('SDK Puter non chargé');
-      await puter.auth.signIn();
-      refreshPuterUI();
-      toast('Connecté à Puter','success');
-      checkInitialStatus();
-    }catch(e){ toast('Erreur Puter : '+e.message,'error') }
+    try{ if(typeof puter==='undefined') throw new Error('SDK Puter non chargé'); await puter.auth.signIn(); refreshPuterUI(); toast('Connecté à Puter','success'); checkInitialStatus(); }
+    catch(e){ toast('Erreur Puter : '+e.message,'error') }
   });
   $('#btn-puter-logout').addEventListener('click',async()=>{
     try{ await puter.auth.signOut(); refreshPuterUI(); toast('Déconnecté','success'); checkInitialStatus(); }
@@ -910,20 +766,11 @@
 
   $('#btn-run-test').addEventListener('click',runTests);
 
-  if('serviceWorker' in navigator){
-    window.addEventListener('load',()=>{
-      navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('SW:',e));
-    });
-  }
-  window.addEventListener('online',()=>checkInitialStatus());
-  window.addEventListener('offline',()=>updateStatus('Hors ligne', 'offline'));
+  if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('SW:',e)); }); }
+  window.addEventListener('online',()=>checkInitialStatus()); window.addEventListener('offline',()=>updateStatus('Hors ligne', 'offline'));
 
   (function init(){
-    loadConversation();
-    loadSettingsUI();
-    renderMessages();
-    renderTestResults();
-    checkInitialStatus();
+    loadConversation(); loadSettingsUI(); renderMessages(); renderTestResults(); checkInitialStatus();
     setTimeout(()=>{ try{ refreshPuterUI(); checkInitialStatus(); }catch{} },800);
   })();
   </script>
