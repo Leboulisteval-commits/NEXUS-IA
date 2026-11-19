@@ -100,6 +100,16 @@
 <style>
 :root{--bg:#0a0a10;--surface:#13131e;--surface-2:#1a1a28;--border:rgba(255,255,255,.08);--text:#f2f2f7;--text-muted:#9d9db0;--text-dim:#66667a;--primary:#00e5c7;--primary-soft:rgba(0,229,199,.12);--accent:#b46bff;--danger:#ff5c7a;--warning:#ffcc00;--success:#00e676;--font-mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;--font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;--radius:14px}
 body.light{--bg:#f4f4f7;--surface:#ffffff;--surface-2:#eceef2;--border:rgba(0,0,0,.1);--text:#17171f;--text-muted:#5d5d6e;--text-dim:#8a8a9a;--primary:#00a88f;--primary-soft:rgba(0,168,143,.12);--accent:#7a2fd1;--danger:#d92d4d;--warning:#b88600;--success:#008f4d}
+/* ===== 5 THÈMES NEXUS : le bouton en haut à droite ne fait que Jour / Nuit (classe .light). Le nom du thème est dans data-theme. ===== */
+body[data-theme="foret"]{--bg:#0a120c;--surface:#122016;--surface-2:#1a2e22;--border:rgba(255,255,255,.08);--text:#eef7ee;--text-muted:#9db0a0;--text-dim:#6a7a6e;--primary:#4ade80;--primary-soft:rgba(74,222,128,.14);--accent:#a3e635;--danger:#ff5c7a;--warning:#ffcc00;--success:#00e676}
+body[data-theme="foret"].light{--bg:#f0f5f0;--surface:#ffffff;--surface-2:#e6efe6;--border:rgba(0,0,0,.1);--text:#16211a;--text-muted:#5d6e60;--text-dim:#8a9a8e;--primary:#16a34a;--primary-soft:rgba(22,163,74,.12);--accent:#65a30d;--danger:#d92d4d;--warning:#b88600;--success:#008f4d}
+body[data-theme="ocean"]{--bg:#071422;--surface:#0e1f33;--surface-2:#152a42;--border:rgba(255,255,255,.09);--text:#eef5ff;--text-muted:#9db0c8;--text-dim:#6a7a9a;--primary:#38bdf8;--primary-soft:rgba(56,189,248,.14);--accent:#818cf8;--danger:#ff5c7a;--warning:#ffcc00;--success:#00e676}
+body[data-theme="ocean"].light{--bg:#eef4fa;--surface:#ffffff;--surface-2:#e2ecf5;--border:rgba(0,0,0,.1);--text:#0f1f33;--text-muted:#5d6e88;--text-dim:#8a9ab0;--primary:#0284c7;--primary-soft:rgba(2,132,199,.12);--accent:#6366f1;--danger:#d92d4d;--warning:#b88600;--success:#008f4d}
+body[data-theme="soleil"]{--bg:#1a0f0a;--surface:#241610;--surface-2:#2f1d15;--border:rgba(255,255,255,.09);--text:#fff3e8;--text-muted:#c8a898;--text-dim:#8a6a5a;--primary:#fb923c;--primary-soft:rgba(251,146,60,.16);--accent:#f472b6;--danger:#ff5c7a;--warning:#ffcc00;--success:#00e676}
+body[data-theme="soleil"].light{--bg:#fff5ee;--surface:#ffffff;--surface-2:#fde8d8;--border:rgba(0,0,0,.1);--text:#2a150a;--text-muted:#7a5a48;--text-dim:#9a7a68;--primary:#ea580c;--primary-soft:rgba(234,88,12,.12);--accent:#db2777;--danger:#d92d4d;--warning:#b88600;--success:#008f4d}
+body[data-theme="minimal"]{--bg:#111111;--surface:#1a1a1a;--surface-2:#222222;--border:rgba(255,255,255,.1);--text:#f5f5f5;--text-muted:#a3a3a3;--text-dim:#737373;--primary:#ffffff;--primary-soft:rgba(255,255,255,.12);--accent:#a3a3a3;--danger:#ff5c7a;--warning:#ffcc00;--success:#00e676}
+body[data-theme="minimal"].light{--bg:#fafafa;--surface:#ffffff;--surface-2:#eeeeee;--border:rgba(0,0,0,.12);--text:#171717;--text-muted:#5d5d5d;--text-dim:#8a8a8a;--primary:#171717;--primary-soft:rgba(0,0,0,.08);--accent:#525252;--danger:#d92d4d;--warning:#b88600;--success:#008f4d}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{
   height:100%;
@@ -268,7 +278,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{max-width:560px;margin:auto;text-align:center;padding:36px 16px}
 .empty h2{font-size:22px;margin:14px 0 8px;font-weight:700}
-.empty p{color:var(--text-muted);font-size:14px;line-height:1.55}uu
+.empty p{color:var(--text-muted);font-size:14px;line-height:1.55}
 .empty-logo{
   display:inline-block;
   font-family:var(--font-mono);
@@ -285,7 +295,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 }
 </style>
 <meta name="theme-color" content="#0a0a10"></head>
-<body style="top: 0px;">
+<body style="top: 0px;" data-theme="nexus">
 
 <header>
 <button class="icon-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
@@ -296,11 +306,11 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <button class="icon-btn" onclick="openSettings()" aria-label="Réglages" style="font-size:24px;width:46px;height:46px;padding:0;display:flex;align-items:center;justify-content:center">⚙️</button>
 </header>
 <style>
-#nexusMemoireBar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 14px;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface)}
-#nexusMemoireBar button{border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
-#nexusMemoireBar button:active{opacity:.7}
+#nexusHorlogeBar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:7px 14px;font-size:12.5px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface)}
+#nexusHorlogeBar b{color:var(--text);font-weight:600}
+#nexusHorlogeHeure{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
-<div id="nexusMemoireBar"><span id="nexusMemoireProjet">📁 Aucun projet</span><span id="nexusMemoireFaits">🧠 0 souvenir</span><span id="nexusMemoireWeb">🌐 Web : auto si actu</span><span style="margin-left:auto;font-size:11px">Réglages dans ⚙️</span></div>
+<div id="nexusHorlogeBar"><span id="nexusHorlogeDate">19 novembre 2026</span><span><b id="nexusHorlogeJour">Jeudi</b> · <span id="nexusHorlogeHeure">01:56:43</span></span></div>
 
 
 <main>
@@ -326,20 +336,27 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 </div>
 </main>
 
-<aside id="sidebar" class="">
+<aside id="sidebar">
 <div class="sidebar-head"><b>CONVERSATIONS</b><button class="icon-btn" onclick="toggleSidebar()">✕</button></div>
 <div style="padding:12px 12px 0"><button class="btn btn-primary" onclick="newConversation()">＋ Nouvelle conversation</button></div>
 <div class="sidebar-search"><input id="searchInput" placeholder="Rechercher..." oninput="renderSidebar()"></div>
-<div id="convList"><div class="conv active" onclick="switchConversation(1795048207982)"><span class="conv-del" onclick="deleteConversation(1795048207982,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
+<div id="convList"><div class="conv active" onclick="switchConversation(1795049801605)"><span class="conv-del" onclick="deleteConversation(1795049801605,event)">✕</span><div class="conv-title">Nouvelle conversation</div><div class="conv-meta"><span>0 msg</span><span>19 nov.</span></div></div></div>
 <div class="sidebar-foot"><button class="btn btn-danger" style="flex:1" onclick="clearAllHistory()">🗑 Tout effacer les conversations</button></div>
 </aside>
-<div id="overlay" onclick="closeSidebar()" class=""></div>
+<div id="overlay" onclick="closeSidebar()"></div>
 
 <dialog id="settingsModal">
 <div class="modal-head"><b>RÉGLAGES NEXUS</b><button class="icon-btn" onclick="closeSettings()">✕</button></div>
 <div class="modal-body">
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:4px 0 8px">🎨 APPARENCE</div>
-<div class="field"><label>Thème</label><button class="btn btn-secondary" onclick="toggleTheme()">🌓 Changer de thème</button><small>Aussi accessible en haut à droite (🌙).</small></div>
+<div class="field"><label>Thème — 5 choix</label><div id="nexusThemes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<button type="button" data-theme-btn="nexus" onclick="nexusChoisirTheme('nexus')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--primary); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: 0 0 0 2px var(--primary-soft);"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#00e5c7"></span><span style="width:14px;height:14px;border-radius:50%;background:#b46bff"></span></span><span><b>NEXUS</b><br><small style="color:var(--text-muted)">Turquoise + violet</small></span></button>
+<button type="button" data-theme-btn="foret" onclick="nexusChoisirTheme('foret')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#4ade80"></span><span style="width:14px;height:14px;border-radius:50%;background:#a3e635"></span></span><span><b>Forêt</b><br><small style="color:var(--text-muted)">Vert</small></span></button>
+<button type="button" data-theme-btn="ocean" onclick="nexusChoisirTheme('ocean')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#38bdf8"></span><span style="width:14px;height:14px;border-radius:50%;background:#818cf8"></span></span><span><b>Océan</b><br><small style="color:var(--text-muted)">Bleu</small></span></button>
+<button type="button" data-theme-btn="soleil" onclick="nexusChoisirTheme('soleil')" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#fb923c"></span><span style="width:14px;height:14px;border-radius:50%;background:#f472b6"></span></span><span><b>Soleil</b><br><small style="color:var(--text-muted)">Orange + rose</small></span></button>
+<button type="button" data-theme-btn="minimal" onclick="nexusChoisirTheme('minimal')" style="grid-column-start: span 2; grid-column-end: auto; display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); cursor: pointer; text-align: left; box-shadow: none;"><span style="display:flex;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:#ffffff;border:1px solid var(--border)"></span><span style="width:14px;height:14px;border-radius:50%;background:#a3a3a3"></span></span><span><b>Minimal</b><br><small style="color:var(--text-muted)">Noir / blanc, épuré</small></span></button>
+</div><small>Le thème change les couleurs. Le bouton en haut à droite ne change que Jour / Nuit.</small></div>
+<div class="field"><label>Jour / Nuit</label><button id="nexusJourNuitBouton" class="btn btn-secondary" onclick="toggleTheme()">🌙 Mode nuit</button><small>Aussi en haut à droite.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🤖 INTELLIGENCE</div>
 <div class="field"><label>Mode de fonctionnement</label>
 <select id="mo" onchange="toggleSettings();saveModeVerif()">
@@ -347,7 +364,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <option value="cles">Mes clés API</option>
 </select>
 <small id="modeHintDetail">PUTER : modèle gratuit via Puter</small></div>
-<div class="check-row" style="border:1px solid var(--border);border-radius:12px;padding:10px"><input type="checkbox" id="vf" checked="" onchange="nexusReglages_ToggleVerif()"><div><b>Vérification croisée — <span id="nexusVerifStatut">activée</span></b><br><small>Un 2e modèle vérifie chaque réponse et la corrige si besoin (max 3 tours).</small></div></div>
+<div class="check-row" style="border:1px solid var(--border);border-radius:12px;padding:12px;align-items:flex-start"><input type="checkbox" id="vf" checked="" onchange="nexusReglages_ToggleVerif()" style="width:28px;height:28px;min-width:28px;margin-top:2px;accent-color:var(--success);cursor:pointer"><div style="flex:1"><b>Vérification croisée — <span id="nexusVerifStatut">activée</span></b><br><small>Un 2e modèle vérifie chaque réponse et la corrige si besoin (max 3 tours).</small><br><button id="nexusVerifBouton" type="button" onclick="nexusVerif_Bouton()" style="margin-top: 10px; width: 100%; padding: 12px; border-radius: 999px; border-top-width: ; border-right-width: ; border-bottom-width: ; border-left-width: ; border-top-style: ; border-right-style: ; border-bottom-style: ; border-left-style: ; border-color: var(--border); border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--surface-2); color: var(--text); font-size: 15px; font-weight: 700; cursor: pointer;">⏻ Désactiver la vérification</button></div></div>
 <div class="field"><label>Persona / Instructions système</label><textarea id="persona" placeholder="Ex : Tu es un professeur bienveillant qui explique simplement..."></textarea></div>
 <div id="api-settings" style="display:none">
 <div class="field"><label>🔑 Producteur (P) - URL API</label><input id="up" list="dl" placeholder="https://api.groq.com/openai/v1/chat/completions"><datalist id="dl"><option value="https://api.groq.com/openai/v1/chat/completions"></option><option value="https://api.mistral.ai/v1/chat/completions"></option><option value="https://openrouter.ai/api/v1/chat/completions"></option></datalist></div>
@@ -361,6 +378,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
 <div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="saveProvider('v');testP('v')">Tester V</button><span id="tv" style="font-family:var(--font-mono);font-size:12px;align-self:center"></span></div>
 </div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">🧠 MÉMOIRE / PROJETS / WEB</div>
+<div class="field"><label>Statut</label><div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--text-muted)"><span id="nexusMemoireProjet">📁 Aucun projet</span><span id="nexusMemoireFaits">🧠 0 souvenir</span><span id="nexusMemoireWeb">🌐 Web : auto si actu</span></div></div>
 <div class="field"><label>Raccourcis</label><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('projet')">📁 Projet…</button><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('memoire')">🧠 Mémoire…</button><button class="btn btn-secondary" onclick="nexusReglages_Raccourci('web')">🌐 Web…</button></div><small>Ces boutons remplissent ta zone de texte, tu n'as plus qu'à compléter et envoyer.</small></div>
 <div class="field"><label>Effacer la mémoire</label><button class="btn btn-secondary" onclick="nexusReglages_OublieTout()">🧹 Oublie tout (mémoire seulement)</button><small>Supprime souvenirs + projets. Tes conversations ne sont pas touchées.</small></div>
 <div style="font-weight:700;font-size:12px;letter-spacing:.1em;margin:16px 0 8px">☁️ STOCKAGE &amp; CLOUD</div>
@@ -466,7 +484,7 @@ setTimeout(setAppHeight, 80);
 setTimeout(setAppHeight, 300);
 setTimeout(setAppHeight, 700);
 
-function updateThemeIcon(){ $("#themeBtn").textContent = document.body.classList.contains('light') ? '☀️' : '🌙'; }
+function updateThemeIcon(){ $("#themeBtn").textContent = document.body.classList.contains('light') ? '☀️' : '🌙'; try{ nexusMajBoutonsTheme(); }catch(e){} }
 function updateThemeColor(){
   const light = document.body.classList.contains('light');
   // Met à jour la couleur de la barre de statut (PWA / écran d'accueil)
@@ -476,6 +494,7 @@ function updateThemeColor(){
     meta.name = 'theme-color';
     document.head.appendChild(meta);
   }
+  try{ const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim(); if(bg) { meta.content = bg; return; } }catch(e){}
   meta.content = light ? '#f4f4f7' : '#0a0a10';
 }
 function toggleTheme(){
@@ -483,8 +502,10 @@ function toggleTheme(){
   localStorage.setItem('nexus_theme', light ? 'light' : 'dark');
   updateThemeIcon();
   updateThemeColor();
+  try{ nexusMajBoutonsTheme(); }catch(e){}
 }
 if(localStorage.getItem('nexus_theme') === 'light') document.body.classList.add('light');
+try{ nexusChargerTheme(); }catch(e){}
 updateThemeColor();
 
 function showToast(msg, ms = 2500){
@@ -2145,15 +2166,22 @@ function nexusReglages_ConnecterCloud(){
 }
 
 
-// ===== VÉRIFICATION : uniquement dans Réglages, comme avant. On garde juste le statut + le toast pour voir que ça a bien basculé. =====
+// ===== VÉRIFICATION : uniquement dans Réglages. Case + gros bouton ON/OFF en-dessous, les deux sont synchronisés. =====
 function nexusMajBoutonVerif(){
   try{
     const on = !!document.getElementById('vf') && document.getElementById('vf').checked;
     const st = document.getElementById('nexusVerifStatut');
     if(st) st.textContent = on ? 'activée' : 'désactivée';
+    const btn = document.getElementById('nexusVerifBouton');
+    if(btn){
+      btn.textContent = on ? '⏻ Désactiver la vérification' : '⏻ Activer la vérification';
+      btn.style.background = on ? 'var(--surface-2)' : 'var(--primary-soft)';
+      btn.style.borderColor = on ? 'var(--border)' : 'var(--primary)';
+    }
   }catch(e){}
 }
 function nexusReglages_ToggleVerif(){
+  // Appelé par la case : la case a déjà basculé, on sauve juste.
   try{ saveModeVerif(); }catch(e){}
   try{ nexusMajBoutonVerif(); }catch(e){}
   try{
@@ -2161,6 +2189,74 @@ function nexusReglages_ToggleVerif(){
     showToast(on ? 'Vérification activée.' : 'Vérification désactivée.');
   }catch(e){}
 }
+function nexusVerif_Bouton(){
+  // Appelé par le gros bouton : on bascule la case nous-mêmes, puis on sauve.
+  try{
+    const cb = document.getElementById('vf');
+    if(!cb) return;
+    cb.checked = !cb.checked;
+    nexusReglages_ToggleVerif();
+  }catch(e){}
+}
+
+
+// ===== THÈMES : 5 choix dans Réglages. Le bouton en haut à droite ne fait que Jour / Nuit (classe .light). =====
+const NEXUS_THEMES = ['nexus', 'foret', 'ocean', 'soleil', 'minimal'];
+function nexusChoisirTheme(nom){
+  if(!NEXUS_THEMES.includes(nom)) return;
+  try{ document.body.setAttribute('data-theme', nom); }catch(e){}
+  try{ localStorage.setItem('nexus_theme_nom', nom); }catch(e){}
+  try{ updateThemeColor(); }catch(e){}
+  try{ nexusMajBoutonsTheme(); }catch(e){}
+}
+function nexusMajBoutonsTheme(){
+  try{
+    const actuel = document.body.getAttribute('data-theme') || 'nexus';
+    document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+      const actif = btn.getAttribute('data-theme-btn') === actuel;
+      btn.style.borderColor = actif ? 'var(--primary)' : 'var(--border)';
+      btn.style.boxShadow = actif ? '0 0 0 2px var(--primary-soft)' : 'none';
+    });
+    const light = document.body.classList.contains('light');
+    const jn = document.getElementById('nexusJourNuitBouton');
+    if(jn) jn.textContent = light ? '☀️ Mode jour' : '🌙 Mode nuit';
+  }catch(e){}
+}
+function nexusChargerTheme(){
+  try{
+    const nom = localStorage.getItem('nexus_theme_nom') || 'nexus';
+    if(NEXUS_THEMES.includes(nom)) document.body.setAttribute('data-theme', nom);
+    else document.body.setAttribute('data-theme', 'nexus');
+  }catch(e){ try{ document.body.setAttribute('data-theme', 'nexus'); }catch(_){} }
+  try{ nexusMajBoutonsTheme(); }catch(e){}
+}
+
+
+// ===== HORLOGE : jour, date et heure en haut, à la place de l'ancienne barre mémoire =====
+function nexusHorlogeMaj(){
+  try{
+    const d = new Date();
+    const dateEl = document.getElementById('nexusHorlogeDate');
+    const jourEl = document.getElementById('nexusHorlogeJour');
+    const heureEl = document.getElementById('nexusHorlogeHeure');
+    const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+    const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    if(dateEl){
+      dateEl.textContent = d.getDate() + ' ' + MOIS[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    if(jourEl){
+      jourEl.textContent = JOURS[d.getDay()];
+    }
+    if(heureEl){
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      const s = String(d.getSeconds()).padStart(2, '0');
+      heureEl.textContent = h + ':' + m + ':' + s;
+    }
+  }catch(e){}
+}
+try{ nexusHorlogeMaj(); }catch(e){}
+try{ setInterval(nexusHorlogeMaj, 1000); }catch(e){}
 
 async function run(t){
   const conv = currentConv();
@@ -2533,6 +2629,7 @@ async function testP(k){
 updateThemeIcon();
 loadModeVerif();
 try{ nexusMajBoutonVerif(); }catch(e){}
+try{ nexusMajBoutonsTheme(); }catch(e){}
 load();
 render();
 fillS();
