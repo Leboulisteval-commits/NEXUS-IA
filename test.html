@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="TEST">
+<title>TEST</title>
+<style>
+html,body{margin:0;background:#ffeb3b;font:14px -apple-system,system-ui,sans-serif}
+#s{position:fixed;inset:0;box-sizing:border-box;border:6px solid #000;background:linear-gradient(180deg,#e53935 0 20%,#fb8c00 20% 40%,#43a047 40% 60%,#1e88e5 60% 80%,#8e24aa 80% 100%)}
+.nx,.nx body,.nx #s{position:fixed;inset:0 0 calc(-1*env(safe-area-inset-bottom)) 0;width:100%;height:calc(100% + env(safe-area-inset-bottom));overflow:hidden}
+#a{position:fixed;left:0;right:0;bottom:0;height:34px;background:#000;color:#fff;text-align:center;line-height:34px;z-index:5}
+#b{position:fixed;left:30px;right:30px;bottom:calc(env(safe-area-inset-bottom) + 10px);height:44px;background:#ff4081;color:#fff;text-align:center;line-height:44px;border-radius:22px;z-index:6}
+#t{position:fixed;left:14px;right:14px;top:calc(env(safe-area-inset-top) + 40px);background:rgba(255,255,255,.92);border-radius:12px;padding:10px;z-index:7;line-height:1.5}
+button{font:inherit;padding:8px 12px;margin:4px 4px 0 0}
+#p{position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:1px}
+</style></head><body>
+<div id="s"></div>
+<div id="t"><button id="m1">Mode 1 : simple</button><button id="m2">Mode 2 : comme Nexus</button><div id="i"></div></div>
+<div id="b">rose : bas + marge iPhone + 10 px</div><div id="a">noir : bottom 0</div>
+<div id="p"><div id="d1" style="height:100vh"></div><div id="d2" style="height:100dvh"></div><div id="d3" style="height:100svh"></div><div id="d4" style="height:100lvh"></div><div id="d5" style="padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)"></div></div>
+<script>
+const g=id=>document.getElementById(id),h=id=>g(id).getBoundingClientRect().height;
+function go(){const cs=getComputedStyle(g('d5')),v=window.visualViewport;
+const r=[['mode',document.documentElement.classList.contains('nx')?'2 (comme Nexus)':'1 (simple)'],['appli installée',(navigator.standalone||matchMedia('(display-mode: standalone)').matches)?'OUI':'non (Safari)'],['innerHeight',innerHeight],['visualViewport',v?v.height.toFixed(1):'-'],['screen.height',screen.height],['100vh',h('d1')],['100dvh',h('d2')],['100svh',h('d3')],['100lvh',h('d4')],['marge haut',cs.paddingTop],['marge bas',cs.paddingBottom]];
+g('i').innerHTML=r.map(x=>'<b>'+x[0]+'</b> : '+x[1]).join('<br>')}
+g('m1').onclick=()=>{document.documentElement.classList.remove('nx');go()};
+g('m2').onclick=()=>{document.documentElement.classList.add('nx');go()};
+addEventListener('resize',go);go();setTimeout(go,500);
+</script></body></html>
