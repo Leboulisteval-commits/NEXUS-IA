@@ -1,7 +1,7 @@
 {
   "name": "NEXUS AI",
   "short_name": "Nexus",
-  "description": "Assistant multi-IA avec routeur local économe",
+  "description": "Assistant multi-IA avec routeur intelligent, cerveau local et mode économe",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
