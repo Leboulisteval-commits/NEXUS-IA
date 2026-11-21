@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Mémoire WebGPU</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; }
+    pre { background: #000; padding: 15px; border-radius: 8px; color: #0f0; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Test des limites WebGPU</h1>
+  <p>Vérifie la mémoire disponible pour l'IA locale.</p>
+  <pre id="output">Initialisation...</pre>
+
+  <script>
+    async function main() {
+      const out = document.getElementById('output');
+      if (!navigator.gpu) {
+        out.textContent = "❌ WebGPU n'est pas supporté sur ce navigateur.";
+        return;
+      }
+
+      try {
+        const adapter = await navigator.gpu.requestAdapter();
+        if (!adapter) {
+          out.textContent = "❌ Aucun adaptateur GPU trouvé.";
+          return;
+        }
+
+        // Récupération des limites matérielles
+        const limits = adapter.limits;
+        let txt = "✅ WebGPU supporté !\n\n";
+        txt += "Max Buffer Size: " + (limits.maxBufferSize / (1024 * 1024)).toFixed(0) + " Mo\n";
+        txt += "Max Storage Buffer Binding Size: " + (limits.maxStorageBufferBindingSize / (1024 * 1024)).toFixed(0) + " Mo\n";
+        txt += "Max Compute Workgroup Storage Size: " + limits.maxComputeWorkgroupStorageSize + " octets\n\n";
+
+        // Vérification des fonctionnalités
+        const features = Array.from(adapter.features);
+        txt += "Fonctionnalités supportées:\n";
+        txt += features.length > 0 ? features.join('\n') : "Aucune fonctionnalité spéciale.\n";
+
+        if (features.includes('shader-f16')) {
+          txt += "\n✅ shader-f16 supporté (optimisation pour les modèles 4-bit).";
+        } else {
+          txt += "\n⚠️ shader-f16 non supporté (certains modèles peuvent ne pas fonctionner).";
+        }
+
+        out.textContent = txt;
+      } catch (e) {
+        out.textContent = "❌ Erreur: " + e.message;
+      }
+    }
+    main();
+  </script>
+</body>
+</html>
