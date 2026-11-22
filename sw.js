@@ -2,8 +2,8 @@
 // Stratégie : on va chercher la page sur Internet en premier (mises à jour immédiates),
 // et on retombe sur le cache hors connexion. Les appels aux IA et les téléchargements
 // de modèles (autres sites) ne sont jamais interceptés.
-const C = 'nexus-ai-v6';
-const S = ['./', './index.html', './manifest.json', './nexus-brain.js', './logo.png', './icon-180.png', './icon-192.png', './icon-512.png'];
+const C = 'nexus-ai-v7';
+const S = ['./', './index.html', './manifest.json', './nexus-brain.js', './nexus-tools.js', './logo.png', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(C).then(c => Promise.all(S.map(u => c.add(u).catch(() => {})))));
