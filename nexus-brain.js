@@ -16,13 +16,14 @@ const WEBLLM_URL = 'https://esm.run/@mlc-ai/web-llm@0.2.79';
 const CONFIG = {
   embeddingModel: 'Xenova/all-MiniLM-L6-v2',          // ~25 Mo
   llmModel: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC',      // ~300 Mo, léger, correct en français pour sa taille
+  // Plusieurs phrases d'exemple par catégorie : le routeur compare la demande à leur moyenne.
   intents: {
-    code: 'programmation développement script code erreur bug python javascript html css api algorithme',
-    creative: 'histoire poème créatif écris-moi invention scénario imagination paroles fiction',
-    translation: 'traduire traduction anglais espagnol allemand italien chinois japonais langue',
-    long_context: 'résumer résumé synthèse analyse de texte long document rapport',
-    general: 'bonjour discussion générale question réponse conseil information explication',
-    math: 'calcul mathématiques addition soustraction multiplication division équation formule'
+    code: ["écris une fonction en javascript", "j'ai une erreur dans mon code python", "comment corriger ce bug", "un script html et css", "une requête sql pour ma base de données", "un algorithme de tri", "mon site ne s'affiche plus", "problème de programmation avec une api"],
+    creative: ["raconte-moi une histoire", "écris un poème", "invente un personnage de fiction", "imagine un scénario original", "écris les paroles d'une chanson", "raconte une blague drôle"],
+    translation: ["traduis cette phrase en anglais", "comment dit-on bonjour en espagnol", "traduction en allemand", "traduire ce texte en français", "que veut dire ce mot en italien"],
+    long_context: ["résume ce long texte", "fais une synthèse de ce document", "analyse ce rapport", "peux-tu résumer cet article", "quels sont les points clés de ce texte"],
+    general: ["bonjour comment ça va", "explique-moi simplement ce concept", "donne-moi un conseil", "une question de culture générale", "une idée de recette de cuisine", "dis-moi quelque chose d'intéressant"],
+    math: ["combien font douze fois sept", "résous cette équation", "calcule un pourcentage", "une addition et une multiplication", "un problème de mathématiques"]
   }
 };
 
@@ -46,9 +47,15 @@ export async function initRouter(onProgress = null) {
       extractor = await pipeline('feature-extraction', CONFIG.embeddingModel);
       // Les phrases de référence sont transformées en vecteurs une seule fois, ici.
       const refs = {};
-      for (const [name, phrase] of Object.entries(CONFIG.intents)) {
-        const out = await extractor(phrase, { pooling: 'mean', normalize: true });
-        refs[name] = Array.from(out.data);
+      for (const [name, phrases] of Object.entries(CONFIG.intents)) {
+        let sum = null;
+        for (const phrase of phrases) {
+          const out = await extractor(phrase, { pooling: 'mean', normalize: true });
+          const v = Array.from(out.data);
+          sum = sum ? sum.map((x, i) => x + v[i]) : v;
+        }
+        const norm = Math.sqrt(sum.reduce((a, x) => a + x * x, 0)) || 1;
+        refs[name] = sum.map(x => x / norm);
       }
       refVectors = refs;
       isRouterReady = true;
@@ -140,8 +147,26 @@ export async function generateLocalResponse(prompt, history = [], maxTokens = 50
     ...history,
     { role: 'user', content: prompt }
   ];
-  const reply = await engine.chat.completions.create({ messages, temperature: 0.7, max_tokens: maxTokens });
-  return reply.choices[0].message.content;
+  try {
+    const reply = await engine.chat.completions.create({ messages, temperature: 0.7, max_tokens: maxTokens });
+    return reply.choices[0].message.content;
+  } catch (error) {
+    // Le téléphone peut couper le GPU (application en arrière-plan, manque de mémoire).
+    if (/disposed|lost|popErrorScope|GPU|device/i.test(String(error && error.message))) {
+      isLLMReady = false;
+      engine = null;
+      throw new Error('CERVEAU_ARRETE: ' + error.message);
+    }
+    throw error;
+  }
+}
+
+/** Oublie le moteur actuel pour permettre un rechargement propre. */
+export function resetLLM() {
+  try { if (engine && engine.unload) engine.unload(); } catch (e) { /* rien */ }
+  isLLMReady = false;
+  engine = null;
+  llmLoading = null;
 }
 
 /** Arrête la génération en cours (bouton ■ de l'application). */
