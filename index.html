@@ -115,7 +115,7 @@ const $=s=>document.querySelector(s),V='3.8';
 const S={g(k,d){try{const v=localStorage.getItem('nexus_'+k);return v===null?d:JSON.parse(v)}catch{return d}},s(k,v){try{localStorage.setItem('nexus_'+k,JSON.stringify(v))}catch(e){}}};
 const P={brain:{n:'Nexus Local',i:'🧠',loc:1},groq:{n:'Groq',i:'⚡',k:1,m:30,d:1000},gemini:{n:'Gemini',i:'💎',k:1},openrouter:{n:'OpenRouter',i:'🔀',k:1,m:20,d:50},puter:{n:'Puter',i:'🖥️'},kilo:{n:'Kilo',i:'🚀',h:200,o:1},pollinations:{n:'Pollinations',i:'🌸',o:1},ovh:{n:'OVHcloud',i:'🇪🇺',o:1,m:2},cohere:{n:'Cohere',i:'💬',k:1},sambanova:{n:'SambaNova',i:'🔥',k:1},nvidia:{n:'NVIDIA NIM',i:'🟢',k:1},ollama:{n:'Ollama Cloud',i:'🦙',k:1},cloudflare:{n:'Cloudflare',i:'☁️',k:1},llm7:{n:'LLM7',i:'🌐',k:1},deepseek:{n:'DeepSeek',i:'🐳',k:1},mistral:{n:'Mistral',i:'🇫🇷',k:1}};
 const KILO_DOC=['https://ai-gateway.kilo.ai/api/v1','https://api.kilo.ai/api/gateway'],KILO_DEAD=['https://api.kilocode.ai/v1'],KILO_DEF=KILO_DOC[0];
-const st={diag:{},card:null,mem:S.g('mem',[]),memOn:S.g('mem_on',false),geminiModel:S.g('gemini_model','gemini-flash-latest'),puterModel:S.g('puter_model','gpt-4o-mini'),cfWorker:S.g('cf_worker',''),cfModel:S.g('cf_model','@cf/meta/llama-3.3-70b-instruct-fp8-fast'),kiloBase:S.g('kilo_base',KILO_DEF),keys:S.g('keys',{}),on:S.g('on',{}),convs:S.g('convs',[]),cur:S.g('cur',null),log:S.g('log',[]),pause:S.g('pause',{}),cnt:S.g('cnt',{}),cache:S.g('cache',{}),custom:S.g('custom',[]),saved:S.g('saved',[]),busy:0,tests:{},credits:0};
+const st={diag:{},card:null,mem:S.g('mem',[]),memOn:S.g('mem_on',false),geminiModel:S.g('gemini_model','gemini-flash-latest'),puterModel:S.g('puter_model','gpt-4o-mini'),cfWorker:S.g('cf_worker','')||(String(S.g('keys',{}).cloudflare||'').startsWith('http')?String(S.g('keys',{}).cloudflare).trim():''),cfModel:S.g('cf_model','@cf/meta/llama-3.3-70b-instruct-fp8-fast'),kiloBase:S.g('kilo_base',KILO_DEF),keys:S.g('keys',{}),on:S.g('on',{}),convs:S.g('convs',[]),cur:S.g('cur',null),log:S.g('log',[]),pause:S.g('pause',{}),cnt:S.g('cnt',{}),cache:S.g('cache',{}),custom:S.g('custom',[]),saved:S.g('saved',[]),busy:0,tests:{},credits:0};
 const customMap=()=>Object.fromEntries((st.custom||[]).map(c=>[c.id,{n:c.name,i:'✨',custom:1,url:c.url,key:c.key,model:c.model}]));
 const allIds=()=>[...Object.keys(P),...(st.custom||[]).map(c=>c.id)];
 const getP=id=>P[id]||customMap()[id];
@@ -349,8 +349,10 @@ h+='<div class="set-sub">IA incluses dans NEXUS</div>';
 for(const id in P){const pp=P[id];if(pp.loc)continue;
 h+=`<div class="set-line"><label class="sw"><input type="checkbox" data-on="${id}" ${st.on[id]===false?'':'checked'}></label><span>${pp.i}</span><b>${pp.n}</b>`;
 if(pp.k||pp.o){
-h+=`<button class="b2" data-a="kedit" data-id="${id}" style="margin:0;padding:8px 10px;width:auto">Modifier</button>
-<input type="password" data-k="${id}" id="k-${id}" placeholder="${id==='cloudflare'?'URL du Worker Cloudflare (ex: https://mon-worker.workers.dev)':id==='ovh'?'Clé facultative (anonyme sans clé)':pp.o?'Clé facultative (mode gratuit sans clé)':'Clé API '+pp.n}" value="${esc(st.keys[id]||'')}" autocomplete="off" style="display:none">`;
+h+=`<button class="b2" data-a="kedit" data-id="${id}" style="margin:0;padding:8px 10px;width:auto">Modifier</button>`;
+if(id!=='cloudflare'){
+h+=`<input type="password" data-k="${id}" id="k-${id}" placeholder="${id==='ovh'?'Clé facultative (anonyme sans clé)':pp.o?'Clé facultative (mode gratuit sans clé)':'Clé API '+pp.n}" value="${esc(st.keys[id]||'')}" autocomplete="off" style="display:none">`;
+}
 }
 if(id==='gemini')h+=`<input type="text" data-gm="1" id="gm-gemini" placeholder="Modèle Gemini" value="${esc(st.geminiModel)}" autocomplete="off" style="display:none">`;
 if(id==='puter')h+=`<select id="puter-model" data-pm="1" style="display:none">
@@ -360,7 +362,8 @@ if(id==='puter')h+=`<select id="puter-model" data-pm="1" style="display:none">
 <option value="deepseek-chat" ${st.puterModel==='deepseek-chat'?'selected':''}>DeepSeek Chat</option>
 </select>
 <button class="b2" data-a="pl" style="margin:0;width:auto;padding:8px 10px">Puter : Se connecter</button>`;
-if(id==='cloudflare')h+=`<select id="cf-model" data-cm="1" style="display:none">
+if(id==='cloudflare')h+=`<input type="text" id="cf-worker-url" placeholder="URL du Worker Cloudflare (ex: https://mon-worker.workers.dev)" value="${esc(st.cfWorker)}" autocomplete="off" style="display:none">
+<select id="cf-model" data-cm="1" style="display:none">
 <option value="@cf/meta/llama-3.3-70b-instruct-fp8-fast" ${st.cfModel==='@cf/meta/llama-3.3-70b-instruct-fp8-fast'?'selected':''}>Llama 3.3 70B FP8 Fast</option>
 <option value="@cf/meta/llama-3.1-8b-instruct" ${st.cfModel==='@cf/meta/llama-3.1-8b-instruct'?'selected':''}>Llama 3.1 8B</option>
 </select>
@@ -434,17 +437,18 @@ $('#v-set').addEventListener('change',e=>{const t=e.target;
 if(t.dataset.mem!==undefined){st.memOn=t.checked;S.s('mem_on',st.memOn);return}
 if(t.dataset.gm!==undefined){st.geminiModel=t.value.trim()||'gemini-flash-latest';S.s('gemini_model',st.geminiModel);if(st.pause.gemini){delete st.pause.gemini;S.s('pause',st.pause)}pstat();return}
 if(t.dataset.pm!==undefined){st.puterModel=t.value;S.s('puter_model',st.puterModel);return}
+if(t.id==='cf-worker-url'){st.cfWorker=t.value.trim();S.s('cf_worker',st.cfWorker);if(st.pause.cloudflare){delete st.pause.cloudflare;S.s('pause',st.pause)}pstat();upd();return}
 if(t.dataset.cm!==undefined){st.cfModel=t.value;S.s('cf_model',st.cfModel);return}
 if(t.dataset.loc!==undefined){toggleLocal(t.checked);return}
 if(t.dataset.on){st.on[t.dataset.on]=t.checked;S.s('on',st.on)}
 if(t.dataset.k){st.keys[t.dataset.k]=t.value.trim();S.s('keys',st.keys);if(st.pause[t.dataset.k]){delete st.pause[t.dataset.k];S.s('pause',st.pause);pstat();}}upd()});
 $('#v-set').addEventListener('click',async e=>{const el=e.target.closest('[data-a]');const a=el?el.dataset.a:null;if(!a)return;
 if(a==='pl'){try{signed()?await puter.auth.signOut():await puter.auth.signIn()}catch(x){toast('Puter : '+x.message)}pstat();upd()}
-else if(a==='kedit'){const id = el.dataset.id; const inp=$('#k-'+id); const selP=$('#puter-model'); const selC=$('#cf-model'); const docC=$('#cf-doc');
-if(inp){inp.style.display=inp.style.display==='none'?'block':'none';
+else if(a==='kedit'){const id = el.dataset.id; const inp=$('#k-'+id); const selP=$('#puter-model'); const wU=$('#cf-worker-url'); const selC=$('#cf-model'); const docC=$('#cf-doc');
+if(id==='cloudflare'&&wU){const show=wU.style.display==='none'?'block':'none';wU.style.display=show;if(selC)selC.style.display=show;if(docC)docC.style.display=show;if(show==='block')wU.focus()}
+else if(inp){inp.style.display=inp.style.display==='none'?'block':'none';
 if(id==='gemini'){const x2=$('#gm-gemini');if(x2)x2.style.display=inp.style.display}
 if(id==='puter'&&selP){selP.style.display=inp.style.display}
-if(id==='cloudflare'&&selC){selC.style.display=inp.style.display; docC.style.display=inp.style.display}
 if(inp.style.display==='block')inp.focus()}}
 else if(a==='cform'){const f=$('#cform');if(f)f.style.display=f.style.display==='none'?'flex':'none'}
 else if(a==='csave'){const nm=$('#cf-name').value.trim(),ur=$('#cf-url').value.trim(),ky=$('#cf-key').value.trim(),mo=$('#cf-model-custom').value.trim();if(!nm||!ur){toast('Nom et URL requis');return}if(editCustom){const cc=st.custom.find(x=>x.id===editCustom);if(cc){cc.name=nm;cc.url=ur;cc.key=ky;cc.model=mo}if(st.pause[editCustom]){delete st.pause[editCustom];S.s('pause',st.pause)}editCustom=null}else{const nid='custom_'+Date.now();st.custom.push({id:nid,name:nm,url:ur,key:ky,model:mo});st.on[nid]=true;S.s('on',st.on)}S.s('custom',st.custom);rset();toast('IA enregistrée')}
