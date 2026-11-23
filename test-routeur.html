@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test Routeur NEXUS - multilingual-e5-small (~118 Mo)</title>
+  <title>Test Routeur NLI - nli-deberta-v3-small (~111 Mo) - NEXUS</title>
   <style>
     :root {
       --bg: #0b1120;
@@ -116,31 +116,31 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>NEXUS — Test Routeur Recommandé</h1>
+      <h1>NEXUS — Test Routeur NLI (~111 Mo)</h1>
       <p class="sub">
-        Modèle : <code>Xenova/multilingual-e5-small</code> (~118 Mo quantifié) + pré-filtrage négations &amp; contexte conversationnel.
+        Modèle : <code>Xenova/nli-deberta-v3-small</code> (quantifié ~111 Mo) en <code>zero-shot-classification</code>.
       </p>
-      <button id="btnLoad" type="button">1. Télécharger et charger le routeur (~118 Mo)</button>
+      <button id="btnLoad" type="button">1. Télécharger et charger le routeur (~111 Mo)</button>
       <div class="bar-bg"><div class="bar-fill" id="barFill"></div></div>
-      <div class="status" id="status">Prêt à charger (pense à fermer les anciens onglets de test avant).</div>
+      <div class="status" id="status">Prêt à charger (ferme les onglets de test précédents avant).</div>
     </div>
 
     <div class="card">
       <div class="presets">
+        <button type="button" data-prev="" data-msg="Raconte moi une histoire sur un dev qui casse tout">Piège : histoire sur un dev</button>
         <button type="button" data-prev="" data-msg="Nan mais je veux pas de code explique juste comment ça marche">Piège : pas de code</button>
-        <button type="button" data-prev="" data-msg="Raconte-moi une histoire sur un dev qui casse tout">Piège : histoire + code</button>
         <button type="button" data-prev="Fais-moi un script python pour trier mes photos" data-msg="Euh non en fait laisse tomber le script fais juste un résumé">Suite : changement d'avis</button>
         <button type="button" data-prev="Traduis ce texte en espagnol" data-msg="Fais pareil en anglais stp">Suite : contexte</button>
         <button type="button" data-prev="" data-msg="Aide-moi à faire marcher ce truc sur mon site">Oral : aide site/code</button>
       </div>
 
-      <label for="prevMsg">Message précédent (optionnel, pour les suites orales courtes)</label>
+      <label for="prevMsg">Message précédent (optionnel)</label>
       <input id="prevMsg" type="text" placeholder="Ex : Fais-moi un script python..." />
 
       <label for="userMsg">Message actuel (à taper ou dicter)</label>
-      <textarea id="userMsg" rows="3" placeholder="Ex : Nan mais pas de code, explique-moi juste..."></textarea>
+      <textarea id="userMsg" rows="3" placeholder="Ex : Raconte moi une histoire sur un dev qui casse tout"></textarea>
 
-      <button id="btnRun" type="button" disabled>2. Tester le routage NEXUS</button>
+      <button id="btnRun" type="button" disabled>2. Tester le routage NLI</button>
       <div id="result" style="margin-top: 12px;"></div>
     </div>
   </div>
@@ -150,43 +150,16 @@
 
     env.allowLocalModels = false;
 
-    const MODEL_ID = 'Xenova/multilingual-e5-small';
+    const MODEL_ID = 'Xenova/nli-deberta-v3-small';
 
-    const INTENT_PASSAGES = {
-      code: "passage: écrire du code informatique, créer un script ou un site, corriger un bug ou expliquer de la programmation",
-      creative: "passage: inventer une histoire, un conte, un poème, un scénario ou écrire un texte créatif ou d'imagination",
-      translation: "passage: traduire un mot, une phrase ou un texte d'une langue vers une autre langue",
-      long_context: "passage: résumer, condenser, faire la synthèse ou analyser un long texte, un pavé ou un document",
-      math: "passage: faire un calcul mathématique, résoudre une équation ou appliquer une formule de calcul",
-      general: "passage: poser une question générale, demander une explication simple ou discuter du quotidien"
+    const INTENT_LABELS = {
+      "writing a fictional story, tale, poem or creative narrative": "creative",
+      "writing, debugging or explaining computer code, programming or a website script": "code",
+      "translating text or words from one language to another": "translation",
+      "summarizing or condensing a long text or document": "long_context",
+      "solving a math calculation or equation": "math",
+      "general chat, simple question or everyday explanation": "general"
     };
-
-    const NEGATION_RULES = [
-      {
-        intent: "code",
-        patterns: [
-          /\b(?:pas de|ne veux pas de|veux pas de|sans|laisse tomber (?:le |du )?|évite (?:le |du )?)\s*(?:code|script|programmation|bug)\b/i
-        ]
-      },
-      {
-        intent: "creative",
-        patterns: [
-          /\b(?:pas d'|ne veux pas d'|veux pas d'|sans)\s*(?:histoire|poème|fiction)\b/i
-        ]
-      },
-      {
-        intent: "translation",
-        patterns: [
-          /\b(?:pas de|ne veux pas de|veux pas de|sans)\s*traduction\b/i
-        ]
-      },
-      {
-        intent: "long_context",
-        patterns: [
-          /\b(?:pas de|ne veux pas de|veux pas de|sans)\s*(?:résumé|synthèse)\b/i
-        ]
-      }
-    ];
 
     const btnLoad = document.getElementById('btnLoad');
     const btnRun = document.getElementById('btnRun');
@@ -196,66 +169,34 @@
     const userInput = document.getElementById('userMsg');
     const resultEl = document.getElementById('result');
 
-    let extractor = null;
-    let passageVectors = null;
+    let classifier = null;
 
-    function cosineSimilarity(a, b) {
-      let dot = 0, normA = 0, normB = 0;
-      for (let i = 0; i < a.length; i++) {
-        dot += a[i] * b[i];
-        normA += a[i] * a[i];
-        normB += b[i] * b[i];
-      }
-      const denom = Math.sqrt(normA) * Math.sqrt(normB);
-      return denom === 0 ? 0 : dot / denom;
-    }
-
-    function detectExcludedIntents(text) {
-      const excluded = new Set();
-      for (const rule of NEGATION_RULES) {
-        if (rule.patterns.some((rx) => rx.test(text))) {
-          excluded.add(rule.intent);
-        }
-      }
-      return excluded;
-    }
-
-    function buildQueryText(currentText, previousText) {
+    function buildInputText(currentText, previousText) {
+      const curr = currentText.trim();
       const prev = (previousText || "").trim();
-      const isShortFollowUp = prev.length > 0 && currentText.trim().split(/\s+/).length <= 8;
+      const isShortFollowUp = prev.length > 0 && curr.split(/\s+/).length <= 8;
       if (isShortFollowUp) {
-        return `query: Contexte précédent : ${prev} | Demande actuelle : ${currentText.trim()}`;
+        return `Previous message: ${prev}. Current message: ${curr}`;
       }
-      return `query: ${currentText.trim()}`;
-    }
-
-    async function ensurePassageVectors() {
-      if (passageVectors) return passageVectors;
-      const list = [];
-      for (const [intent, passage] of Object.entries(INTENT_PASSAGES)) {
-        const out = await extractor(passage, { pooling: 'mean', normalize: true });
-        list.push({ intent, vector: Array.from(out.data) });
-      }
-      passageVectors = list;
-      return passageVectors;
+      return curr;
     }
 
     document.querySelectorAll('.presets button').forEach((btn) => {
       btn.addEventListener('click', () => {
         prevInput.value = btn.dataset.prev || '';
         userInput.value = btn.dataset.msg || '';
+        resultEl.innerHTML = '';
       });
     });
 
     btnLoad.addEventListener('click', async () => {
       btnLoad.disabled = true;
       resultEl.innerHTML = '';
-      passageVectors = null;
       const t0 = performance.now();
 
       try {
-        statusEl.textContent = "Téléchargement du modèle (~118 Mo) et préparation...";
-        extractor = await pipeline('feature-extraction', MODEL_ID, {
+        statusEl.textContent = "Téléchargement du modèle NLI (~111 Mo) en cours...";
+        classifier = await pipeline('zero-shot-classification', MODEL_ID, {
           quantized: true,
           progress_callback: (info) => {
             if (info.status === 'progress' && typeof info.progress === 'number') {
@@ -268,14 +209,14 @@
           }
         });
 
-        await ensurePassageVectors();
         const sec = ((performance.now() - t0) / 1000).toFixed(1);
         barFill.style.width = '100%';
-        statusEl.textContent = `✅ Routeur chargé en ${sec} s !`;
+        statusEl.textContent = `✅ Routeur NLI chargé en ${sec} s !`;
         btnRun.disabled = false;
       } catch (err) {
         console.error(err);
-        statusEl.innerHTML = `<span class="err">❌ Erreur de chargement :\n${err.message}</span>`;
+        statusEl.innerHTML = `<span class="err">❌ Erreur de chargement :
+${err.message}</span>`;
         btnLoad.disabled = false;
       }
     });
@@ -283,63 +224,46 @@
     btnRun.addEventListener('click', async () => {
       const rawText = userInput.value.trim();
       const rawPrev = prevInput.value.trim();
-      if (!rawText || !extractor) return;
+      if (!rawText || !classifier) return;
 
       btnRun.disabled = true;
-      resultEl.innerHTML = '<div class="status">Analyse en cours...</div>';
+      resultEl.innerHTML = '<div class="status">Analyse logique en cours...</div>';
       const t0 = performance.now();
 
       try {
-        const excluded = detectExcludedIntents(rawText);
-        const queryStr = buildQueryText(rawText, rawPrev);
-        const passVecs = await ensurePassageVectors();
+        const textToClassify = buildInputText(rawText, rawPrev);
+        const candidateLabels = Object.keys(INTENT_LABELS);
 
-        const qOut = await extractor(queryStr, { pooling: 'mean', normalize: true });
-        const qVec = Array.from(qOut.data);
-
-        let scored = passVecs.map((item) => {
-          let score = cosineSimilarity(qVec, item.vector);
-          const isExcluded = excluded.has(item.intent);
-          if (isExcluded) {
-            score = score - 0.25;
-          }
-          return { intent: item.intent, score, isExcluded };
+        const res = await classifier(textToClassify, candidateLabels, {
+          hypothesis_template: "The user's request is about {}."
         });
 
-        scored.sort((a, b) => b.score - a.score);
+        const scored = res.labels.map((label, idx) => ({
+          intent: INTENT_LABELS[label],
+          label,
+          score: res.scores[idx]
+        }));
 
         const best = scored[0];
         const second = scored[1] || { score: 0 };
         const margin = best.score - second.score;
-
-        let finalIntent = best.intent;
-        let fallbackUsed = false;
-        if (best.score < 0.72 || margin < 0.015) {
-          finalIntent = "general";
-          fallbackUsed = true;
-        }
-
         const ms = Math.round(performance.now() - t0);
-        const excludedLabels = Array.from(excluded).join(', ') || 'aucune';
 
         let html = `
           <div class="verdict">
-            <div class="verdict-title">🎯 Intention retenue : ${finalIntent}${fallbackUsed ? ' (repli prudent)' : ''}</div>
+            <div class="verdict-title">🎯 Intention retenue : ${best.intent}</div>
             <div class="verdict-meta">
-              Temps : <strong>${ms} ms</strong> · Écart : <strong>${(margin * 100).toFixed(1)} pts</strong> · Exclusions détectées : <strong>${excludedLabels}</strong>
+              Temps : <strong>${ms} ms</strong> · Écart avec le 2e : <strong>${(margin * 100).toFixed(1)} pts</strong>
             </div>
           </div>
         `;
 
         scored.forEach((row, idx) => {
           const pct = (row.score * 100).toFixed(1);
-          const isTop = row.intent === finalIntent;
+          const isTop = idx === 0;
           html += `
             <div class="row ${isTop ? 'top' : ''}">
-              <span>
-                ${idx + 1}. ${row.intent}
-                ${row.isExcluded ? '<span class="warn"> [exclu]</span>' : ''}
-              </span>
+              <span>${idx + 1}. ${row.intent}</span>
               <span>${pct} %</span>
             </div>
           `;
@@ -348,7 +272,8 @@
         resultEl.innerHTML = html;
       } catch (err) {
         console.error(err);
-        resultEl.innerHTML = `<div class="err">❌ Erreur pendant l'analyse :\n${err.message}</div>`;
+        resultEl.innerHTML = `<div class="err">❌ Erreur pendant l'analyse :
+${err.message}</span>`;
       } finally {
         btnRun.disabled = false;
       }
