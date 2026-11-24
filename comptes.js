@@ -5,17 +5,20 @@ export const FOURNISSEURS = [
   { id: "openrouter", nom: "OpenRouter", champs: [{ k: "apiKey", l: "Clé API", secret: true }, { k: "model", l: "Modèle (optionnel)" }] },
   { id: "cohere", nom: "Cohere", champs: [{ k: "apiKey", l: "Clé API", secret: true }, { k: "model", l: "Modèle (optionnel)" }] },
   { id: "cloudflare", nom: "Cloudflare (via ton Worker)", champs: [{ k: "workerUrl", l: "URL de ton Worker" }, { k: "model", l: "Modèle (optionnel)" }] },
-  { id: "pollinations", nom: "Pollinations", champs: [{ k: "apiKey", l: "Clé gratuite (optionnelle)", secret: true }, { k: "actif", l: "Utiliser même sans clé (anonyme)", type: "checkbox" }] },
+  { id: "pollinations", nom: "Pollinations", champs: [{ k: "apiKey", l: "Clé gratuite (optionnelle)", secret: true }] },
   { id: "puter", nom: "Puter", connexion: true, champs: [] },
 ];
 
+// Modèles par défaut posés par l'app (le corps n'est pas modifié). Groq a retiré llama-3.3-70b-versatile le 16/08/2026.
+const DEFAUTS = { groq: "openai/gpt-oss-120b" };
 const net = (nom, r) => { const e = new Error(nom + " " + r.status); e.status = r.status; e.kind = r.status === 401 ? "auth" : r.status === 429 ? "quota" : "network"; return e; };
 
 // Transforme ce que l'utilisateur a saisi (localStorage) en config pour nx.configurerFournisseurs(). Pas de clé = pas de fournisseur.
 export function construireConfig(saisi = {}, { puterChat = null, fetchFn = (...a) => fetch(...a) } = {}) {
   const cfg = {}, v = (id, k) => String(saisi?.[id]?.[k] ?? "").trim();
   for (const id of ["groq", "openrouter", "cohere"]) {
-    if (v(id, "apiKey")) cfg[id] = { apiKey: v(id, "apiKey"), ...(v(id, "model") && { model: v(id, "model") }) };
+    const model = v(id, "model") || DEFAUTS[id];
+    if (v(id, "apiKey")) cfg[id] = { apiKey: v(id, "apiKey"), ...(model && { model }) };
   }
   const url = v("cloudflare", "workerUrl");
   if (url) {
@@ -27,7 +30,8 @@ export function construireConfig(saisi = {}, { puterChat = null, fetchFn = (...a
     } };
     cfg.cloudflare = { binding, ...(v("cloudflare", "model") && { model: v("cloudflare", "model") }) };
   }
-  if (v("pollinations", "apiKey") || saisi?.pollinations?.actif) cfg.pollinations = { apiKey: v("pollinations", "apiKey") };
+  // Secours gratuit : toujours branché (anonyme sans clé, priorité basse dans le corps).
+  cfg.pollinations = { apiKey: v("pollinations", "apiKey") };
   if (puterChat) cfg.puter = { puterChat };
   return cfg;
 }
