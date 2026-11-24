@@ -1,7 +1,7 @@
-const CACHE = "nexus-ai-v7";
-const SHELL = ["./", "./index.html", "./app.js", "./comptes.js", "./nexus-corps.mjs", "./nexus-tools.js", "./manifest.json", "./logo.png", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
+const CACHE = "nexus-ai-v1.0";
+const SHELL = ["./", "./index.html", "./app.js", "./comptes.js", "./journal.js", "./vision.js", "./guide.js", "./nexus-corps.mjs", "./nexus-tools.js", "./manifest.json", "./logo.png", "./avatar.png", "./icon-180.png"];
 self.addEventListener("install", (e) => {
-  // un fichier manquant (ex. une icône) ne doit pas bloquer les autres
+  // un fichier manquant (ex. une image) ne doit pas bloquer les autres
   e.waitUntil(caches.open(CACHE).then((c) => Promise.allSettled(SHELL.map((u) => c.add(u)))));
   self.skipWaiting();
 });
