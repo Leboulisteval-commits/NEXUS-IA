@@ -1295,7 +1295,7 @@ export function construireCharge({question, fichier, memoires=[]}){
   // Jamais toute la mémoire. Jamais le fichier entier sans limite.
   return {
     question:String(question||""),
-    fichierExtrait: fichier?.text ? String(fichier.text).slice(0,1500) : null,
+    fichierExtrait: fichier?.text ? String(fichier.text).slice(0,3500) : null,
     fichierNom: fichier?.name||null,
     memoire: memoirePertinente(question, memoires).map(m=>m.texte||m.t),
   };
@@ -2361,7 +2361,13 @@ class NexusAnnuaire {
       if(!vq.ok && vq.quotaDepasse) return false;
       return true;
     });
-    cands.sort((a,b) => (a.priorite - b.priorite) || ((a.cout === "0" ? 0 : 1) - (b.cout === "0" ? 0 : 1)) || a.id.localeCompare(b.id));
+    // v1.1 : palier d'abord. Gratuits qui se renouvellent chaque jour (Groq, Cloudflare, Cohere) > OpenRouter > Puter (crédit mensuel qui part vite) > secours (Pollinations).
+    // Les payants passent devant seulement si l'utilisateur demande la meilleure qualité. Petit modèle pour le simple, gros pour le difficile.
+    const rg = this.reglage || {};
+    const palier = (e) => { const t = e.tags || []; const p = t.includes("pollinations") ? 3 : t.includes("puter") ? 2 : t.includes("openrouter") ? 1 : 0; return (rg.premium && (p === 1 || p === 2)) ? p - 4 : p; };
+    const taille = (e) => { const petit = (e.tags || []).includes("petit"); return rg.difficulte === "difficile" ? (petit ? 1 : 0) : (petit ? 0 : 1); };
+    if (f === "vision") cands.sort((a,b) => (a.priorite - b.priorite) || a.id.localeCompare(b.id));
+    else cands.sort((a,b) => (palier(a) - palier(b)) || (taille(a) - taille(b)) || (a.priorite - b.priorite) || ((a.cout === "0" ? 0 : 1) - (b.cout === "0" ? 0 : 1)) || a.id.localeCompare(b.id));
     return cands;
   }
   choisir(fonctionnalite, { exclure = [] } = {}) {
@@ -2682,6 +2688,11 @@ class NexusAnnuaire {
         push(this.ajouter({ id: "groq-general", transport: t, fonctionnalites: ["general"], priorite: 1, cout: "0", tags: ["groq"], description: "Groq — general" }), "groq-general");
         push(this.ajouter({ id: "groq-translation", transport: t, fonctionnalites: ["translation"], priorite: 2, cout: "0", tags: ["groq"], description: "Groq — translation" }), "groq-translation");
         push(this.ajouter({ id: "groq-explication", transport: t, fonctionnalites: ["explication_simple"], priorite: 2, cout: "0", tags: ["groq"], description: "Groq — explication_simple" }), "groq-explication");
+        push(this.ajouter({ id: "groq-creative", transport: t, fonctionnalites: ["creative"], priorite: 2, cout: "0", tags: ["groq"], description: "Groq — creative" }), "groq-creative");
+        push(this.ajouter({ id: "groq-long", transport: t, fonctionnalites: ["long_context"], priorite: 3, cout: "0", tags: ["groq"], description: "Groq — long_context" }), "groq-long");
+        // v1.1 : petit modèle pas cher pour les questions simples, discussions courtes et traductions.
+        const tp = this.creerTransportGroq({ ...config.groq, model: config.groq.modelPetit || "openai/gpt-oss-20b" });
+        if (tp) for (const [f, id] of [["general","groq-petit-general"],["explication_simple","groq-petit-explication"],["translation","groq-petit-translation"]]) push(this.ajouter({ id, transport: tp, fonctionnalites: [f], priorite: 1, cout: "0", tags: ["groq","petit"], description: "Groq petit modèle — "+f }), id);
       } else refuses.push({ id: "groq", raison: "Groq : clé API manquante ou fetch indisponible." });
     }
     // OPENROUTER : passerelle, fallback large
@@ -2758,7 +2769,32 @@ class NexusAnnuaire {
         push(this.ajouter({ id: "cloudflare-explication", transport: t, fonctionnalites: ["explication_simple"], priorite: 1, cout: "0", tags: ["cloudflare","llama-3.3-fp8-fast"], description: "Cloudflare Llama 3.3 FP8 FAST — explication_simple" }), "cloudflare-explication");
         push(this.ajouter({ id: "cloudflare-general", transport: t, fonctionnalites: ["general"], priorite: 2, cout: "0", tags: ["cloudflare","llama-3.3-fp8-fast"], description: "Cloudflare Llama 3.3 FP8 FAST — general" }), "cloudflare-general");
         push(this.ajouter({ id: "cloudflare-code", transport: t, fonctionnalites: ["code"], priorite: 2, cout: "0", tags: ["cloudflare","llama-3.3-fp8-fast"], description: "Cloudflare Llama 3.3 FP8 FAST — code (même base Llama 3.3 70B que Groq, paire proche : si Groq tombe, Cloudflare prend le relais avec quasiment la même IA)" }), "cloudflare-code");
+        push(this.ajouter({ id: "cloudflare-creative", transport: t, fonctionnalites: ["creative"], priorite: 3, cout: "0", tags: ["cloudflare","llama-3.3-fp8-fast"], description: "Cloudflare — creative" }), "cloudflare-creative");
+        push(this.ajouter({ id: "cloudflare-long", transport: t, fonctionnalites: ["long_context"], priorite: 2, cout: "0", tags: ["cloudflare","llama-3.3-fp8-fast"], description: "Cloudflare Llama 70B — long_context (résumés)" }), "cloudflare-long");
       } else refuses.push({ id: "cloudflare", raison: "Cloudflare : clé + accountId ou binding Workers AI manquants." });
+    }
+    // VISION (v1.1) : regarder une image. Gratuit d'abord (Pollinations), puis le compte Puter. Jamais d'invention.
+    if (config.pollinations) {
+      const pk = config.pollinations.apiKey || "", ff = config.pollinations.fetchFn || (typeof fetch === "function" ? (...a) => fetch(...a) : null);
+      if (ff) {
+        const tv = async ({ messages, signal } = {}) => {
+          const url = pk ? "https://gen.pollinations.ai/v1/chat/completions" : "https://text.pollinations.ai/openai";
+          const r = await ff(url, { method: "POST", headers: { "Content-Type": "application/json", ...(pk ? { Authorization: "Bearer " + pk } : {}) }, body: JSON.stringify({ model: "openai", messages }), signal });
+          if (!r.ok) { const e = new Error("HTTP " + r.status); e.status = r.status; throw e; }
+          const j = await r.json();
+          return { texte: String(j?.choices?.[0]?.message?.content ?? "").trim(), finishReason: j?.choices?.[0]?.finish_reason || "stop" };
+        };
+        push(this.ajouter({ id: "pollinations-vision", transport: tv, fonctionnalites: ["vision"], priorite: 1, cout: "0", tags: ["pollinations","vision"], description: "Pollinations — vision (gratuit)" }), "pollinations-vision");
+      }
+    }
+    if (config.puter?.puterChat) {
+      const pc = config.puter.puterChat;
+      const tv = async ({ messages } = {}) => {
+        const c = messages[messages.length - 1].content, q = c[0].text, img = c[1].image_url.url;
+        const r = await pc(q, img);
+        return { texte: String(typeof r === "string" ? r : (r?.message?.content?.[0]?.text ?? r?.message?.content ?? "")).trim(), finishReason: "stop" };
+      };
+      push(this.ajouter({ id: "puter-vision", transport: tv, fonctionnalites: ["vision"], priorite: 2, cout: "0", tags: ["puter","vision"], description: "Puter — vision" }), "puter-vision");
     }
     // QWEN : conversation uniquement, jamais autre chose
     if (config.qwen?.transport) {
@@ -2938,10 +2974,7 @@ export class NexusCorps{
     }
     // 6. PEAU : charge minimum
     const charge=construireCharge({ question:texteOral, fichier, memoires:this.memoires });
-    const messages=[
-      { role:"system", content:"Tu es NEXUS. Réponds en français, clair, agréable, pas robot. Date : "+new Date().toLocaleDateString("fr-FR") },
-      { role:"user", content: charge.fichierExtrait ? `Fichier ${charge.fichierNom} : ${charge.fichierExtrait}\n\nQuestion : ${charge.question}` : charge.question + (charge.memoire.length?`\n\nContexte utile : ${charge.memoire.join(" ; ")}`:"") }
-    ];
+    const messages = this.construireMessages(charge);
     // 7. JAMBES : vers la fonctionnalité
     try{
       this.stats.appels++; this.stats.externe++;
@@ -3520,14 +3553,29 @@ export class NexusMains{
   // Le transport reçoit : { fonctionnalite: "code", messages: [...], signal }.
   // Il ne reçoit JAMAIS un nom d'IA. Plus tard, l'ANNUAIRE (carnet d'adresses) lira fonctionnalite
   // et choisira l'IA correspondante. Pour l'instant, transport = la porte de la pharmacie, pas le nom du labo.
+  // v1.1 : JAMAIS tout l'historique. Contexte = fiche de faits (jamais résumée) + petit résumé + 2-3 derniers échanges + question complète.
+  // Le même contexte sert pour toutes les IA : on peut changer d'IA sans recommencer.
+  construireMessages(charge){
+    const ctx = (this.corps && typeof this.corps.contexteConversation === "function") ? this.corps.contexteConversation() : { fiche:[], resume:"", recents:[] };
+    const fiche = [...new Set([...(ctx.fiche||[]), ...(charge?.memoire||[])])].slice(0,6);
+    const sys = ["Tu es NEXUS. Réponds en français, clair, naturel et agréable, jamais comme un robot. Date : "+new Date().toLocaleDateString("fr-FR")+"."];
+    if(fiche.length) sys.push("Faits à retenir sur l'utilisateur : "+fiche.join(" ; "));
+    if(ctx.resume) sys.push("Résumé de ce qui a été dit avant : "+ctx.resume);
+    const msgs=[{ role:"system", content:sys.join("\n") }];
+    for(const e of (ctx.recents||[])) msgs.push({ role:"user", content:e.q }, { role:"assistant", content:e.a });
+    const web = this.corps?.webCourant || "";
+    let u="";
+    if(charge?.fichierExtrait) u+="Fichier « "+(charge.fichierNom||"")+" » (extrait) :\n"+charge.fichierExtrait+"\n\n";
+    if(web) u+=web+"\n\n";
+    u+=((charge?.fichierExtrait||web) ? "Question : " : "")+String(charge?.question||"");
+    msgs.push({ role:"user", content:u });
+    return msgs;
+  }
   async allerChercherMedicament({ fonctionnalite, charge, transport }){
     if(typeof transport!=="function"){
       const annuaire = this.corps?.annuaire;
       if(annuaire && typeof annuaire.appelerViaAnnuaire === "function"){
-        const messagesAnnuaire = [
-          { role:"system", content:"Tu es NEXUS. Réponds en français, clair, agréable, pas robot. Date : "+new Date().toLocaleDateString("fr-FR") },
-          { role:"user", content: (charge?.fichierExtrait ? `Fichier ${charge.fichierNom||""} : ${charge.fichierExtrait}\n\nQuestion : ${charge.question}` : String(charge?.question||"")) + (charge?.memoire?.length?`\n\nContexte utile : ${charge.memoire.join(" ; ")}`:"") },
-        ];
+        const messagesAnnuaire = this.construireMessages(charge);
         const vmA = validerMessagesContrat(messagesAnnuaire);
         if(!vmA.ok) return { ok:false, panne:true, kind:"contrat_invalide", texte: messagePanne("transport_missing"), fonctionnalite };
         try{
@@ -3623,7 +3671,69 @@ export class NexusCorpsV12 extends NexusCorpsV11{
   ajouterPuter({ model = null, fonctionnalites = ["code"], priorite = 10, puterChat = null } = {}){ return this.annuaire.ajouterPuter({ model, fonctionnalites, priorite, puterChat }); }
   ajouterPollinations({ model = "openai", fonctionnalites = ["creative"], priorite = 10, apiKey = "", fetchFn = null } = {}){ return this.annuaire.ajouterPollinations({ model, fonctionnalites, priorite, apiKey, fetchFn }); }
   listerModelesPollinations(){ return this.annuaire.listerModelesPollinations(); }
-  async recevoirAutonome({ texte, fichier=null, transport=null, enLigne=true }={}){
+  // ---- v1.1 : mémoire de conversation locale (aucun appel IA pour résumer) ----
+  contexteConversation(){
+    this.echanges ??= []; this.resumeLignes ??= [];
+    const fiche = (this.memoires||[]).slice(-6).map(m=>m.texte||m.t).filter(Boolean);
+    return { fiche, resume:this.resumeLignes.join(" "), recents:this.echanges.slice(-3) };
+  }
+  noterEchange(question, reponse, fichier=null){
+    this.echanges ??= []; this.resumeLignes ??= [];
+    const cut=(t,n)=>{ t=String(t||"").replace(/\s+/g," ").trim(); return t.length>n ? t.slice(0,n-1).trim()+"…" : t; };
+    let q=cut(question,1200);
+    // Pièce jointe : jamais renvoyée en entier. On garde le nom, le type et un petit extrait.
+    if(fichier) q+=" [fichier : "+(fichier.name||"document")+(fichier.text ? " — extrait : "+cut(fichier.text,200) : "")+"]";
+    this.echanges.push({ q, a:cut(reponse,1200) });
+    while(this.echanges.length>3){
+      const old=this.echanges.shift();
+      this.resumeLignes.push("• "+cut(old.q.replace(/\[fichier :.*$/,"").trim()||old.q,90)+" → "+cut(old.a,110));
+    }
+    // Résumé trop long : on résume le résumé (anciennes lignes réduites, très anciennes oubliées), en local.
+    const taille=()=>this.resumeLignes.join(" ").length;
+    while(taille()>900 && this.resumeLignes.length>1){
+      if(this.resumeLignes.length>8) this.resumeLignes.shift();
+      else this.resumeLignes=this.resumeLignes.map((l,i)=> i<this.resumeLignes.length-3 ? cut(l,60) : l);
+      if(taille()>900 && this.resumeLignes.length>3) this.resumeLignes.shift();
+    }
+  }
+  effacerConversation(){ this.echanges=[]; this.resumeLignes=[]; this.historique=[]; this.webCourant=""; }
+  async recevoirAutonome(opts={}){
+    const { texte, fichier=null, contexteWeb="" } = opts||{};
+    const n = normTxt(texte||"");
+    // Difficulté et qualité demandée : décident quel modèle passe en premier (petit/gros, gratuit/payant).
+    this.annuaire.reglage = {
+      difficulte: ((texte||"").length>500 || /\b(analyse|raisonne|raisonnement|demontre|algorithme|architecture|optimis\w*|complexe|approfondi\w*|en detail|pas a pas)\b/.test(n)) ? "difficile" : "simple",
+      premium: /\b(meilleure qualite|haute qualite|qualite maximale|le meilleur modele|mode pro|reflechis bien|reflechis longuement)\b/.test(n),
+    };
+    this.webCourant = String(contexteWeb||"").slice(0,2500);
+    try{
+      // VISION : une image va à une IA qui voit (gratuite d'abord). Sinon panne honnête, jamais d'invention.
+      if(fichier && fichier.kind==="image" && fichier.img){
+        const q=String(texte||"").trim()||"Décris précisément cette image en français.";
+        if(!this.annuaire.listerPour("vision").length) return { from:"Nexus", intent:"vision", chemin:"pharmacie-panne", panne:true, kind:"transport_missing", texte:"Je ne peux pas regarder cette image : aucune IA de vision n'est disponible.", version:this.version };
+        const messages=[
+          { role:"system", content:"Tu es NEXUS. Décris et analyse l'image en français, clairement. N'invente rien : si tu ne vois pas ou ne comprends pas quelque chose, dis-le." },
+          { role:"user", content:[{ type:"text", text:q },{ type:"image_url", image_url:{ url:fichier.img } }] },
+        ];
+        try{
+          const r=await this.annuaire.appelerViaAnnuaire({ fonctionnalite:"vision", messages, timeoutMs:30000 });
+          const out={ from:"Nexus", intent:"vision", fonctionnalite:"vision", chemin:"pharmacie-externe", via:r.via, transportId:r.transportId, texte:this.mains.donnerMedicament(r.texte,null), version:this.version };
+          this.noterEchange(q+" [image : "+(fichier.name||"image")+"]", out.texte);
+          this.nerfs.emit("reponse", out);
+          return out;
+        }catch(e){
+          const cl=classifierErreur(e);
+          return { from:"Nexus", intent:"vision", chemin:"pharmacie-panne", panne:true, kind:cl.kind, texte:messagePanne(cl.kind), version:this.version };
+        }
+      }
+      const fSansImg = (fichier && fichier.kind==="image") ? null : fichier;
+      const res = await this._recevoirAutonomeInterne({ ...opts, fichier:fSansImg });
+      const ok = res && !res.panne && !res.bloque && !/panne|quota-pause|contrat-invalide|fermee/.test(res.chemin||"") && res.texte;
+      if(ok) this.noterEchange(texte, res.texte, fSansImg);
+      return res;
+    } finally { this.webCourant=""; }
+  }
+  async _recevoirAutonomeInterne({ texte, fichier=null, transport=null, enLigne=true }={}){
     // 1. CLIENT ENTRE DANS LA PHARMACIE
     this.nerfs.emit("accueil", { texte });
     // COLONNE v1.9 : vérifier le contrat fichier AVANT de le lire, sinon lireOrdonnance peut crasher sur un type invalide.
