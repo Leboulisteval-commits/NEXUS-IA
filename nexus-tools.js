@@ -366,18 +366,28 @@ function jsonp(url, timeout) {
   });
 }
 async function ddgSearch(q, timeout) {
-  const d = await jsonp('https://api.duckduckgo.com/?q=' + encodeURIComponent(q) + '&format=json&no_html=1&skip_disambig=1&t=nexusai', timeout);
+  const url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(q) + '&format=json&no_html=1&skip_disambig=1&t=nexusai';
+  let d;
+  // 1) JSONP (contourne CORS) ; 2) si ça échoue, requête directe. L'erreur éventuelle est remontée (journal), jamais avalée en silence.
+  try { d = await jsonp(url, timeout); }
+  catch (e1) {
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), timeout);
+    try { const r = await fetch(url, { signal: ctl.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); d = await r.json(); }
+    catch (e2) { throw new Error('jsonp: ' + (e1 && e1.message || e1) + ' | fetch: ' + (e2 && e2.message || e2)); }
+    finally { clearTimeout(to); }
+  }
   const text = d.AbstractText || d.Answer || d.Definition || ((d.RelatedTopics || []).find(x => x.Text) || {}).Text || '';
   return text ? { text: String(text).slice(0, 700), source: d.AbstractSource || '', url: d.AbstractURL || '' } : null;
 }
 export async function searchWeb(question, { timeout = 6000 } = {}) {
   const q = searchQuery(question);
-  const [wiki, ddg] = await Promise.all([wikiSearch(q, timeout).catch(() => null), ddgSearch(q, timeout).catch(() => null)]);
+  const erreurs = {};
+  const [wiki, ddg] = await Promise.all([wikiSearch(q, timeout).catch((e) => { erreurs.wikipedia = String(e && e.message || e); return null; }), ddgSearch(q, timeout).catch((e) => { erreurs.duckduckgo = String(e && e.message || e); return null; })]);
   const parts = [];
   if (wiki) parts.push('[Wikipédia — ' + wiki.title + '] ' + wiki.text);
   if (ddg) parts.push('[DuckDuckGo' + (ddg.source ? ' — ' + ddg.source : '') + '] ' + ddg.text);
   return {
-    wiki, ddg, found: parts.length,
+    wiki, ddg, erreurs, found: parts.length,
     summary: '📖 Wikipédia ' + (wiki ? '✓' : '✗') + ' · 🦆 DuckDuckGo ' + (ddg ? '✓ (Source : DuckDuckGo)' : '✗'),
     context: parts.length ? "Sources trouvées gratuitement sur Internet pour t'aider (elles peuvent être incomplètes ou hors sujet) :\n" + parts.join('\n') + "\n\nConsigne : compare ces sources. Si elles se contredisent, ou si elles ne répondent pas à la question, dis-le clairement ; sinon appuie ta réponse dessus et indique la source (Wikipédia ou DuckDuckGo)." : ''
   };
