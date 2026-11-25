@@ -109,17 +109,48 @@ textarea#rep{width:100%;height:90px;margin-top:8px;background:var(--soft);color:
 .mt button.on.bad{background:rgba(224,68,90,.14);color:var(--er)}
 .sug{display:flex;align-items:center;justify-content:center;gap:8px}
 .sug .mini{width:24px;height:24px;object-fit:contain}
-.wel{position:relative;text-align:center;color:var(--dm);padding:40px 10px;overflow:hidden}
-.wel>*{position:relative;z-index:1}
-.wel .bgav{position:absolute;inset:0;z-index:0;pointer-events:none}
-.bgav img{position:absolute;width:90px;opacity:.14;animation:drift 14s ease-in-out infinite}
-.bgav img:nth-child(1){left:2%;top:6%}.bgav img:nth-child(2){right:0;top:38%;width:120px;animation-delay:-5s}.bgav img:nth-child(3){left:18%;bottom:0;width:70px;animation-delay:-9s}
-@keyframes drift{0%,100%{transform:translate(0,0) rotate(-4deg)}50%{transform:translate(14px,-18px) rotate(5deg)}}
-.sug.fl{animation:bob 4.5s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.sugs{transition:opacity .35s}.sugs.out{opacity:0}
 @media (prefers-reduced-motion:reduce){.bgav img,.sug.fl{animation:none}}
 .guide h2{margin:6px 0 10px}.guide h3{margin:18px 0 6px;color:var(--brand)}.guide h4{margin:10px 0 2px}.guide p{margin:0 0 8px;line-height:1.5;font-size:14px;overflow-wrap:anywhere}.guide a{color:var(--brand)}
+
+/* ===== v1.1 ===== */
+#app{top:0;left:0;right:0;bottom:auto;height:100%;height:100lvh}
+#bar{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 6px);align-items:flex-end}
+#inwrap{background:rgba(255,255,255,.80);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+#in::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#msgs{padding-bottom:calc(205px + env(safe-area-inset-bottom));-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent 84px,#000 150px,#000 calc(100% - 200px - env(safe-area-inset-bottom)),transparent calc(100% - 84px - env(safe-area-inset-bottom)),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,transparent 84px,#000 150px,#000 calc(100% - 200px - env(safe-area-inset-bottom)),transparent calc(100% - 84px - env(safe-area-inset-bottom)),transparent 100%)}
+#v-chat.hf #msgs{padding-bottom:calc(205px + env(safe-area-inset-bottom))}
+/* avatar de fond : un seul, grand, qui flotte et fait coucou / clin d'oeil. Les messages passent par-dessus. */
+#bgav{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top) + 96px);z-index:0;pointer-events:none;display:flex;justify-content:center;transition:opacity .7s,top .7s,transform .7s}
+#bgav .avw{position:relative;width:min(60vw,240px);aspect-ratio:1;animation:fly 7s ease-in-out infinite}
+#bgav img{width:100%;height:100%;display:block;filter:drop-shadow(0 18px 22px rgba(90,60,200,.28))}
+#bgav.chat{opacity:.4;top:calc(50% - 140px);transform:scale(1.15)}
+#bgav.off{opacity:0}
+@keyframes fly{0%,100%{transform:translateY(0) rotate(-2deg)}25%{transform:translateY(-14px) rotate(1.5deg)}50%{transform:translateY(-4px) rotate(2.5deg)}75%{transform:translateY(-16px) rotate(-1deg)}}
+.wink{position:absolute;left:55%;top:35.5%;width:9.6%;height:12%;border-radius:50%;background:radial-gradient(ellipse,#3a2878 0%,#2b1d5e 75%);opacity:0;transform:scaleY(.1)}
+.wink::after{content:'';position:absolute;left:6%;right:6%;top:46%;height:3px;border-radius:3px;background:#c4e8ff;box-shadow:0 0 7px #8fd0ff}
+.avw.doWink .wink{animation:wk .9s ease-in-out}
+@keyframes wk{0%,100%{opacity:0;transform:scaleY(.1)}20%,80%{opacity:1;transform:scaleY(1)}}
+.hello{position:absolute;right:-4%;top:20%;font-size:36px;opacity:0;transform-origin:70% 80%}
+.avw.doWave{animation:fly 7s ease-in-out infinite,wave 1.9s ease-in-out}
+.avw.doWave .hello{animation:hi 1.9s ease-in-out}
+@keyframes wave{0%,100%{rotate:0deg}15%{rotate:-8deg}30%{rotate:7deg}45%{rotate:-7deg}60%{rotate:5deg}}
+@keyframes hi{0%{opacity:0;transform:scale(.4)}15%{opacity:1;transform:scale(1)}30%{transform:rotate(25deg)}45%{transform:rotate(-15deg)}60%{transform:rotate(25deg)}85%{opacity:1}100%{opacity:0;transform:scale(.6)}}
+/* accueil : l'avatar propose, les messages sont ses bulles */
+.wel{position:relative;text-align:center;color:var(--dm);padding:calc(236px) 6px 0;overflow:visible;display:flex;flex-direction:column;align-items:center;gap:12px}
+.spk{position:relative;max-width:92%;padding:12px 16px;border-radius:22px;background:rgba(255,255,255,.94);color:var(--tx);font-size:15px;line-height:1.45;box-shadow:0 8px 24px rgba(90,60,200,.16);animation:pop .55s both}
+.spk::before,.spk::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.94);box-shadow:0 3px 8px rgba(90,60,200,.14)}
+.spk::before{width:12px;height:12px;left:50%;top:-18px;margin-left:-6px}
+.spk::after{width:7px;height:7px;left:50%;top:-30px;margin-left:-3px}
+.sugs{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;transition:opacity .35s}
+.sugs.out{opacity:0}
+.sug{width:auto;max-width:92%;padding:11px 16px;border-radius:22px 22px 22px 8px;border:1px solid rgba(120,90,220,.16);background:rgba(255,255,255,.92);color:#5b4a8a;font-size:14.5px;text-align:left;box-shadow:0 6px 18px rgba(90,60,200,.12);animation:pop .55s both}
+.sug:nth-child(1){animation-delay:.25s}.sug:nth-child(2){animation-delay:.45s}.sug:nth-child(3){animation-delay:.65s}
+.sug.fl{animation:pop .55s both,bob 4.6s ease-in-out .9s infinite}
+@keyframes pop{0%{opacity:0;transform:translateY(14px) scale(.9)}100%{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.hintaide{font-size:12.5px;color:var(--dm);margin-top:4px}
+@media (prefers-reduced-motion:reduce){#bgav .avw,.avw.doWave,.sug.fl,.spk,.sug{animation:none}}
+.mt{flex-wrap:wrap;row-gap:4px}.mt .who{flex-basis:100%;margin-bottom:2px}
 </style></head><body>
 <div id="app">
 <header>
@@ -130,14 +161,16 @@ textarea#rep{width:100%;height:90px;margin-top:8px;background:var(--soft);color:
   </div>
   <button data-v="set" title="Réglages"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
 </header>
+<div id="bgav" class="home"><div class="avw"><img src="avatar.png" alt=""><i class="wink"></i><span class="hello">👋</span></div></div>
 <main>
 <section class="v on" id="v-chat"><div id="msgs"><div style="text-align:center;color:var(--dm);padding:40px 10px"><h2 style="color:var(--tx)">NEXUS AI</h2>Je réponds seul aux demandes simples et je ne sollicite une IA que si c'est nécessaire.<br>Tapez <b>aide</b> pour voir ce que je sais faire.<div class="sugs"><button class="sug" data-q="Quelle heure est-il à Tokyo ?">🕐 Quelle heure est-il à Tokyo ?</button><button class="sug" data-q="Dans 3 semaines">📅 Dans 3 semaines</button><button class="sug" data-q="Explique-moi ce qu'est une étoile simplement">🧠 Explique-moi ce qu'est une étoile simplement</button></div></div></div></section>
 <section class="v" id="v-hist"><button class="b2 on" data-v="chat" style="margin-bottom:10px">← Retour au chat</button><input id="q" placeholder="Rechercher dans l'historique…"><div id="hl"></div><div id="stock"></div></section>
 <section class="v" id="v-set"></section>
 <section class="v" id="v-guide"></section>
 </main>
-<div id="bar" style="display: flex;"><button id="nw" title="Nouvelle conversation" aria-label="Nouvelle conversation"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><div id="inwrap"><div id="fchip"><img id="fth" alt=""><span id="fname"></span><button id="focr" title="Lire le texte de l'image (gratuit)">Aa</button><button id="fx" title="Retirer le fichier">✕</button></div><div id="inrow"><textarea id="in" rows="1" placeholder="Demandez à NEXUS..." enterkeyhint="send"></textarea><button id="mic" title="Parler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button><button id="att" title="Joindre un fichier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></button></div></div><button id="sb" aria-label="Envoyer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg></button></div><input type="file" id="attfile" style="display:none">
+<div id="bar" style="display: flex;"><button id="nw" title="Nouvelle conversation" aria-label="Nouvelle conversation"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><div id="inwrap"><div id="fchip"><img id="fth" alt=""><span id="fname"></span><button id="focr" title="Lire le texte de l'image (gratuit)">Aa</button><button id="fx" title="Retirer le fichier">✕</button></div><div id="inrow"><textarea id="in" rows="1" placeholder="Message à NEXUS…" enterkeyhint="send"></textarea><button id="mic" title="Parler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button><button id="att" title="Joindre un fichier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></button></div></div><button id="sb" aria-label="Envoyer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg></button></div><input type="file" id="attfile" style="display:none">
 </div>
+<div id="sa" style="position:fixed;left:0;bottom:0;width:1px;height:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none"></div>
 <div id="lb" hidden><img alt=""><button type="button" aria-label="Fermer">✕</button></div>
 <div id="ts"></div>
 <div id="dlmenu" style="display:none"><div id="dlbox"></div></div>
