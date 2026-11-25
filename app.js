@@ -1,9 +1,8 @@
 import { NexusCorpsV12, NexusRate, ajouterMemoire } from "./nexus-corps.mjs";
 import * as JN from "./journal.js";
-import { voir } from "./vision.js";
 import { GUIDE_HTML } from "./guide.js";
 import { construireConfig } from "./comptes.js";
-const $=s=>document.querySelector(s),V='1.0';
+const $=s=>document.querySelector(s),V='1.1';
 const S={g(k,d){try{const v=localStorage.getItem('nexus_'+k);return v===null?d:JSON.parse(v)}catch{return d}},s(k,v){try{localStorage.setItem('nexus_'+k,JSON.stringify(v))}catch(e){}}};
 const P={"groq": ["Groq", "⚡"], "openrouter": ["OpenRouter", "🔀"], "puter": ["Puter", "🖥️"], "pollinations": ["Pollinations", "🌸"], "cohere": ["Cohere", "💬"], "cloudflare": ["Cloudflare", "☁️"]};
 const PI=Object.fromEntries(Object.entries(P).map(([k,v])=>[k,{n:v[0],i:v[1]}]));
@@ -45,8 +44,11 @@ function wait(m){st.msg=m;const e=document.getElementById('typ');if(e)e.textCont
 const SUG=[{i:'👋',t:'Bonjour !'},{i:'🌤️',t:'Météo à Paris',q:'Météo Paris'},{i:'💱',t:'100 euros en dollars'},{i:'📅',t:'Dans 3 semaines'},{i:'🕐',t:'Quelle heure est-il à Tokyo ?'},{i:'🎲',t:'Lance un dé'},{i:'🔐',t:'Génère-moi un mot de passe'},{i:'📖',t:'Qui est Marie Curie ?'},{i:'🧮',t:'15 % de 240'},{i:'📏',t:'10 km en miles'},{i:'🧠',t:'Explique-moi ce qu\'est une étoile simplement'},{i:'⚡',t:'Écris-moi une fonction JavaScript'},{i:'✍️',t:'Raconte-moi une histoire drôle'},{i:'🌍',t:'Traduis « bonjour » en anglais'},{i:'🍳',t:'Une idée de dîner rapide ?'}];
 function pick3(){const a=[...SUG];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,3)}
 const SUG2=[{i:'🎨',t:'Génère-moi une image de coucher de soleil'},{i:'🌡️',t:'Convertis 25 °C en °F'},{i:'⏳',t:'Combien de jours avant Noël ?'},{i:'🐍',t:'Écris un script Python pour trier une liste'},{i:'💡',t:'Donne-moi une idée de cadeau'},{i:'🧘',t:'Un exercice de respiration de 2 minutes'},{i:'🗺️',t:'Idées de week-end en France'},{i:'🔤',t:'Corrige : je suis aller au marché'},{i:'📝',t:'Aide-moi à écrire un message poli'},{i:'🎵',t:'Une idée de playlist pour travailler'}];SUG.push(...SUG2);
-function sugHtml(){return st.sug.map((x,k)=>'<button class="sug fl" style="animation-delay:'+(k*.7)+'s" data-q="'+esc(x.q||x.t)+'"><img src="avatar.png" class="mini" alt="">'+x.i+' '+esc(x.t)+'</button>').join('')}
-function welcome(){if(!st.sug)st.sug=pick3();return'<div class="wel"><div class="bgav"><img src="avatar.png" alt=""><img src="avatar.png" alt=""><img src="avatar.png" alt=""></div><h2 style="color:var(--tx)">NEXUS AI</h2>Je réponds seul aux demandes simples et je ne sollicite une IA que si c\'est nécessaire.<br>Tapez <b>aide</b> pour voir ce que je sais faire.<div class="sugs">'+sugHtml()+'</div></div>'}
+function sugHtml(){return st.sug.map((x,k)=>'<button class="sug fl" data-q="'+esc(x.q||x.t)+'">'+x.i+' '+esc(x.t)+'</button>').join('')}
+function welcome(){if(!st.sug)st.sug=pick3();return'<div class="wel"><div class="spk">Coucou ! Je réponds seul aux demandes simples et je ne sollicite une IA que si c\'est nécessaire. Tu veux essayer ?</div><div class="sugs">'+sugHtml()+'</div><div class="hintaide">Écris <b>aide</b> pour voir tout ce que je sais faire.</div></div>'}
+function syncAv(){const b=document.getElementById('bgav');if(!b)return;const c=cur0(),v=document.querySelector('.v.on'),chat=!v||v.id==='v-chat';b.className=chat?((!c||!c.m.length)?'home':'chat'):'off'}
+const avw=document.querySelector('#bgav .avw');function animAv(){if(document.hidden||!avw)return;const k=Math.random()<.5?'doWink':'doWave';avw.classList.add(k);setTimeout(()=>avw.classList.remove(k),2000)}
+setInterval(animAv,6500);setTimeout(animAv,1500);
 setInterval(()=>{const c=cur0();if(document.hidden||st.busy||(c&&c.m.length))return;const el=document.querySelector('#v-chat.on .sugs');if(!el)return;st.sug=pick3();el.classList.add('out');setTimeout(()=>{el.innerHTML=sugHtml();el.classList.remove('out')},350)},7000);
 let TL=null;
 const TP=import('./nexus-tools.js').then(m=>{TL=m;return m}).catch(e=>{L('tools_error',{msg:String(e&&e.message||e).slice(0,160)});return null});
@@ -68,10 +70,10 @@ h=h.replace(/^#{1,6}\s*(.+)$/gm,'<b>$1</b>').replace(/^\s*[-*]\s+/gm,'• ').rep
 h=inl(h);
 return h.replace(/\n/g,'<br>').replace(/\u0001(\d+)\u0001/g,(m,i)=>sp[i]).replace(/<\/table><\/div><br>/g,'</table></div>').replace(/<hr><br>/g,'<hr>')}
 function fileThumb(f){if(!f)return'';if(f.kind==='image'&&(f.thumb||f.full))return'<div class="ath"><img class="th" data-lb="'+esc(f.full||f.thumb)+'" src="'+esc(f.thumb||f.full)+'" alt="'+esc(f.name)+'"><span>'+esc(f.name)+'</span></div>';return'<div class="ath"><div class="fi">'+(f.kind==='image'?'🖼️':'📄')+'</div><span>'+esc(f.name)+(f.size?' · '+kb(f.size):'')+'</span></div>'}
-function render(){const c=cur0(),e=$('#msgs');if(!c||!c.m.length){e.innerHTML=welcome()+cardHtml();return}
+function render(){const c=cur0(),e=$('#msgs');if(!c||!c.m.length){e.innerHTML=welcome()+cardHtml();syncAv();return}
 e.innerHTML=c.m.map((m,i)=>{if(m.r==='user')return`<div class="m user"><div class="bb">${fileThumb(m.file)}${esc(m.c)}</div></div>`;
 const body=m.img?'<div>'+md(m.c)+'</div><img class="gimg" data-lb="'+esc(m.img)+'" src="'+esc(m.img)+'" alt="'+esc(m.prompt||'image')+'">':md(m.c);
-return`<div class="m ai"><div class="bb">${body}</div><div class="mt"><span class="who"><img src="avatar.png" class="av" alt="">NEXUS</span><button data-a="cp" data-i="${i}" title="Copier">📋</button><button data-a="tts" data-i="${i}" title="Écouter">🔊</button>${m.img?`<button data-a="imgsave" data-i="${i}">💾</button><button data-a="imgnew" data-i="${i}">🔄</button>`:(m.err?'':`<button data-a="dl" data-i="${i}">⬇️</button>`)}<button data-a="sv" data-i="${i}">Sauvegarder</button><button data-a="gd" data-i="${i}" class="${m.good?'on':''}" title="Bonne réponse">👍</button><button data-a="bd" data-i="${i}" class="${m.bad?'on bad':''}" title="Mauvaise réponse">👎</button>${(m.via&&!m.err&&!m.img)?`<button data-a="re" data-i="${i}">🔁 Redemander à une autre IA</button>`:''}</div></div>`}).join('')+(st.busy?'<div class="m ai"><div class="bb" id="typ">'+esc(st.msg||'…')+'</div></div>':'')+cardHtml();e.scrollTop=e.scrollHeight}
+return`<div class="m ai"><div class="bb">${body}</div><div class="mt"><span class="who"><img src="avatar.png" class="av" alt="">NEXUS</span><button data-a="cp" data-i="${i}" title="Copier">📋</button><button data-a="tts" data-i="${i}" title="Écouter">🔊</button>${m.img?`<button data-a="imgsave" data-i="${i}">💾</button><button data-a="imgnew" data-i="${i}">🔄</button>`:(m.err?'':`<button data-a="dl" data-i="${i}">⬇️</button>`)}<button data-a="sv" data-i="${i}">Sauvegarder</button><button data-a="gd" data-i="${i}" class="${m.good?'on':''}" title="Bonne réponse">👍</button><button data-a="bd" data-i="${i}" class="${m.bad?'on bad':''}" title="Mauvaise réponse">👎</button>${(m.via&&!m.err&&!m.img)?`<button data-a="re" data-i="${i}">🔁 Redemander à une autre IA</button>`:''}</div></div>`}).join('')+(st.busy?'<div class="m ai"><div class="bb" id="typ">'+esc(st.msg||'…')+'</div></div>':'')+cardHtml();e.scrollTop=e.scrollHeight;syncAv()}
 function openLb(s){const l=$('#lb');if(!l)return;l.querySelector('img').src=s;l.hidden=false;JN.log('plein_ecran',{})}
 $('#lb').onclick=()=>{$('#lb').hidden=true};
 function say(c,o){c.m.push({r:'ai',...o});save();render()}
@@ -81,7 +83,11 @@ try{const m=S.g('memoires',[]);if(Array.isArray(m))nx.memoires=m}catch{}
 const provDe=e=>PROV.find(p=>(e.tags||[]).includes(p));
 const entrees=()=>nx.listerCarnet();
 const actifs=()=>PROV.filter(p=>entrees().some(e=>provDe(e)===p&&e.actif!==false));
-let puterOK=false,LASTVIA=null;
+let puterOK=false,LASTVIA=null,BRM=null,qwenMsg='';
+const qwenOn=()=>S.g('qwen_on',false);
+async function qwenCharger(progress){if(!navigator.gpu)throw new Error('WebGPU indisponible sur cet appareil');BRM??=await import('./nexus-brain.js');try{await BRM.ensurePersistentStorage()}catch{}const ok=await BRM.initLLM(progress);if(!ok)throw new Error('chargement impossible (réseau ou mémoire)');return BRM}
+const estSocial=t=>{const n=nm(t);return n.length<=40&&!/\d/.test(n)&&/^(salut|bonjour|bonsoir|coucou|hello|hey|yo|ca va|comment ca va|ca va bien|tu vas bien|merci|merci beaucoup|ok merci|bonne nuit|bonne journee|bonne soiree|a demain|a bientot|a plus|au revoir|bye|lol|mdr|super|cool|top|genial|bravo|ca marche|d accord|ok)( [a-z]{2,8})?[ !?.]*$/.test(n)};
+async function qwenRepondre(raw){if(!qwenOn()||!estSocial(raw))return null;try{wait('Nexus se réveille…');const B=await qwenCharger();const r=await B.generateLocalResponse(raw,[{role:'system',content:'Tu es NEXUS. Réponds par une ou deux phrases très courtes, chaleureuses et naturelles, en français. Tu ne donnes JAMAIS de fait, de chiffre, de conseil ni de code. Si on te demande quelque chose de sérieux, propose simplement de poser la question.'}],60);const t=String(r||'').trim();if(!t||t.length>200||/[\u3040-\u30ff\u3400-\u9fff\u0400-\u04ff]|https?:|\d{2,}/.test(t)||/^\W/.test(t)){JN.log('qwen_rejete',{raison:'filtre',texte:t.slice(0,200)});return null}JN.log('qwen_reponse',{q:raw,texte:t});return t}catch(e){JN.log('qwen_erreur',{msg:String(e&&e.message||e)});return null}}
 const FREE_PUTER='liquid/lfm-2.5-1.2b-instruct:free';
 async function puterSecours(...args){try{return await window.puter.ai.chat(...args)}catch(e){const m=String(e&&(e.message||e.error?.message||e.error||e.code)||e)+JSON.stringify(e||{});if(/credit|insufficient|quota|limit|402|429|balance|funds/i.test(m)){JN.log('puter_secours_gratuit',{msg:m.slice(0,160)});const b=[...args],k=b.findIndex(x=>x&&typeof x==='object'&&!Array.isArray(x));if(k>=0)b[k]={...b[k],model:FREE_PUTER};else b.push({model:FREE_PUTER});return await window.puter.ai.chat(...b)}throw e}}
 function enrober(){for(const en of nx.annuaire.entrees.values()){if(en._w)continue;const o=en.transport;en.transport=async(arg)=>{const t0=Date.now();JN.log('ia_appel',{id:en.id,fonctionnalite:arg&&arg.fonctionnalite,nb_messages:arg&&arg.messages&&arg.messages.length});try{const r=await o(arg);JN.log('ia_ok',{id:en.id,ms:Date.now()-t0,texte:String(r&&r.texte||'').slice(0,4000)});LASTVIA=provDe({tags:en.tags||[]})||en.id;return r}catch(e){JN.log('ia_erreur',{id:en.id,ms:Date.now()-t0,statut:e&&e.status,type:e&&e.kind,msg:String(e&&(e.message||e.error?.message)||e).slice(0,300)});throw e}};en._w=1}}
@@ -142,6 +148,7 @@ async function send(t0){
   if(!c.t)c.t=raw.slice(0,40);save();st.busy=1;st.stop=0;st.msg='Nexus réfléchit...';$('#sb').innerHTML=IC_STOP;updSb();render();
   JN.log('message_utilisateur',{texte:raw,fichier:att?{name:att.name,kind:att.kind,size:att.size,trunc:att.trunc,src:att.src}:null,hors_ligne:!navigator.onLine});
   try{
+    let web='',webInfo=null;
     await pret;apprendre(raw);
     if(!att){
       const mr=memRepondre(raw);if(mr){JN.log('reponse',{via:'memoire',texte:mr});say(c,{p:'local',c:mr});return}
@@ -149,19 +156,28 @@ async function send(t0){
       if(T0&&/image|photo|illustration|dessin|logo|affiche|portrait|paysage|visuel/i.test(raw)){const gp=T0.parseImageRequest(raw);if(gp){JN.log('route',{via:'image',prompt:gp});await genImage(c,gp);return}}
       const l=await local(raw);
       if(l){JN.log('reponse',{via:'local',texte:l});say(c,{p:'local',c:l});return}
+      const qw=await qwenRepondre(raw);
+      if(qw){nx.noterEchange(raw,qw);say(c,{p:'local',c:qw});return}
+      if(navigator.onLine&&T0&&T0.isFactual(raw)){
+        wait('Nexus cherche sur Internet…');
+        try{webInfo=await T0.searchWeb(raw,{timeout:6000});JN.log('recherche_web',{q:raw,wikipedia:!!webInfo.wiki,duckduckgo:!!webInfo.ddg,erreurs:webInfo.erreurs,wiki:webInfo.wiki&&webInfo.wiki.title,ddg:webInfo.ddg&&webInfo.ddg.text&&webInfo.ddg.text.slice(0,200)});if(webInfo.found)web=webInfo.context}catch(e){JN.log('recherche_web_erreur',{msg:String(e&&e.message||e)})}
+      }
     }
     let fichier=att?{name:att.name,text:String(att.text||'').slice(0,190000)}:null,texte=raw;
-    if(att&&att.kind==='image'){
-      wait('Nexus regarde l\'image…');
-      const v=await voir({dataUrl:att.img,question:raw,cle:((st.comptes.pollinations||{}).apiKey||'').trim(),puterChat:puterOK?(...x)=>puterSecours(...x):null,fetchFn:(...x)=>fetch(...x),log:JN.log});
-      if(st.stop)return;
-      if(v.ok){JN.log('reponse',{via:'vision',voie:v.voie,texte:v.texte});say(c,{p:'nexus',c:v.texte});return}
-      let txt='';try{const T=await needTools();wait('Lecture du texte de l\'image…');txt=await T.ocrImage(att.file||att.img,p=>wait('Lecture du texte… '+p))}catch(e){L('ocr_error',{msg:String(e&&e.message||e).slice(0,120)})}
-      if(!txt||txt.length<3){say(c,{p:'local',err:1,c:'Je n\'arrive pas à analyser cette image pour le moment : aucune IA capable de la regarder n\'est disponible (ou plus de crédit), et je n\'y trouve pas de texte à lire. Réessaie plus tard.'});return}
-      fichier={name:att.name+' (texte lu)',text:txt.slice(0,190000)};texte=raw+'\n\n(Je ne peux pas voir l\'image, seulement le texte qu\'elle contient.)';
-    }
+    if(att&&att.kind==='image'){wait('Nexus regarde l\'image…');fichier={name:att.name,kind:'image',text:'',img:att.img}}
     const t1=Date.now();LASTVIA=null;
-    const r=await nx.recevoirAutonome({texte,fichier,enLigne:navigator.onLine});
+    let r=await nx.recevoirAutonome({texte,fichier,enLigne:navigator.onLine,contexteWeb:web});
+    if(att&&att.kind==='image'&&r.panne&&!st.stop){
+      // Aucune IA ne peut voir l'image : on lit le texte qu'elle contient (gratuit, local), sans jamais inventer.
+      let txt='';try{const T=await needTools();wait('Lecture du texte de l\'image…');txt=await T.ocrImage(att.file||att.img,p=>wait('Lecture du texte… '+p))}catch(e){L('ocr_error',{msg:String(e&&e.message||e).slice(0,120)})}
+      if(!txt||txt.length<3){say(c,{p:'local',err:1,c:'Je n\'arrive pas à analyser cette image pour le moment : aucune IA de vision n\'est disponible (ou plus de crédit) et je n\'y trouve pas de texte à lire. Réessaie plus tard.'});return}
+      r=await nx.recevoirAutonome({texte:raw+'\n\n(Je ne peux pas voir l\'image, seulement le texte qu\'elle contient.)',fichier:{name:att.name+' (texte lu)',text:txt.slice(0,190000)},enLigne:navigator.onLine})
+    }
+    if(r.panne&&webInfo&&webInfo.found&&!st.stop){
+      // Plus aucune IA : on répond honnêtement avec ce que Wikipédia / DuckDuckGo ont trouvé, sans rien inventer.
+      const p=[];if(webInfo.wiki)p.push('**'+webInfo.wiki.title+'** (Wikipédia) : '+webInfo.wiki.text);if(webInfo.ddg)p.push(webInfo.ddg.text+(webInfo.ddg.source?' (Source : '+webInfo.ddg.source+')':' (Source : DuckDuckGo)'));
+      r={...r,texte:'Aucune IA n\'est disponible pour reformuler, mais voici ce que j\'ai trouvé :\n\n'+p.join('\n\n'),panne:false,chemin:'web-sources'};JN.log('reponse',{via:'web-sources'})
+    }
     syncRate();S.s('memoires',nx.memoires);
     JN.log('resultat_corps',{chemin:r.chemin,intent:r.intent,bloque:r.bloque,champs:Object.keys(r),ms:Date.now()-t1,texte:r.texte});
     if(st.stop)return;
@@ -207,13 +223,9 @@ h+='<button class="b2" data-a="savec" style="margin-top:8px">💾 Enregistrer le
 h+='<div class="set-sub">Test</div><button class="b2" data-a="tt" id="tt">▶ Tester mes IA</button>';
 h+='<div class="set-note">Envoie un court message à chaque IA branchée.</div></div>';
 h+='<div class="set-card"><div class="set-title">Mémoire de Nexus</div><div class="set-note">Nexus retient, sur ce téléphone, ce que tu lui demandes de retenir (ex : « je m\'appelle … »).</div>'+memHtml()+'</div>';
-h+='<div class="set-card"><div class="set-title">Journal détaillé</div><div class="set-note" id="jcount">…</div><div class="set-note">Enregistre tout ce qui se passe dans l\'app (messages, réponses, appels aux IA, erreurs, réseau, clics). Les clés sont masquées.</div><button class="b2" data-a="jdl">📥 Télécharger le journal complet</button><button class="b2" data-a="jcp">📋 Copier les 300 dernières lignes</button><button class="b2 r" data-a="jclr">🗑️ Vider le journal détaillé</button></div>';
-h+='<div class="set-card"><div class="set-title">Journal</div><div class="set-note">Gestion du journal et des données.</div>';
-h+='<div class="j-row" data-a="vj"><span>📋</span><b>Voir le journal</b><span>›</span></div>';
-h+='<div class="j-row" data-a="rp"><span>📄</span><b>Copier le rapport</b><span>›</span></div>';
-h+='<textarea id="rep" readonly placeholder="Le rapport apparaît ici" style="display:none"></textarea>';
-h+='<div class="j-row" data-a="lc"><span>🗑️</span><b>Vider le journal</b><span>›</span></div>';
-h+='<button class="b2 r" data-a="all">Tout effacer</button></div>';
+h+='<div class="set-card"><div class="set-title">Voix de Nexus</div><select id="voxsel" style="width:100%;padding:10px;border-radius:10px;margin-bottom:6px"><option value="">Automatique (la plus naturelle)</option>'+voixFR().map(v=>'<option value="'+esc(v.name)+'"'+(v.name===voixNom?' selected':'')+'>'+esc(v.name)+'</option>').join('')+'</select><button class="b2" data-a="voxt">🔊 Écouter un exemple</button><div class="set-note">Sur iPhone, pour une voix bien plus naturelle : Réglages → Accessibilité → Contenu énoncé → Voix → Français, puis télécharge une voix « Améliorée » ou « Premium ».</div></div>';
+{const qOn=qwenOn(),gpu=!!navigator.gpu;h+='<div class="set-card"><div class="set-title">Cerveau local (Qwen 2.5 · 0,5 Md)</div><div class="set-note">Petit modèle qui tourne sur ton téléphone, sans crédit. Nexus ne l\'utilise que pour les politesses (salut, merci, ça va…). Jamais pour les faits, le code, les traductions ni les réponses sérieuses, pour ne pas dégrader la qualité.</div><div class="set-note" id="qwst">'+(gpu?(qOn?'✅ Installé':(qwenMsg||'Non installé · téléchargement d\'environ 400 Mo, Wi-Fi conseillé')):'⚠️ Ton navigateur ne gère pas WebGPU : indisponible ici.')+'</div>'+(gpu?(qOn?'<button class="b2" data-a="qwt">▶ Tester</button><button class="b2 r" data-a="qwd">🗑️ Supprimer</button>':'<button class="b2" data-a="qwi">⬇️ Télécharger</button>'):'')+'</div>'}
+h+='<div class="set-card"><div class="set-title">Journal</div><div class="set-note" id="jcount">…</div><div class="set-note">Tout ce qui se passe dans l\'app est enregistré (messages, réponses, appels aux IA, erreurs, réseau, clics). Les clés sont masquées.</div><div class="j-row" data-a="vj"><span>👁️</span><b>Voir le journal</b><span>›</span></div><textarea id="rep" readonly placeholder="Le journal apparaît ici" style="display:none"></textarea><button class="b2" data-a="jdl">📥 Télécharger le journal complet</button><button class="b2" data-a="jcp">📋 Copier les 300 dernières lignes</button><button class="b2" data-a="jclr">🗑️ Vider le journal</button><button class="b2 r" data-a="all">Tout effacer (conversations, comptes, journal)</button></div>';
 h+='<div class="h" style="text-align:center;margin:14px">NEXUS AI v'+V+'</div>';
 $('#v-set').innerHTML=h;pstat();JN.count().then(n=>{const e=$('#jcount');if(e)e.textContent=n+' entrées enregistrées'});
 }
@@ -227,28 +239,33 @@ async function tests(){const b=$('#tt');b.disabled=true;b.textContent='⏳ Test�
   PROV.filter(id=>st.on[id]===false).forEach(id=>{delete st.tests[id]});pstat();
   JN.log('test_ias',{fin:true,ms:Date.now()-t00});b.disabled=false;b.textContent='▶ Tester mes IA'}
 $('#v-set').addEventListener('change',e=>{const t=e.target;
-  if(t.dataset.on){st.on[t.dataset.on]=t.checked;S.s('on',st.on);appliquer();upd();return}
+  if(t.id==='voxsel'){voixNom=t.value;S.s('voix',voixNom);return}if(t.dataset.on){st.on[t.dataset.on]=t.checked;S.s('on',st.on);appliquer();upd();return}
   if(t.dataset.f){(st.comptes[t.dataset.f]??={})[t.dataset.k]=t.type==='checkbox'?t.checked:t.value.trim();S.s('comptes',st.comptes)}});
 $('#v-set').addEventListener('click',async e=>{const el=e.target.closest('[data-a]');const a=el?el.dataset.a:null;if(!a)return;
 if(a==='pl'){try{if(!window.puter)throw new Error('Puter.js non chargé');puterOK?await window.puter.auth.signOut():await window.puter.auth.signIn();location.reload()}catch(x){toast('Puter : '+(x&&x.message||x))}}
 else if(a==='kedit'){const w=$('#kf-'+el.dataset.id);if(w)w.style.display=w.style.display==='none'?'block':'none'}
 else if(a==='savec'){S.s('comptes',st.comptes);location.reload()}
-else if(a==='vj'){const r=$('#rep');if(r){if(r.style.display==='none'){r.value=st.log.length?st.log.map(x=>JSON.stringify(x)).join('\n'):'Journal vide.';r.style.display='block'}else r.style.display='none'}}
+else if(a==='vj'){const r=$('#rep');if(r){if(r.style.display==='none'){const all=await JN.all();r.value=all.length?all.slice(-200).map(x=>{const {t,type,...rest}=x;return String(t).slice(11,19)+' '+type+' '+JSON.stringify(rest)}).join('\n'):'Journal vide.';r.style.display='block'}else r.style.display='none'}}
 else if(a==='tt')tests();else if(a==='rp'){const r=report();$('#rep').value=r;toast(await copy(r)?'Rapport copié':'Sélectionnez le texte')}
 else if(a==='jdl'){const all=await JN.all();const blob=new Blob([JSON.stringify({app:'NEXUS AI',version:V,exporte:new Date().toISOString(),entrees:all},null,1)],{type:'application/json'});const u=URL.createObjectURL(blob),x=document.createElement('a');x.href=u;x.download='nexus-journal-'+Date.now()+'.json';document.body.appendChild(x);x.click();setTimeout(()=>{x.remove();URL.revokeObjectURL(u)},4000);toast('Journal exporté ('+all.length+' lignes)')}
 else if(a==='jcp'){const all=await JN.all();toast(await copy(JSON.stringify(all.slice(-300)))?'Copié (300 dernières lignes)':'Copie impossible')}
 else if(a==='jclr'){if(confirm('Vider tout le journal détaillé ?')){await JN.clear();toast('Journal détaillé vidé');rset()}}
+else if(a==='qwi'){el.disabled=true;try{await qwenCharger(p=>{qwenMsg=p;const n=$('#qwst');if(n)n.textContent=p});S.s('qwen_on',true);toast('Cerveau local prêt');JN.log('qwen_installe',{})}catch(x){qwenMsg='';toast('Qwen : '+(x&&x.message||x));JN.log('qwen_erreur',{msg:String(x&&x.message||x)})}rset()}
+else if(a==='qwd'){S.s('qwen_on',false);try{const ks=await caches.keys();await Promise.all(ks.filter(k=>/webllm|mlc/i.test(k)).map(k=>caches.delete(k)))}catch{}try{BRM&&BRM.resetLLM()}catch{}toast('Cerveau local supprimé');rset()}
+else if(a==='qwt'){const r=await qwenRepondre('Salut');toast(r?'Qwen : '+r:'Pas de réponse (voir le journal)')}
+else if(a==='voxt'){lire('Bonjour, je suis Nexus. Voici ma voix. Que puis-je faire pour toi ?')}
 else if(a==='lc'){st.log=[];S.s('log',[]);toast('Journal vidé')}
 else if(a==='memdel'){nx.memoires.splice(+el.dataset.i,1);S.s('memoires',nx.memoires);rset()}
 else if(a==='memclr'){nx.memoires=[];S.s('memoires',[]);rset()}
-else if(a==='all'&&confirm('Tout effacer ?')){Object.keys(localStorage).filter(k=>k.startsWith('nexus_')).forEach(k=>localStorage.removeItem(k));location.reload()}});
+else if(a==='all'&&confirm('Tout effacer ?')){await JN.clear();Object.keys(localStorage).filter(k=>k.startsWith('nexus_')).forEach(k=>localStorage.removeItem(k));location.reload()}});
 function rhist(){const q=norm($('#q').value||''),l=[...st.convs].reverse().filter(c=>!q||norm(c.t+' '+c.m.map(m=>m.c).join(' ')).includes(q));$('#hl').innerHTML=l.length?l.map(c=>`<div class="hi" data-o="${c.id}"><div><b>${esc(c.t||'(vide)')}</b><br><small>${new Date(c.d).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${c.m.length} messages</small></div><button class="ib" data-del="${c.id}">🗑</button></div>`).join(''):'<div class="h">Aucune conversation.</div>';const sv=(st.saved||[]).filter(s=>!q||norm((s.t||'')+' '+(s.c||'')).includes(q));const se=$('#stock');if(se)se.innerHTML='<div class="stock-title">Stockage</div><div class="h" style="margin-top:0">'+sv.length+' élément'+(sv.length>1?'s':'')+' sauvegardé'+(sv.length>1?'s':'')+'</div>'+(sv.length?sv.slice().reverse().map(s=>`<div class="stock-card"><b>${esc(s.t||'Réponse sauvegardée')}</b><br><small>${new Date(s.d).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${'NEXUS'}</small><div class="h">${esc((s.c||'').slice(0,160))}${(s.c||'').length>160?'…':''}</div><div class="stock-actions"><button data-svcp="${s.id}">Copier</button><button data-svdel="${s.id}">Supprimer</button></div></div>`).join(''):'<div class="h">Aucun élément sauvegardé.</div>')}
 function report(){const c=cur0();return['# Rapport NEXUS AI v'+V,'Date : '+new Date().toISOString(),...(c?c.m.map(m=>'['+m.r+(m.p?' '+m.p:'')+'] '+m.c):['(aucune)']),...st.log.map(x=>JSON.stringify(x))].join('\n')}
 async function copy(t){try{await navigator.clipboard.writeText(t);return 1}catch{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();let ok=0;try{ok=document.execCommand('copy')}catch{}a.remove();return ok}}
-function view(v){const bar=document.getElementById('bar');if(bar)bar.style.display=(v==='chat'?'flex':'none');document.querySelectorAll('.v').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));if(v==='set')rset();if(v==='hist')rhist();if(v==='guide')rguide()}
+function view(v){const bar=document.getElementById('bar');if(bar)bar.style.display=(v==='chat'?'flex':'none');document.querySelectorAll('.v').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));if(v==='set')rset();if(v==='hist')rhist();if(v==='guide')rguide();syncAv()}
 function rguide(){$('#v-guide').innerHTML='<button class="b2" data-v="set" style="margin-bottom:12px">← Retour aux paramètres</button><div class="guide">'+GUIDE_HTML+'</div>'}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;const v=b.dataset.v;const cur=document.querySelector('.v.on')?.id?.replace('v-','');if(v===cur&&v!=='chat')view('chat');else view(v);});
-$('#sb').onclick=()=>send();$('#nw').onclick=()=>{pf=null;chip();st.sug=null;st.cur=null;nx.historique=[];save();render();view('chat')};$('#q').oninput=rhist;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;const v=b.dataset.v;const cur=document.querySelector('.v.on')?.id?.replace('v-','');if(b.classList&&b.classList.contains('head-center')){if(cur==='chat'){newChat();JN.log('nouveau_chat',{via:'logo'})}else view('chat');return}if(v===cur&&v!=='chat')view('chat');else view(v);});
+function newChat(){pf=null;chip();st.sug=null;st.cur=null;nx.effacerConversation();save();render();view('chat')}
+$('#sb').onclick=()=>send();$('#nw').onclick=newChat;$('#q').oninput=rhist;
 let rec=null,micOn=false,micBase='';
 function stopMic(){micOn=false;micBase='';if(rec){try{rec.onresult=null;rec.onend=null;rec.onerror=null;rec.abort?rec.abort():rec.stop()}catch{}rec=null}$('#mic').classList.remove('on')}
 $('#mic').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Micro non disponible dans ce navigateur');JN.log('mic',{etat:'indisponible'});return}
@@ -258,7 +275,13 @@ rec.onresult=e=>{let interim='';for(let k=e.resultIndex;k<e.results.length;k++){
 rec.onerror=e=>{JN.log('mic',{etat:'erreur',err:e&&e.error});if(e&&(e.error==='not-allowed'||e.error==='service-not-allowed')){toast('Micro refusé : autorise-le dans les réglages');stopMic()}};
 rec.onend=()=>{if(micOn){try{rec.start()}catch{stopMic()}}};
 rec.start()}catch(x){stopMic();toast('Micro impossible');JN.log('mic',{etat:'exception',msg:String(x&&x.message||x)})}};
-let ttsI=null;function lire(txt){if(!('speechSynthesis' in window)){toast('Lecture vocale indisponible');return}const s=window.speechSynthesis;const meme=ttsI===txt;if(s.speaking||s.pending){s.cancel();JN.log('tts',{etat:'stop'});ttsI=null;if(meme)return}ttsI=txt;const u=new SpeechSynthesisUtterance(String(txt).replace(/[*_`#>]/g,'').slice(0,4000));u.lang='fr-FR';const v=(s.getVoices()||[]).find(x=>/^fr/i.test(x.lang));if(v)u.voice=v;u.onend=u.onerror=()=>{ttsI=null};s.speak(u);JN.log('tts',{etat:'start',len:String(txt).length})}
+let ttsI=null,voixNom=S.g('voix','');
+const voixFR=()=>{try{return (speechSynthesis.getVoices()||[]).filter(v=>/^fr/i.test(v.lang))}catch{return[]}};
+function meilleureVoix(){const vs=voixFR();if(!vs.length)return null;const p=vs.find(v=>v.name===voixNom);if(p)return p;const sc=v=>{const n=v.name.toLowerCase();let s=0;if(/premium|enhanced|amélioré|ameliore/.test(n))s+=6;if(/siri/.test(n))s+=5;if(/amélie|amelie|audrey|aurélie|aurelie|thomas|marie|léa|lea|google/.test(n))s+=3;if(/fr[-_]fr/i.test(v.lang))s+=2;if(v.localService)s+=1;return s};return [...vs].sort((x,y)=>sc(y)-sc(x))[0]}
+function pourLire(t){return String(t).replace(/```[\s\S]*?```/g,' Voir le code à l\'écran. ').replace(/`([^`]+)`/g,'$1').replace(/https?:\/\/\S+/g,'lien').replace(/[*_#>~|]/g,'').replace(/^\s*[-•]\s+/gm,'').replace(/\p{Extended_Pictographic}/gu,'').replace(/\s*\n+\s*/g,'. ').replace(/\.{2,}/g,'.').replace(/\s+/g,' ').trim()}
+function phrases(t){const ph=t.match(/[^.!?;:]+[.!?;:]*/g)||[t],out=[];let cur='';for(const p of ph){if((cur+p).length>170&&cur){out.push(cur.trim());cur=p}else cur+=p}if(cur.trim())out.push(cur.trim());return out}
+function lire(txt){if(!('speechSynthesis' in window)){toast('Lecture vocale indisponible');return}const s=window.speechSynthesis,meme=ttsI===txt;if(s.speaking||s.pending){s.cancel();JN.log('tts',{etat:'stop'});ttsI=null;if(meme)return}ttsI=txt;const v=meilleureVoix();phrases(pourLire(txt).slice(0,5000)).forEach(ch=>{const u=new SpeechSynthesisUtterance(ch);u.lang='fr-FR';if(v)u.voice=v;u.rate=.97;u.pitch=1.02;u.onend=u.onerror=()=>{};s.speak(u)});JN.log('tts',{etat:'start',len:String(txt).length,voix:v&&v.name})}
+if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=()=>{if(document.querySelector('#v-set.on'))rset()};
 const IC_SEND='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg>';
 const IC_STOP='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
 $('#att').onclick=()=>$('#attfile').click();const TXT=/\.(txt|md|markdown|csv|tsv|json|jsonl|xml|html?|css|js|mjs|ts|tsx|jsx|py|java|c|h|cpp|cs|go|rs|php|rb|sh|sql|log|ya?ml|toml|ini|cfg|conf|env|svg|srt|vtt|tex)$/i,IMG=/\.(png|jpe?g|gif|webp|heic|heif|bmp)$/i,PDOC=/\.(pdf|docx|xlsx|xls|ods)$/i;
@@ -293,6 +316,7 @@ $('#hl').onclick=e=>{const d=e.target.closest('[data-del]');if(d){st.convs=st.co
 $('#stock').onclick=async e=>{const del=e.target.closest('[data-svdel]');if(del){st.saved=(st.saved||[]).filter(s=>s.id!=del.dataset.svdel);S.s('saved',st.saved);rhist();toast('Supprimé');return}const cp=e.target.closest('[data-svcp]');if(cp){const s=(st.saved||[]).find(x=>x.id==cp.dataset.svcp);if(s)toast(await copy(s.c)?'Copié':'Copie impossible')}};
 addEventListener('online',upd);addEventListener('offline',upd);
 if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>L('sw_error',{msg:e.message})));
-render();upd();view('chat');addEventListener('pageshow',()=>view('chat'));setTimeout(upd,1500);setInterval(()=>{pstat();upd()},60000);
+function viewportDiag(tag){try{const sa=document.getElementById('sa'),r=x=>Math.round(x),ap=document.querySelector('#app').getBoundingClientRect(),bar=document.querySelector('#bar').getBoundingClientRect(),vv=window.visualViewport;JN.log('ecran',{tag,innerH:innerHeight,outerH:outerHeight,screenH:screen.height,vvH:vv&&r(vv.height),vvTop:vv&&r(vv.offsetTop),appH:r(ap.height),appBottom:r(ap.bottom),barBottom:r(bar.bottom),safeBottom:sa?r(sa.getBoundingClientRect().height):null,standalone:matchMedia('(display-mode: standalone)').matches,navStandalone:navigator.standalone})}catch{}}
+render();upd();view('chat');viewportDiag('start');setTimeout(()=>viewportDiag('1s'),1000);addEventListener('resize',()=>viewportDiag('resize'));addEventListener('pageshow',()=>view('chat'));setTimeout(upd,1500);setInterval(()=>{pstat();upd()},60000);
 JN.instrumenter({version:V,standalone:(()=>{try{return matchMedia('(display-mode: standalone)').matches}catch{return null}})()});
 L('start',{v:V});
