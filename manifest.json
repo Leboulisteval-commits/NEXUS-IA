@@ -1,7 +1,7 @@
 {
   "name": "NEXUS AI",
   "short_name": "Nexus",
-  "description": "NEXUS AI v1.1 : assistant IA qui orchestre les IA gratuites pour toi",
+  "description": "NEXUS AI v2.0 : assistant IA qui orchestre les IA gratuites pour toi",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
