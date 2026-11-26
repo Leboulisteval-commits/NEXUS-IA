@@ -2252,6 +2252,52 @@ function quotaPourTags(tags = []) {
   if (t.includes("qwen")) return QUOTAS_GRATUITS.qwen;
   return null;
 }
+
+// ===== v2.0 : catalogue des IA (données). [modèle, coût relatif, niveaux 1-5 par fonctionnalité, (gratuit)] =====
+const _N = (n, o = {}) => ({ general: n, explication_simple: n, code: n, creative: n, translation: n, long_context: n, ...o });
+const CATALOGUE_CF = [
+  ["@cf/ibm-granite/granite-4.0-h-micro", 1, { general: 1 }],
+  ["@cf/zai-org/glm-4.7-flash", 2, { general: 3, explication_simple: 3, code: 3, translation: 3, long_context: 3 }],
+  ["@cf/google/gemma-4-26b-a4b-it", 3, { general: 4, explication_simple: 4, creative: 4, translation: 4, long_context: 3, code: 3 }],
+  ["@cf/openai/gpt-oss-20b", 4, { general: 4, explication_simple: 4, code: 4, long_context: 3 }],
+  ["@cf/meta/llama-4-scout-17b-16e-instruct", 5, { long_context: 4, general: 4, explication_simple: 4, creative: 3 }],
+  ["@cf/mistralai/mistral-small-3.1-24b-instruct", 6, { general: 4, explication_simple: 4, creative: 4, translation: 4, long_context: 4, code: 3 }],
+  ["@cf/openai/gpt-oss-120b", 8, { general: 5, explication_simple: 5, code: 5, long_context: 4, creative: 4 }],
+  ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", 8, _N(4)],
+  ["@cf/deepseek-ai/deepseek-v4.1-flash-1017", 9, { code: 5, general: 4, long_context: 4 }],
+  ["@cf/qwen/qwen2.5-coder-32b-instruct", 10, { code: 5 }],
+  ["@cf/qwen/qwen3.8-27b", 11, { general: 5, code: 4, translation: 4, long_context: 4, creative: 4 }],
+  ["@cf/zai-org/glm-5", 14, _N(5)],
+];
+const CATALOGUE_PUTER = [
+  ["openrouter:xiaomi/mimo-v2-flash:free", 1, { general: 3, explication_simple: 3, code: 3, translation: 3, creative: 3 }, true],
+  ["inclusionai/ling-3.2-flash:free", 1, { general: 3, explication_simple: 3, translation: 3 }, true],
+  ["openrouter:deepseek/deepseek-r1-0528:free", 2, { general: 4, code: 4, long_context: 3 }, true],
+  ["recursive/flint-v1.0:free", 1, { general: 2, explication_simple: 2 }, true],
+  ["google/gemini-3.8-flash", 2, { general: 4, explication_simple: 4, creative: 4, translation: 5, long_context: 5, code: 4 }],
+  ["minimax/minimax-m3.1-flash", 2, { general: 4, explication_simple: 4, code: 4 }],
+  ["mistralai/mistral-small-2603", 2, { general: 4, explication_simple: 4, creative: 4, translation: 4 }],
+  ["google/gemma-4-31b-it", 3, { general: 4, explication_simple: 4, creative: 4, translation: 4 }],
+  ["openai/o4-mini", 4, { general: 5, explication_simple: 5, code: 5 }],
+  ["deepseek/deepseek-v4-pro", 5, { code: 5, general: 5, long_context: 4 }],
+  ["openai/gpt-5.4", 6, _N(5)],
+  ["qwen/qwen4-max", 6, { general: 5, translation: 5, code: 5, explication_simple: 5 }],
+  ["moonshotai/kimi-k3", 7, { long_context: 5, general: 5 }],
+  ["anthropic/claude-sonnet-4-5", 9, _N(5)],
+  ["openai/gpt-5.5", 10, _N(5)],
+  ["anthropic/claude-opus-5-5", 14, _N(5)],
+];
+const CATALOGUE_POLL = [
+  ["openai-fast", 1, { general: 3, explication_simple: 3, code: 3, translation: 3 }],
+  ["openai/gpt-5.4-nano", 1, { general: 3, explication_simple: 3, translation: 3 }],
+  ["openai", 2, _N(4)],
+  ["mistral", 2, { general: 4, explication_simple: 4, creative: 4, translation: 4 }],
+  ["deepseek", 2, { general: 4, code: 4, explication_simple: 4 }],
+  ["gemini", 2, _N(4)],
+  ["qwen-large", 3, { general: 4, code: 4, translation: 4 }],
+];
+export const CATALOGUES = { cloudflare: CATALOGUE_CF, puter: CATALOGUE_PUTER, pollinations: CATALOGUE_POLL };
+
 class NexusAnnuaire {
   constructor(corps = null) {
     this.corps = corps;
@@ -2366,6 +2412,13 @@ class NexusAnnuaire {
     const rg = this.reglage || {};
     const palier = (e) => { const t = e.tags || []; const p = t.includes("pollinations") ? 3 : t.includes("puter") ? 2 : t.includes("openrouter") ? 1 : 0; return (rg.premium && (p === 1 || p === 2)) ? p - 4 : p; };
     const taille = (e) => { const petit = (e.tags || []).includes("petit"); return rg.difficulte === "difficile" ? (petit ? 1 : 0) : (petit ? 0 : 1); };
+    const metaOk = cands.some((e) => e.meta);
+    if (metaOk && f !== "vision") {
+      const niv = (f === "code" && (rg.niveau || 3) >= 4) ? 5 : (rg.niveau || 3), lvl = (e) => e.meta?.niveau?.[f] ?? 3, cout = (e) => (e.meta?.cout ?? e.priorite ?? 5) * (e.meta?.poids ?? 1);
+      const perso = (e) => ((e.tags || []).includes("perso") ? 0 : 1), secours = (e) => ((e.tags || []).includes("pollinations") ? 1 : 0), ok = (e) => (lvl(e) >= niv ? 0 : 1);
+      cands.sort((a, b) => perso(a) - perso(b) || secours(a) - secours(b) || ok(a) - ok(b) || (ok(a) === 0 ? cout(a) - cout(b) : (lvl(b) - lvl(a)) || cout(a) - cout(b)) || a.id.localeCompare(b.id));
+      return cands;
+    }
     if (f === "vision") cands.sort((a,b) => (a.priorite - b.priorite) || a.id.localeCompare(b.id));
     else cands.sort((a,b) => (palier(a) - palier(b)) || (taille(a) - taille(b)) || (a.priorite - b.priorite) || ((a.cout === "0" ? 0 : 1) - (b.cout === "0" ? 0 : 1)) || a.id.localeCompare(b.id));
     return cands;
@@ -2590,6 +2643,8 @@ class NexusAnnuaire {
         if (model) res = await puterChat(messages, { model, signal });
         else res = await puterChat(messages, { signal });
       } catch (e) {
+        // v2.0 : une vraie erreur (quota, crédit, auth, réseau) n'est PAS rejouée : une question = un seul appel.
+        if (e && (e.status || e.kind || e.name === "AbortError")) throw e;
         // Fallback : Puter ancien format = chat(texte, options)
         const prompt = messages.map(m => m.content).join("\n\n");
         if (model) res = await puterChat(prompt, { model });
@@ -3671,6 +3726,95 @@ export class NexusCorpsV12 extends NexusCorpsV11{
   ajouterPuter({ model = null, fonctionnalites = ["code"], priorite = 10, puterChat = null } = {}){ return this.annuaire.ajouterPuter({ model, fonctionnalites, priorite, puterChat }); }
   ajouterPollinations({ model = "openai", fonctionnalites = ["creative"], priorite = 10, apiKey = "", fetchFn = null } = {}){ return this.annuaire.ajouterPollinations({ model, fonctionnalites, priorite, apiKey, fetchFn }); }
   listerModelesPollinations(){ return this.annuaire.listerModelesPollinations(); }
+
+  // ===================== v2.0 : CATALOGUE ET CONFIGURATION =====================
+  // Chaque IA a : un coût relatif, un niveau de qualité (1-5) par fonctionnalité, un poids selon QUI paie.
+  // poids : IA perso 0 (c'est la tienne), Puter gratuit 0.1, Puter au solde de l'utilisateur 0.8, Cloudflare (crédits Nexus partagés) 1, Pollinations 3 (secours, toujours en dernier).
+  // Nexus choisit, pour chaque demande, l'IA la MOINS COÛTEUSE qui atteint le niveau requis, puis bascule en silence sur les suivantes.
+  configurerNexus({ workerUrl = "", workerVersion = 1, pollinationsKey = "", puterChat = null, perso = [], fetchFn = null } = {}) {
+    const ff = fetchFn || (typeof fetch === "function" ? (...a) => fetch(...a) : null);
+    const ajoutes = [], refuses = [];
+    const T = ["general", "explication_simple", "code", "creative", "translation", "long_context"];
+    const nv = (n, extra = {}) => { const o = {}; for (const k of T) o[k] = n; return { ...o, ...extra }; };
+    const reg = (id, transport, niveau, cout, poids, tags) => {
+      if (!transport) { refuses.push({ id, raison: "transport indisponible" }); return; }
+      const r = this.annuaire.ajouter({ id, transport, fonctionnalites: Object.keys(niveau), priorite: cout, cout: "0", tags, description: id });
+      if (r && r.ok === false) { refuses.push({ id, raison: r.raison || "refusé" }); return; }
+      const en = this.annuaire.entrees.get(id); if (en) en.meta = { niveau, cout, poids };
+      ajoutes.push(id);
+    };
+    const slug = (m) => String(m).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    // --- IA personnelles (OpenAI-compatibles) : toujours en premier ---
+    for (const p of perso || []) {
+      if (!p || !p.url || !p.apiKey || !p.model || p.actif === false) continue;
+      const t = this.creerTransportPerso({ url: p.url, apiKey: p.apiKey, model: p.model, fetchFn: ff });
+      reg("perso-" + slug(p.nom || p.model) , t, nv(5), 0, 0, ["perso"]);
+    }
+    // --- Cloudflare via ton Worker ---
+    if (workerUrl && ff) {
+      const binding = { run: async (model, { messages }) => {
+        const r = await ff(workerUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, model }) });
+        if (!r.ok) { const e = new Error("Cloudflare " + r.status); e.status = r.status; e.kind = r.status === 401 || r.status === 403 ? "auth" : r.status === 429 ? "quota" : "network"; throw e; }
+        return r.json();
+      } };
+      for (const [m, cout, niveau] of CATALOGUE_CF) {
+        if (workerVersion < 2 && !m.includes("llama-3.3-70b")) continue; // l'ancien Worker ne lit que result.response
+        const t = this.annuaire.creerTransportCloudflare({ binding, model: m });
+        reg("cf-" + slug(m.replace("@cf/", "")), t, niveau, cout, 1, ["cloudflare"]);
+      }
+    }
+    // --- Puter : gratuits (0 crédit) puis payants au solde du compte ---
+    if (typeof puterChat === "function") {
+      for (const [m, cout, niveau, gratuit] of CATALOGUE_PUTER) {
+        reg("puter-" + slug(m), this.annuaire.creerTransportPuter({ puterChat, model: m }), niveau, cout, gratuit ? 0.1 : 0.8, ["puter", gratuit ? "puter-gratuit" : "puter-solde"]);
+      }
+    }
+    // --- Pollinations : secours (clé publique) ---
+    if (ff && pollinationsKey) {
+      for (const [m, cout, niveau] of CATALOGUE_POLL) {
+        const t = async ({ messages, signal }) => {
+          const r = await ff("https://gen.pollinations.ai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + pollinationsKey }, body: JSON.stringify({ model: m, messages: messages.map((x) => ({ role: x.role, content: x.content })) }), signal });
+          if (!r.ok) { const e = new Error("Pollinations " + r.status); e.status = r.status; e.kind = r.status === 401 || r.status === 402 || r.status === 403 || r.status === 429 ? "quota" : "network"; throw e; }
+          const j = await r.json();
+          return { texte: String(j?.choices?.[0]?.message?.content ?? "").trim(), finishReason: j?.choices?.[0]?.finish_reason || "stop" };
+        };
+        reg("pollinations-" + slug(m), t, niveau, cout, 3, ["pollinations"]);
+      }
+    }
+    // --- Vision : Cloudflare (Worker v2) / Pollinations / Puter ---
+    if (workerUrl && ff && workerVersion >= 2) {
+      const tv = async ({ messages, signal }) => {
+        const r = await ff(workerUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: "@cf/meta/llama-3.2-11b-vision-instruct", messages }), signal });
+        if (!r.ok) { const e = new Error("Cloudflare vision " + r.status); e.status = r.status; throw e; }
+        const j = await r.json(); return { texte: String(j?.response ?? j?.result?.response ?? "").trim(), finishReason: "stop" };
+      };
+      const en = this.annuaire.ajouter({ id: "cf-vision", transport: tv, fonctionnalites: ["vision"], priorite: 1, cout: "0", tags: ["cloudflare", "vision"], description: "Cloudflare — vision" }); if (en?.ok !== false) ajoutes.push("cf-vision");
+    }
+    if (ff && pollinationsKey) {
+      const tv = async ({ messages, signal }) => {
+        const r = await ff("https://gen.pollinations.ai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + pollinationsKey }, body: JSON.stringify({ model: "openai", messages }), signal });
+        if (!r.ok) { const e = new Error("Pollinations vision " + r.status); e.status = r.status; throw e; }
+        const j = await r.json(); return { texte: String(j?.choices?.[0]?.message?.content ?? "").trim(), finishReason: "stop" };
+      };
+      const en = this.annuaire.ajouter({ id: "pollinations-vision", transport: tv, fonctionnalites: ["vision"], priorite: 2, cout: "0", tags: ["pollinations", "vision"], description: "Pollinations — vision" }); if (en?.ok !== false) ajoutes.push("pollinations-vision");
+    }
+    if (typeof puterChat === "function") {
+      const tv = async ({ messages }) => { const c = messages[messages.length - 1].content; const r = await puterChat(c[0].text, c[1].image_url.url); return { texte: String(typeof r === "string" ? r : (r?.message?.content?.[0]?.text ?? r?.message?.content ?? "")).trim(), finishReason: "stop" }; };
+      const en = this.annuaire.ajouter({ id: "puter-vision", transport: tv, fonctionnalites: ["vision"], priorite: 3, cout: "0", tags: ["puter", "vision"], description: "Puter — vision" }); if (en?.ok !== false) ajoutes.push("puter-vision");
+    }
+    return { ok: true, ajoutes, refuses };
+  }
+  // IA personnelle : n'importe quelle API compatible OpenAI (Groq, OpenRouter, Mistral, DeepSeek, OpenAI, Together, Cerebras…)
+  creerTransportPerso({ url, apiKey, model, fetchFn }) {
+    if (!url || !apiKey || !model || !fetchFn) return null;
+    const u = /\/chat\/completions\/?$/.test(url) ? url : url.replace(/\/+$/, "") + "/chat/completions";
+    return async ({ messages, signal }) => {
+      const r = await fetchFn(u, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + apiKey }, body: JSON.stringify({ model, messages: messages.map((x) => ({ role: x.role, content: x.content })) }), signal });
+      if (!r.ok) { const e = new Error("IA perso " + r.status); e.status = r.status; e.kind = r.status === 401 || r.status === 403 ? "auth" : r.status === 429 || r.status === 402 ? "quota" : "network"; throw e; }
+      const j = await r.json();
+      return { texte: String(j?.choices?.[0]?.message?.content ?? "").trim(), finishReason: j?.choices?.[0]?.finish_reason || "stop" };
+    };
+  }
   // ---- v1.1 : mémoire de conversation locale (aucun appel IA pour résumer) ----
   contexteConversation(){
     this.echanges ??= []; this.resumeLignes ??= [];
@@ -3701,7 +3845,12 @@ export class NexusCorpsV12 extends NexusCorpsV11{
     const { texte, fichier=null, contexteWeb="" } = opts||{};
     const n = normTxt(texte||"");
     // Difficulté et qualité demandée : décident quel modèle passe en premier (petit/gros, gratuit/payant).
+    const longTxt = (texte || "").length;
+    const niveau = /\b(meilleure qualite|haute qualite|qualite maximale|le meilleur modele|mode pro|reflechis bien|reflechis longuement)\b/.test(n) ? 5
+      : (longTxt > 500 || /\b(analyse|raisonne|raisonnement|demontre|algorithme|architecture|optimis\w*|complexe|approfondi\w*|en detail|pas a pas|refactor\w*|dissertation|argumente)\b/.test(n)) ? 4
+      : (longTxt < 110 && !/\b(code|script|fonction|programme|ecris|redige|histoire|poeme|resume|traduis)\b/.test(n)) ? 2 : 3;
     this.annuaire.reglage = {
+      niveau,
       difficulte: ((texte||"").length>500 || /\b(analyse|raisonne|raisonnement|demontre|algorithme|architecture|optimis\w*|complexe|approfondi\w*|en detail|pas a pas)\b/.test(n)) ? "difficile" : "simple",
       premium: /\b(meilleure qualite|haute qualite|qualite maximale|le meilleur modele|mode pro|reflechis bien|reflechis longuement)\b/.test(n),
     };
