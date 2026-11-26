@@ -1,14 +1,16 @@
 import { NexusCorpsV12, NexusRate, ajouterMemoire } from "./nexus-corps.mjs";
 import * as JN from "./journal.js";
 import { GUIDE_HTML } from "./guide.js";
-import { construireConfig } from "./comptes.js";
-const $=s=>document.querySelector(s),V='1.1';
+import { VERSION, WORKER_URL, POLLINATIONS_KEY, LIMITES_JOUR, MODELES_PERSO } from "./config.js";
+import { PAGES, ORDRE, ACCUEIL } from "./legal.js";
+import { compresser, texteLisible } from "./compression.js";
+const $=s=>document.querySelector(s),V=VERSION;
 const S={g(k,d){try{const v=localStorage.getItem('nexus_'+k);return v===null?d:JSON.parse(v)}catch{return d}},s(k,v){try{localStorage.setItem('nexus_'+k,JSON.stringify(v))}catch(e){}}};
 const P={"groq": ["Groq", "⚡"], "openrouter": ["OpenRouter", "🔀"], "puter": ["Puter", "🖥️"], "pollinations": ["Pollinations", "🌸"], "cohere": ["Cohere", "💬"], "cloudflare": ["Cloudflare", "☁️"]};
 const PI=Object.fromEntries(Object.entries(P).map(([k,v])=>[k,{n:v[0],i:v[1]}]));
 const PROV=Object.keys(PI);
 const old=S.g('keys',{})||{};
-const st={diag:{},card:null,comptes:S.g('comptes',null)||{groq:{apiKey:old.groq||''},openrouter:{apiKey:old.openrouter||''},cohere:{apiKey:old.cohere||''},cloudflare:{workerUrl:old.cloudflare||S.g('cf_worker','')||'',model:S.g('cf_model','')||''},pollinations:{apiKey:old.pollinations||''}},on:S.g('on',{}),convs:S.g('convs',[]),cur:S.g('cur',null),log:S.g('log',[]),saved:S.g('saved',[]),busy:0,tests:{},sug:null,msg:''};
+const st={perso:S.g('perso',[]),legal:null,diag:{},card:null,comptes:S.g('comptes',null)||{groq:{apiKey:old.groq||''},openrouter:{apiKey:old.openrouter||''},cohere:{apiKey:old.cohere||''},cloudflare:{workerUrl:old.cloudflare||S.g('cf_worker','')||'',model:S.g('cf_model','')||''},pollinations:{apiKey:old.pollinations||''}},on:S.g('on',{}),convs:S.g('convs',[]),cur:S.g('cur',null),log:S.g('log',[]),saved:S.g('saved',[]),busy:0,tests:[],sug:null,msg:''};
 let ac=null,pf=null;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’]/g,' ').replace(/\s+/g,' ').trim();
@@ -44,12 +46,13 @@ function wait(m){st.msg=m;const e=document.getElementById('typ');if(e)e.textCont
 const SUG=[{i:'👋',t:'Bonjour !'},{i:'🌤️',t:'Météo à Paris',q:'Météo Paris'},{i:'💱',t:'100 euros en dollars'},{i:'📅',t:'Dans 3 semaines'},{i:'🕐',t:'Quelle heure est-il à Tokyo ?'},{i:'🎲',t:'Lance un dé'},{i:'🔐',t:'Génère-moi un mot de passe'},{i:'📖',t:'Qui est Marie Curie ?'},{i:'🧮',t:'15 % de 240'},{i:'📏',t:'10 km en miles'},{i:'🧠',t:'Explique-moi ce qu\'est une étoile simplement'},{i:'⚡',t:'Écris-moi une fonction JavaScript'},{i:'✍️',t:'Raconte-moi une histoire drôle'},{i:'🌍',t:'Traduis « bonjour » en anglais'},{i:'🍳',t:'Une idée de dîner rapide ?'}];
 function pick3(){const a=[...SUG];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,3)}
 const SUG2=[{i:'🎨',t:'Génère-moi une image de coucher de soleil'},{i:'🌡️',t:'Convertis 25 °C en °F'},{i:'⏳',t:'Combien de jours avant Noël ?'},{i:'🐍',t:'Écris un script Python pour trier une liste'},{i:'💡',t:'Donne-moi une idée de cadeau'},{i:'🧘',t:'Un exercice de respiration de 2 minutes'},{i:'🗺️',t:'Idées de week-end en France'},{i:'🔤',t:'Corrige : je suis aller au marché'},{i:'📝',t:'Aide-moi à écrire un message poli'},{i:'🎵',t:'Une idée de playlist pour travailler'}];SUG.push(...SUG2);
-function sugHtml(){return st.sug.map((x,k)=>'<button class="sug fl" data-q="'+esc(x.q||x.t)+'">'+x.i+' '+esc(x.t)+'</button>').join('')}
-function welcome(){if(!st.sug)st.sug=pick3();return'<div class="wel"><div class="spk">Coucou ! Je réponds seul aux demandes simples et je ne sollicite une IA que si c\'est nécessaire. Tu veux essayer ?</div><div class="sugs">'+sugHtml()+'</div><div class="hintaide">Écris <b>aide</b> pour voir tout ce que je sais faire.</div></div>'}
+function sugHtml(){const x=st.sug[0];return'<button class="sug fl" data-q="'+esc(x.q||x.t)+'">'+x.i+' '+esc(x.t)+'</button>'}
+function welcome(){if(!st.sug)st.sug=pick3();return'<div class="wel"><div class="sugs">'+sugHtml()+'</div></div>'}
 function syncAv(){const b=document.getElementById('bgav');if(!b)return;const c=cur0(),v=document.querySelector('.v.on'),chat=!v||v.id==='v-chat';b.className=chat?((!c||!c.m.length)?'home':'chat'):'off'}
-const avw=document.querySelector('#bgav .avw');function animAv(){if(document.hidden||!avw)return;const k=Math.random()<.5?'doWink':'doWave';avw.classList.add(k);setTimeout(()=>avw.classList.remove(k),2000)}
-setInterval(animAv,6500);setTimeout(animAv,1500);
-setInterval(()=>{const c=cur0();if(document.hidden||st.busy||(c&&c.m.length))return;const el=document.querySelector('#v-chat.on .sugs');if(!el)return;st.sug=pick3();el.classList.add('out');setTimeout(()=>{el.innerHTML=sugHtml();el.classList.remove('out')},350)},7000);
+const avw=document.querySelector('#bgav .avw');let dernierAv='';
+function animAv(){if(document.hidden||!avw)return;const c=cur0();if(c&&c.m.length&&Math.random()<.5)return;const k=['doWave','doWink','doSpin','doHop'].filter(x=>x!==dernierAv)[Math.floor(Math.random()*3)];dernierAv=k;avw.classList.add(k);setTimeout(()=>avw.classList.remove(k),2400)}
+setInterval(animAv,5200);setTimeout(animAv,1200);
+setInterval(()=>{const c=cur0();if(document.hidden||st.busy||(c&&c.m.length))return;const el=document.querySelector('#v-chat.on .sugs');if(!el)return;const prev=st.sug&&st.sug[0]&&st.sug[0].t;let n=pick3();if(n[0].t===prev)n=pick3();st.sug=n;el.classList.add('out');setTimeout(()=>{el.innerHTML=sugHtml();el.classList.remove('out')},350)},6000);
 let TL=null;
 const TP=import('./nexus-tools.js').then(m=>{TL=m;return m}).catch(e=>{L('tools_error',{msg:String(e&&e.message||e).slice(0,160)});return null});
 const needTools=async()=>{const m=TL||await TP;if(!m)throw new Error('Module outils indisponible');return m};
@@ -73,24 +76,27 @@ function fileThumb(f){if(!f)return'';if(f.kind==='image'&&(f.thumb||f.full))retu
 function render(){const c=cur0(),e=$('#msgs');if(!c||!c.m.length){e.innerHTML=welcome()+cardHtml();syncAv();return}
 e.innerHTML=c.m.map((m,i)=>{if(m.r==='user')return`<div class="m user"><div class="bb">${fileThumb(m.file)}${esc(m.c)}</div></div>`;
 const body=m.img?'<div>'+md(m.c)+'</div><img class="gimg" data-lb="'+esc(m.img)+'" src="'+esc(m.img)+'" alt="'+esc(m.prompt||'image')+'">':md(m.c);
-return`<div class="m ai"><div class="bb">${body}</div><div class="mt"><span class="who"><img src="avatar.png" class="av" alt="">NEXUS</span><button data-a="cp" data-i="${i}" title="Copier">📋</button><button data-a="tts" data-i="${i}" title="Écouter">🔊</button>${m.img?`<button data-a="imgsave" data-i="${i}">💾</button><button data-a="imgnew" data-i="${i}">🔄</button>`:(m.err?'':`<button data-a="dl" data-i="${i}">⬇️</button>`)}<button data-a="sv" data-i="${i}">Sauvegarder</button><button data-a="gd" data-i="${i}" class="${m.good?'on':''}" title="Bonne réponse">👍</button><button data-a="bd" data-i="${i}" class="${m.bad?'on bad':''}" title="Mauvaise réponse">👎</button>${(m.via&&!m.err&&!m.img)?`<button data-a="re" data-i="${i}">🔁 Redemander à une autre IA</button>`:''}</div></div>`}).join('')+(st.busy?'<div class="m ai"><div class="bb" id="typ">'+esc(st.msg||'…')+'</div></div>':'')+cardHtml();e.scrollTop=e.scrollHeight;syncAv()}
+return`<div class="m ai"><div class="bb">${body}</div><div class="mt"><span class="who"><img src="avatar.png" class="av" alt="">NEXUS</span><button data-a="cp" data-i="${i}" title="Copier">📋</button><button data-a="tts" data-i="${i}" title="Écouter">🔊</button>${m.img?`<button data-a="imgsave" data-i="${i}">💾</button><button data-a="imgnew" data-i="${i}">🔄</button>`:(m.err?'':`<button data-a="dl" data-i="${i}">⬇️</button>`)}<button data-a="sv" data-i="${i}">Sauvegarder</button><button data-a="gd" data-i="${i}" class="${m.good?'on':''}" title="Bonne réponse">👍</button><button data-a="bd" data-i="${i}" class="${m.bad?'on bad':''}" title="Mauvaise réponse">👎</button>${m.pbtn?'<button class="b2 pcn" data-a="pcn">🔌 Se connecter à Puter (gratuit)</button>':''}${(m.via&&!m.err&&!m.img)?`<button data-a="re" data-i="${i}">🔁 Redemander à une autre IA</button>`:''}</div></div>`}).join('')+(st.busy?'<div class="m ai"><div class="bb" id="typ">'+esc(st.msg||'…')+'</div></div>':'')+cardHtml();e.scrollTop=e.scrollHeight;syncAv()}
 function openLb(s){const l=$('#lb');if(!l)return;l.querySelector('img').src=s;l.hidden=false;JN.log('plein_ecran',{})}
 $('#lb').onclick=()=>{$('#lb').hidden=true};
 function say(c,o){c.m.push({r:'ai',...o});save();render()}
 // ---------- Nexus : créé UNE seule fois ----------
 const nx=new NexusCorpsV12();
 try{const m=S.g('memoires',[]);if(Array.isArray(m))nx.memoires=m}catch{}
-const provDe=e=>PROV.find(p=>(e.tags||[]).includes(p));
-const entrees=()=>nx.listerCarnet();
-const actifs=()=>PROV.filter(p=>entrees().some(e=>provDe(e)===p&&e.actif!==false));
-let puterOK=false,LASTVIA=null,BRM=null,qwenMsg='';
-const qwenOn=()=>S.g('qwen_on',false);
-async function qwenCharger(progress){if(!navigator.gpu)throw new Error('WebGPU indisponible sur cet appareil');BRM??=await import('./nexus-brain.js');try{await BRM.ensurePersistentStorage()}catch{}const ok=await BRM.initLLM(progress);if(!ok)throw new Error('chargement impossible (réseau ou mémoire)');return BRM}
-const estSocial=t=>{const n=nm(t);return n.length<=40&&!/\d/.test(n)&&/^(salut|bonjour|bonsoir|coucou|hello|hey|yo|ca va|comment ca va|ca va bien|tu vas bien|merci|merci beaucoup|ok merci|bonne nuit|bonne journee|bonne soiree|a demain|a bientot|a plus|au revoir|bye|lol|mdr|super|cool|top|genial|bravo|ca marche|d accord|ok)( [a-z]{2,8})?[ !?.]*$/.test(n)};
-async function qwenRepondre(raw){if(!qwenOn()||!estSocial(raw))return null;try{wait('Nexus se réveille…');const B=await qwenCharger();const r=await B.generateLocalResponse(raw,[{role:'system',content:'Tu es NEXUS. Réponds par une ou deux phrases très courtes, chaleureuses et naturelles, en français. Tu ne donnes JAMAIS de fait, de chiffre, de conseil ni de code. Si on te demande quelque chose de sérieux, propose simplement de poser la question.'}],60);const t=String(r||'').trim();if(!t||t.length>200||/[\u3040-\u30ff\u3400-\u9fff\u0400-\u04ff]|https?:|\d{2,}/.test(t)||/^\W/.test(t)){JN.log('qwen_rejete',{raison:'filtre',texte:t.slice(0,200)});return null}JN.log('qwen_reponse',{q:raw,texte:t});return t}catch(e){JN.log('qwen_erreur',{msg:String(e&&e.message||e)});return null}}
-const FREE_PUTER='liquid/lfm-2.5-1.2b-instruct:free';
-async function puterSecours(...args){try{return await window.puter.ai.chat(...args)}catch(e){const m=String(e&&(e.message||e.error?.message||e.error||e.code)||e)+JSON.stringify(e||{});if(/credit|insufficient|quota|limit|402|429|balance|funds/i.test(m)){JN.log('puter_secours_gratuit',{msg:m.slice(0,160)});const b=[...args],k=b.findIndex(x=>x&&typeof x==='object'&&!Array.isArray(x));if(k>=0)b[k]={...b[k],model:FREE_PUTER};else b.push({model:FREE_PUTER});return await window.puter.ai.chat(...b)}throw e}}
-function enrober(){for(const en of nx.annuaire.entrees.values()){if(en._w)continue;const o=en.transport;en.transport=async(arg)=>{const t0=Date.now();JN.log('ia_appel',{id:en.id,fonctionnalite:arg&&arg.fonctionnalite,nb_messages:arg&&arg.messages&&arg.messages.length});try{const r=await o(arg);JN.log('ia_ok',{id:en.id,ms:Date.now()-t0,texte:String(r&&r.texte||'').slice(0,4000)});LASTVIA=provDe({tags:en.tags||[]})||en.id;return r}catch(e){JN.log('ia_erreur',{id:en.id,ms:Date.now()-t0,statut:e&&e.status,type:e&&e.kind,msg:String(e&&(e.message||e.error?.message)||e).slice(0,300)});throw e}};en._w=1}}
+const entrees=()=>[...nx.annuaire.entrees.values()];
+const groupe=e=>{const t=e.tags||[];return t.includes('perso')?'perso':t.includes('cloudflare')?'cloudflare':t.includes('puter')?'puter':t.includes('pollinations')?'pollinations':'autre'};
+const actifs=()=>entrees().filter(e=>e.actif!==false);
+let puterOK=false,LASTVIA=null,cfV=1;
+const GJ=()=>{const d=new Date().toISOString().slice(0,10);let c=S.g('cnt',{});if(!c||c.d!==d)c={d};return c};
+const incr=g=>{const c=GJ();c[g]=(c[g]||0)+1;S.s('cnt',c)};
+// Puter : on convertit ses erreurs en erreurs « quota » / « auth » pour que le corps passe à l'IA suivante sans bruit.
+async function puterChat(...args){try{return await window.puter.ai.chat(...args)}catch(e){const m=String(e&&(e.message||e.error?.message||e.error)||e)+JSON.stringify(e||{});const er=new Error(m.slice(0,200));if(/credit|insufficient|quota|limit|402|429|balance|funds/i.test(m)){er.status=429;er.kind='quota'}else if(/auth|sign.?in|login|401/i.test(m)){er.status=401;er.kind='auth'}else er.status=500;JN.log('puter_erreur',{msg:m.slice(0,200)});throw er}}
+// Journal de chaque appel + plafond quotidien sur les crédits partagés de Nexus (Cloudflare, Pollinations).
+function enrober(){for(const en of nx.annuaire.entrees.values()){if(en._w)continue;const o=en.transport,g=groupe(en);en.transport=async(arg)=>{const t0=Date.now(),lim=LIMITES_JOUR[g],test=!!(arg&&arg.test);
+  if(lim&&!test&&(GJ()[g]||0)>=lim){JN.log('plafond_jour',{ia:en.id,groupe:g,limite:lim});const e=new Error('plafond quotidien');e.status=429;e.kind='quota';throw e}
+  JN.log('ia_appel',{id:en.id,groupe:g,test,fonctionnalite:arg&&arg.fonctionnalite,nb_messages:arg&&arg.messages&&arg.messages.length,taille:JSON.stringify(arg&&arg.messages||'').length});if(lim&&!test)incr(g);
+  try{const r=await o(arg);JN.log('ia_ok',{id:en.id,ms:Date.now()-t0,texte:String(r&&r.texte||'').slice(0,4000)});if(!test)LASTVIA=en.id;return r}
+  catch(e){JN.log('ia_erreur',{id:en.id,ms:Date.now()-t0,statut:e&&e.status,type:e&&e.kind,msg:String(e&&(e.message||e.error?.message)||e).slice(0,300)});throw e}};en._w=1}}
 const NR=Object.values(nx).find(v=>v instanceof NexusRate);let nrT='';
 function syncRate(){if(!NR)return;for(const e of (NR.entries||[]).filter(x=>x.date>nrT)){JN.log('corps_'+e.type,e);nrT=e.date}}
 const nm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’\-]/g,' ').replace(/\s+/g,' ').trim();
@@ -100,17 +106,33 @@ function memRepondre(t){const n=nm(t),nom=()=>{const k=nx.memoires.find(x=>/m'ap
 if(/(comment je m appelle|quel est mon (prenom|nom)|tu connais mon (prenom|nom)|tu sais comment je m appelle|tu te souviens de mon (prenom|nom))/.test(n)){const p=nom();return p?'Tu t\'appelles '+p+'.':'Je ne sais pas encore comment tu t\'appelles. Dis-moi : « Je m\'appelle … ».'}
 if(/(que sais tu de moi|qu est ce que tu sais de moi|ce que tu sais sur moi|dis moi ce que tu sais de moi)/.test(n)){return nx.memoires.length?'Voici ce que je retiens de toi :\n'+nx.memoires.map(x=>'• '+x.texte).join('\n'):'Je ne sais encore rien sur toi. Dis-moi par exemple : « Je m\'appelle … » ou « J\'aime … ».'}return null}
 function mkThumb(d){return new Promise(ok=>{try{const im=new Image();im.onload=()=>{try{const k=Math.min(1,140/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(im.naturalWidth*k));cv.height=Math.max(1,Math.round(im.naturalHeight*k));cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);ok(cv.toDataURL('image/jpeg',.6))}catch{ok('')}};im.onerror=()=>ok('');im.src=d}catch{ok('')}})}
-function appliquer(){for(const e of entrees()){const p=provDe(e);if(!p)continue;st.on[p]===false?nx.desactiverTransport(e.id):nx.activerTransport(e.id)}}
+const prenomMem=()=>{const k=nx.memoires.find(x=>/m'appelle/i.test(x.texte||''));return k?String(k.texte).replace(/^Je m'appelle\s*/i,'').replace(/\.$/,'').trim():''};
+let dernierTalk='';
+function smallTalk(t){const n=nm(t);if(n.length>48||/\d/.test(n))return null;const p=prenomMem(),h=new Date().getHours(),soir=h>=18||h<5;const P=p?' '+p:'';let pool=null;
+ if(/^(salut|bonjour|bonsoir|coucou|hello|hey|yo|hola|salutations)( nexus)?[ !.?]*$/.test(n))pool=[(soir?'Bonsoir':'Bonjour')+P+' ! Ravi de te retrouver. Qu\'est-ce que je peux faire pour toi ?','Salut'+P+' ! Dis-moi ce dont tu as besoin.',(soir?'Bonsoir':'Bonjour')+P+' ! Une question, un calcul, une idée ? Je t\'écoute.','Hello'+P+' ! Comment puis-je t\'aider aujourd\'hui ?'];
+ else if(/^(ca va|comment (ca va|vas tu|tu vas|allez vous|va)|tu vas bien|la forme|comment tu vas)( nexus)?[ ?!.]*$/.test(n))pool=['Ça va très bien, merci ! Et toi, comment se passe ta journée ?','Au top, merci de demander ! Et de ton côté ?','Je vais bien, prêt à t\'aider. Et toi, ça va ?'];
+ else if(/^(ca va bien|tres bien|bien et toi|je vais bien|ca roule|nickel|ca va super|pas mal)[ !.]*$/.test(n))pool=['Content de l\'entendre ! Je peux t\'aider sur quelque chose ?','Tant mieux ! Qu\'est-ce que je peux faire pour toi ?'];
+ else if(/^(merci|merci beaucoup|ok merci|super merci|thanks|thx|mille mercis|je te remercie|merci nexus)[ !.]*$/.test(n))pool=['Avec plaisir !','De rien'+P+', n\'hésite pas si tu as besoin d\'autre chose.','Je t\'en prie ! C\'est toujours un plaisir.'];
+ else if(/^(au revoir|a demain|a bientot|a plus|a plus tard|bye|bonne nuit|bonne journee|bonne soiree|ciao|a la prochaine)( nexus)?[ !.]*$/.test(n))pool=[/nuit/.test(n)?'Bonne nuit'+P+' ! Fais de beaux rêves.':'À bientôt'+P+' ! Prends soin de toi.','À la prochaine'+P+' !',/nuit/.test(n)?'Bonne nuit ! À demain.':'Au revoir'+P+', et bonne continuation !'];
+ else if(/^(qui es tu|tu es qui|c est quoi nexus|presente toi|tu fais quoi|que sais tu faire|tu es quoi)[ ?!.]*$/.test(n))pool=['Je suis NEXUS, ton assistant IA. Je réponds seul aux demandes simples (calculs, conversions, heure, météo…) et je fais appel à la bonne IA quand il le faut. Écris « aide » pour voir tout ce que je sais faire.'];
+ else if(/^(bravo|bien joue|genial|parfait|excellent|trop fort|j adore|top|super|cool|magnifique)[ !.]*$/.test(n))pool=['Merci, ça me fait plaisir !','Content que ça te plaise !','Merci'+P+' ! On continue ?'];
+ else if(/^(lol|mdr|haha+|hihi|ptdr|xd)[ !.]*$/.test(n))pool=['Content que ça te fasse sourire !','Haha ! 😄','Ça fait plaisir de te voir de bonne humeur.'];
+ else if(/^(ok|d accord|ca marche|entendu|compris|oui|non|ok d accord)[ !.]*$/.test(n))pool=['Parfait !','Très bien. Dis-moi si tu as besoin de quelque chose.','D\'accord !'];
+ if(!pool)return null;const ch=pool.filter(x=>x!==dernierTalk);dernierTalk=ch[Math.floor(Math.random()*ch.length)]||pool[0];return dernierTalk}
+async function workerVersion(){try{const c=S.g('cfv',null);if(c&&Date.now()-c.t<3600e3)return c.v;const ac=new AbortController(),to=setTimeout(()=>ac.abort(),4000);const r=await fetch(WORKER_URL,{signal:ac.signal});clearTimeout(to);const j=await r.json();const v=j&&j.v?+j.v:1;S.s('cfv',{v,t:Date.now()});return v}catch{const c=S.g('cfv',null);return c?c.v:1}}
+function appliquer(){for(const e of entrees()){if(groupe(e)==='perso'){const p=st.perso.find(x=>'perso-'+String(x.nom||x.model).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')===e.id);if(p&&p.actif===false)nx.desactiverTransport(e.id)}}}
 async function demarrer(){
   for(let i=0;i<30&&!window.puter;i++)await new Promise(r=>setTimeout(r,100));
   try{puterOK=!!(window.puter&&await window.puter.auth.isSignedIn())}catch{puterOK=false}
-  const cfg=construireConfig(st.comptes,{puterChat:puterOK?(...a)=>puterSecours(...a):null});
-  try{const r=nx.configurerFournisseurs(cfg);L('config',{ajoutes:r.ajoutes.length,refuses:r.refuses.map(x=>x.id)})}catch(e){L('config_error',{msg:String(e&&e.message||e)})}
-  appliquer();enrober();upd();pstat();JN.log('config_finale',{actifs:actifs(),puter:puterOK,nb_transports:entrees().length});
+  cfV=await workerVersion();
+  try{const r=nx.configurerNexus({workerUrl:WORKER_URL,workerVersion:cfV,pollinationsKey:POLLINATIONS_KEY,puterChat:puterOK?puterChat:null,perso:st.perso,fetchFn:(...x)=>fetch(...x)});L('config',{ajoutes:r.ajoutes.length,refuses:r.refuses.map(x=>x.id)})}catch(e){L('config_error',{msg:String(e&&e.message||e)})}
+  appliquer();enrober();upd();pbadge();JN.log('config_finale',{actifs:actifs().length,puter:puterOK,worker_v:cfV,perso:st.perso.length});
 }
 const pret=demarrer();
-function upd(){const k=actifs().length;$('#stt').textContent=navigator.onLine?k+' IA prête'+(k>1?'s':''):'Hors ligne — fonctions locales seulement'}
-function pstat(){for(const id of PROV){const e=$('#ps-'+id);if(!e)continue;const t=st.tests[id],n=entrees().filter(x=>provDe(x)===id).length;e.textContent=[n?'branchée':'non configurée',t?(t.ok?'✅ Test OK · '+t.d:'❌ '+t.d):''].filter(Boolean).join(' · ')}const pl=document.querySelector('[data-a="pl"]');if(pl)pl.textContent=puterOK?'Puter : Connecté ✓':'Puter : Se connecter'}
+function upd(){pbadge();$('#stt').textContent=navigator.onLine?(actifs().length?'Prêt':'Aucune IA connectée'):'Hors ligne — fonctions locales seulement'}
+function pbadge(){const b=$('#pbadge');if(!b)return;b.style.display=(!puterOK&&window.puter&&S.g('fr_ok',false))?'inline-flex':'none'}
+async function puterConnexion(){try{if(!window.puter)throw new Error('Puter n\'a pas pu se charger (réseau ?)');JN.log('puter_connexion',{etat:'demande'});await window.puter.auth.signIn();JN.log('puter_connexion',{etat:'ok'});location.reload()}catch(x){JN.log('puter_connexion',{etat:'echec',msg:String(x&&x.message||x)});toast('Puter : '+(x&&x.message||'connexion annulée'))}}
+function pstat(){}
 
 // ---------- Fichier joint -> carte d'action (sans nom d'IA) ----------
 async function proposeCard(){let T;try{T=await needTools()}catch(e){toast('Module outils indisponible');return}const an=T.analyzeDoc(pf);let acts=an.actions;if(pf.kind==='image'){const lo=acts.filter(x=>x.local);if(lo.length)acts=lo}const a0=acts[0];st.card={label:an.label,actions:acts,sel:a0.id,open:false,size:kb(pf.size),vis:pf.kind==='image'};render()}
@@ -118,20 +140,17 @@ function cardPick(id){const cd=st.card;if(!cd)return;if(!cd.actions.find(x=>x.id
 async function cardOk(){const cd=st.card;if(!cd)return;const a=cd.actions.find(x=>x.id===cd.sel);if(a.local){await runOcr();return}st.card=null;await send(a.prompt)}
 function cardHtml(){const cd=st.card;if(!cd||st.busy)return'';const a=cd.actions.find(x=>x.id===cd.sel);return'<div class="m ai"><div class="bb card">'+(cd.vis?'🖼️':'📄')+' Ce document ressemble à <b>'+esc(cd.label)+'</b> ('+esc(cd.size)+').<br>Je propose : « <b>'+esc(a.label)+'</b> ».<div class="cbtn"><button data-a="cardok">'+(a.local?'Lancer':'Envoyer')+'</button><button data-a="cardalt">Autre action</button><button data-a="cardno">Annuler</button></div>'+(cd.open?'<div class="clist">'+cd.actions.map(x=>'<button data-a="cardpick" data-id="'+x.id+'">'+esc(x.label)+'</button>').join('')+'</div>':'')+'</div></div>'}
 
-// ---------- Génération d'image : Pollinations (clé si dispo) -> adresse gratuite -> compte Puter ----------
+// ---------- Génération d'image : Cloudflare (Worker v2) -> Pollinations -> compte Puter ----------
 async function genImage(c,prompt){
-  wait('Génération de l\'image… (10 à 30 s)');
-  let url=null,last='';
-  try{
-    const T=await needTools(),seed=Math.floor(Math.random()*1e6),pk=((st.comptes.pollinations||{}).apiKey||'').trim(),essais=[];
-    if(pk)essais.push(()=>'https://gen.pollinations.ai/image/'+encodeURIComponent(prompt)+'?model=flux&width=1024&height=1024&nologo=true&seed='+seed+'&key='+encodeURIComponent(pk));
-    essais.push(()=>T.imageUrl(prompt,seed));
-    for(const f of essais){try{const u=f();await T.loadImage(u,70000);url=u;break}catch(e){last=String(e&&e.message||e)}}
-  }catch(e){last=String(e&&e.message||e)}
-  if(!url&&window.puter&&puterOK){try{wait('Génération avec ton compte Puter…');const im=await window.puter.ai.txt2img(prompt);url=im&&im.src;if(!url)throw new Error('image vide')}catch(e){last=String(e&&e.message||e);url=null}}
+  wait('Génération de l\'image… (10 à 30 s)');let url=null,last='';const seed=Math.floor(Math.random()*1e6);let T=null;try{T=await needTools()}catch{}
+  const voies=[];
+  if(cfV>=2&&(GJ().cloudflare||0)<LIMITES_JOUR.cloudflare)voies.push(['cloudflare',async()=>{incr('cloudflare');const r=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:true,prompt})});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j.image)throw new Error('image vide');return j.image}]);
+  voies.push(['pollinations',async()=>{const u='https://gen.pollinations.ai/image/'+encodeURIComponent(prompt)+'?model=z-image-turbo&width=1024&height=1024&nologo=true&seed='+seed+'&key='+encodeURIComponent(POLLINATIONS_KEY);if(T)await T.loadImage(u,70000);return u}]);
+  if(puterOK)voies.push(['puter',async()=>{const im=await window.puter.ai.txt2img(prompt);if(!im||!im.src)throw new Error('image vide');return im.src}]);
+  for(const [nom,f] of voies){const t0=Date.now();try{url=await f();JN.log('image_ok',{voie:nom,ms:Date.now()-t0,prompt});break}catch(e){last=String(e&&e.message||e);JN.log('image_echec',{voie:nom,ms:Date.now()-t0,msg:last.slice(0,160)})}if(st.stop)return}
   if(st.stop)return;
-  if(url)say(c,{p:'local',c:'Voici ton image.',img:url,prompt,why:'image générée'});
-  else{L('img_error',{msg:last.slice(0,120)});say(c,{p:'local',err:1,c:'⚠️ Impossible de générer l\'image pour le moment ('+(last||'erreur')+'). Réessaie plus tard.'})}
+  if(url)say(c,{p:'local',c:'Voici ton image.',img:url,prompt});
+  else say(c,{p:'local',err:1,c:'⚠️ Impossible de générer l\'image pour le moment. Réessaie dans quelques instants.'});
 }
 
 // ---------- Envoi d'un message ----------
@@ -152,26 +171,27 @@ async function send(t0){
     await pret;apprendre(raw);
     if(!att){
       const mr=memRepondre(raw);if(mr){JN.log('reponse',{via:'memoire',texte:mr});say(c,{p:'local',c:mr});return}
+      const stk=smallTalk(raw);if(stk){JN.log('reponse',{via:'petite-phrase',texte:stk});nx.noterEchange(raw,stk);say(c,{p:'local',c:stk});return}
       const T0=await needTools().catch(()=>null);
       if(T0&&/image|photo|illustration|dessin|logo|affiche|portrait|paysage|visuel/i.test(raw)){const gp=T0.parseImageRequest(raw);if(gp){JN.log('route',{via:'image',prompt:gp});await genImage(c,gp);return}}
       const l=await local(raw);
       if(l){JN.log('reponse',{via:'local',texte:l});say(c,{p:'local',c:l});return}
-      const qw=await qwenRepondre(raw);
-      if(qw){nx.noterEchange(raw,qw);say(c,{p:'local',c:qw});return}
-      if(navigator.onLine&&T0&&T0.isFactual(raw)){
+      const calc=/(\d\s*[x×*+\/÷-]\s*\d)|combien (font|fait|ca fait)|^calcul/.test(nm(raw));
+      if(navigator.onLine&&T0&&!calc&&T0.isFactual(raw)){
         wait('Nexus cherche sur Internet…');
-        try{webInfo=await T0.searchWeb(raw,{timeout:6000});JN.log('recherche_web',{q:raw,wikipedia:!!webInfo.wiki,duckduckgo:!!webInfo.ddg,erreurs:webInfo.erreurs,wiki:webInfo.wiki&&webInfo.wiki.title,ddg:webInfo.ddg&&webInfo.ddg.text&&webInfo.ddg.text.slice(0,200)});if(webInfo.found)web=webInfo.context}catch(e){JN.log('recherche_web_erreur',{msg:String(e&&e.message||e)})}
+        try{webInfo=await T0.searchWeb(raw,{timeout:6000});JN.log('recherche_web',{q:raw,wikipedia:!!webInfo.wiki,duckduckgo:!!webInfo.ddg,erreurs:webInfo.erreurs,wiki:webInfo.wiki&&webInfo.wiki.title,ddg:webInfo.ddg&&webInfo.ddg.text&&webInfo.ddg.text.slice(0,200)});if(webInfo.found)web=webInfo.context;const defQ=/^(qui est|qui etait|qui sont|qu est ce que|qu est ce qu|c est quoi|que signifie|definition de|definition du|parle moi de|dis moi qui est)\b/.test(nm(raw));const wt=webInfo.wiki?webInfo.wiki.text:'',dt=webInfo.ddg?webInfo.ddg.text:'',best=dt.length>wt.length?dt:wt;if(defQ&&best.length>=140){const rep2='**'+(webInfo.wiki?webInfo.wiki.title:raw.replace(/\?/g,'').trim())+'**\n\n'+best+'\n\n_Source : '+(best===wt?'Wikipédia':(webInfo.ddg.source||'DuckDuckGo'))+'._';JN.log('reponse',{via:'web-direct',texte:rep2});nx.noterEchange(raw,best);say(c,{p:'local',c:rep2});return}}catch(e){JN.log('recherche_web_erreur',{msg:String(e&&e.message||e)})}
       }
     }
-    let fichier=att?{name:att.name,text:String(att.text||'').slice(0,190000)}:null,texte=raw;
+    let fichier=null,texte=raw;
+    if(att&&att.kind!=='image'){const cp=compresser({name:att.name,text:String(att.text||''),question:raw,budget:2800});fichier={name:att.name,text:cp.text};JN.log('compression',{fichier:att.name,avant:cp.avant,apres:cp.apres,methode:cp.methode})}
     if(att&&att.kind==='image'){wait('Nexus regarde l\'image…');fichier={name:att.name,kind:'image',text:'',img:att.img}}
     const t1=Date.now();LASTVIA=null;
     let r=await nx.recevoirAutonome({texte,fichier,enLigne:navigator.onLine,contexteWeb:web});
     if(att&&att.kind==='image'&&r.panne&&!st.stop){
       // Aucune IA ne peut voir l'image : on lit le texte qu'elle contient (gratuit, local), sans jamais inventer.
       let txt='';try{const T=await needTools();wait('Lecture du texte de l\'image…');txt=await T.ocrImage(att.file||att.img,p=>wait('Lecture du texte… '+p))}catch(e){L('ocr_error',{msg:String(e&&e.message||e).slice(0,120)})}
-      if(!txt||txt.length<3){say(c,{p:'local',err:1,c:'Je n\'arrive pas à analyser cette image pour le moment : aucune IA de vision n\'est disponible (ou plus de crédit) et je n\'y trouve pas de texte à lire. Réessaie plus tard.'});return}
-      r=await nx.recevoirAutonome({texte:raw+'\n\n(Je ne peux pas voir l\'image, seulement le texte qu\'elle contient.)',fichier:{name:att.name+' (texte lu)',text:txt.slice(0,190000)},enLigne:navigator.onLine})
+      if(!texteLisible(txt)){say(c,{p:'local',err:1,pbtn:!puterOK?1:0,c:'Je n\'arrive pas à analyser cette image pour le moment : aucune IA de vision n\'est disponible'+(puterOK?'':' (connecte-toi à Puter pour en débloquer)')+' et je n\'y trouve pas de texte lisible. Réessaie plus tard.'});return}
+      r=await nx.recevoirAutonome({texte:raw+'\n\n(Je ne peux pas voir l\'image, seulement le texte qu\'elle contient.)',fichier:{name:att.name+' (texte lu)',text:compresser({name:att.name,text:txt,question:raw,budget:2000}).text},enLigne:navigator.onLine})
     }
     if(r.panne&&webInfo&&webInfo.found&&!st.stop){
       // Plus aucune IA : on répond honnêtement avec ce que Wikipédia / DuckDuckGo ont trouvé, sans rien inventer.
@@ -182,7 +202,7 @@ async function send(t0){
     JN.log('resultat_corps',{chemin:r.chemin,intent:r.intent,bloque:r.bloque,champs:Object.keys(r),ms:Date.now()-t1,texte:r.texte});
     if(st.stop)return;
     const loc=r.chemin==='pharmacie-local',err=!!r.bloque||/panne|quota|hors-ligne|refuse|invalide|nez-|fermee|vide/.test(r.chemin||'');
-    say(c,{p:loc?'local':'nexus',c:r.texte,err:err?1:0,...(!loc&&!err&&LASTVIA?{via:LASTVIA}:{})});
+    say(c,{p:loc?'local':'nexus',c:r.texte,err:err?1:0,...(err&&!puterOK&&!loc?{pbtn:1}:{}),...(!loc&&!err&&LASTVIA?{via:LASTVIA}:{})});
   }catch(e){L('send_error',{msg:String(e&&e.message||e),pile:String(e&&e.stack||'').slice(0,600)});say(c,{p:'local',err:1,c:'❌ Erreur : '+(e&&e.message||e)})}
   finally{st.busy=0;st.msg='';st.sug=null;$('#sb').innerHTML=IC_SEND;updSb();render()}
 }
@@ -190,7 +210,7 @@ async function send(t0){
 async function reask(i){
   if(st.busy)return;const c=cur0(),m=c&&c.m[i];if(!m||!m.via)return;let q=i-1;while(q>=0&&c.m[q].r!=='user')q--;if(q<0)return;
   const prev=m.via,question=c.m[q].c;st.busy=1;st.stop=0;st.msg='Nexus cherche une autre réponse…';render();JN.log('redemander',{ecarte:prev,question});
-  const off=entrees().filter(e=>provDe(e)===prev);off.forEach(e=>nx.desactiverTransport(e.id));
+  const off=entrees().filter(e=>e.id===prev);off.forEach(e=>nx.desactiverTransport(e.id));
   try{
     try{nx.cache&&nx.cache.clear&&nx.cache.clear()}catch{}
     if(!actifs().length){say(c,{p:'local',err:1,c:'Aucune autre IA n\'est disponible pour le moment.'});return}
@@ -199,88 +219,96 @@ async function reask(i){
     const err=!!r.bloque||/panne|quota|hors-ligne|refuse|invalide|nez-|fermee|vide/.test(r.chemin||'');
     say(c,{p:'nexus',c:r.texte,err:err?1:0,...(!err&&LASTVIA&&LASTVIA!==prev?{via:LASTVIA}:{})});
   }catch(e){say(c,{p:'local',err:1,c:'❌ Erreur : '+(e&&e.message||e)})}
-  finally{off.forEach(e=>{st.on[prev]===false?0:nx.activerTransport(e.id)});st.busy=0;st.msg='';render()}
+  finally{off.forEach(e=>nx.activerTransport(e.id));st.busy=0;st.msg='';render()}
 }
 
 // ---------- Réglages ----------
 const memHtml=()=>nx.memoires.length?nx.memoires.map((x,i)=>'<div class="set-line"><b style="font-weight:400">'+esc(x.texte||x.t||'')+'</b><button class="ib" data-a="memdel" data-i="'+i+'">✕</button></div>').join('')+'<button class="b2 r" data-a="memclr">Tout oublier</button>':'<div class="set-note">Rien de retenu pour l\'instant.</div>';
-const IS='style="width:100%;margin-top:6px"';
-function champs(id){const c=st.comptes[id]||{},v=k=>esc(c[k]||'');const inp=(k,ph,t)=>`<input type="${t||'text'}" data-f="${id}" data-k="${k}" placeholder="${ph}" value="${v(k)}" autocomplete="off" ${IS}>`;
-  if(id==='cloudflare')return inp('workerUrl','URL de ton Worker Cloudflare','password')+inp('model','Modèle (optionnel)')+'<div class="cf-instructions" style="display:block">Le Worker garde tes secrets <code>ACCOUNT_ID</code> et <code>API_TOKEN</code> côté Cloudflare. Colle ici seulement son adresse.</div>';
-  if(id==='pollinations')return inp('apiKey','Clé gratuite (optionnelle)','password')+'<div class="cf-instructions" style="display:block">Sans clé, Pollinations reste actif comme secours gratuit quand les autres IA n\'ont plus de crédit.</div>';
-  return inp('apiKey','Clé API '+PI[id].n,'password')+inp('model','Modèle (optionnel)')}
+const slugp=m=>String(m).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const persoId=p=>'perso-'+slugp(p.nom||p.model);
+const INP='style="width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);font:inherit;background:#fff"';
+function testHtml(){return st.tests.length?st.tests.map(t=>'<div class="set-line"><b style="font-weight:600">'+esc(t.nom)+'</b><span class="h">'+(t.ok?'✅ répond · '+esc(t.d):(t.ok===null?'— '+esc(t.d):'❌ '+esc(t.d)))+'</span></div>').join(''):''}
 function rset(){
-let h='';
-h+='<button class="b2" data-v="chat" style="margin-bottom:12px">← Retour au chat</button>';
-h+='<div class="set-card"><div class="set-title">Guide</div><div class="set-note">Comment créer ton compte et ta clé pour chaque IA.</div><button class="b2" data-v="guide">📖 Ouvrir le guide</button></div>';
-h+='<div class="set-card"><div class="set-title">IA</div><div class="set-note">Un interrupteur désactive une IA. Les clés restent sur ce téléphone. Nexus choisit lui-même l\'IA selon la demande.</div>';
-for(const id of PROV){const pp=PI[id];
-  h+=`<div class="set-line"><label class="sw"><input type="checkbox" data-on="${id}" ${st.on[id]===false?'':'checked'}></label><span>${pp.i}</span><b>${pp.n}</b>`;
-  if(id==='puter')h+=`<button class="b2" data-a="pl" style="margin:0;width:auto;padding:8px 10px">Puter : Se connecter</button>`;
-  else h+=`<button class="b2" data-a="kedit" data-id="${id}" style="margin:0;padding:8px 10px;width:auto">Modifier</button><div id="kf-${id}" style="display:none;width:100%">${champs(id)}</div>`;
-  h+=`<div class="h" id="ps-${id}"></div></div>`}
-h+='<button class="b2" data-a="savec" style="margin-top:8px">💾 Enregistrer les comptes et recharger</button>';
-h+='<div class="set-sub">Test</div><button class="b2" data-a="tt" id="tt">▶ Tester mes IA</button>';
-h+='<div class="set-note">Envoie un court message à chaque IA branchée.</div></div>';
+st.legal=null;
+let h='<button class="b2" data-v="chat" style="margin-bottom:12px">← Retour au chat</button>';
+h+='<div class="set-card"><div class="set-title">Guide</div><div class="set-note">Comment utiliser Nexus et ajouter ta propre IA.</div><button class="b2" data-v="guide">📖 Ouvrir le guide</button></div>';
+h+='<div class="set-card"><div class="set-title">Compte Puter</div><div class="set-note">'+(puterOK?'✅ Connecté. Nexus utilise d\'abord les modèles gratuits de ton compte Puter.':'Connecte-toi (gratuit, sans carte bancaire) pour débloquer des IA gratuites : c\'est le plus simple pour que Nexus réponde à tout.')+'</div><button class="b2" data-a="pl">'+(puterOK?'Se déconnecter de Puter':'🔌 Se connecter à Puter')+'</button></div>';
+h+='<div class="set-card"><details id="paBox"'+(st.perso.length?' open':'')+'><summary class="set-title" style="cursor:pointer">IA personnelles</summary><div class="set-note" style="margin-top:8px">Ajoute ta propre IA (clé API) : Nexus l\'utilisera <b>en premier</b>, ce qui économise les crédits partagés. Compatible avec toute API de type OpenAI. Ta clé reste uniquement sur cet appareil.</div>';
+st.perso.forEach((p,k)=>{h+='<div class="set-line"><label class="sw"><input type="checkbox" data-pa-on="'+k+'"'+(p.actif===false?'':' checked')+'></label><b>'+esc(p.nom||p.model)+'</b><small class="h">'+esc(p.model)+'</small><button class="ib" data-a="padel" data-i="'+k+'" title="Supprimer">✕</button></div>'});
+h+='<div class="set-sub" style="margin-top:12px">Ajouter une IA</div><select id="pa-tpl" '+INP+'>'+MODELES_PERSO.map((m,k)=>'<option value="'+k+'">'+esc(m.nom)+'</option>').join('')+'</select>'
+ +'<input id="pa-nom" type="text" placeholder="Nom (ex. Mon Groq)" autocomplete="off" '+INP+'><input id="pa-url" type="url" placeholder="URL de l\'API (https://…)" autocomplete="off" value="'+esc(MODELES_PERSO[0].url)+'" '+INP+'><input id="pa-key" type="password" placeholder="Clé API" autocomplete="off" '+INP+'><input id="pa-model" type="text" placeholder="Modèle" autocomplete="off" value="'+esc(MODELES_PERSO[0].model)+'" '+INP+'>'
+ +'<div class="set-note" id="pa-aide">Clé à créer sur : '+esc(MODELES_PERSO[0].aide)+'</div><button class="b2" data-a="paadd">➕ Ajouter cette IA</button></details></div>';
+h+='<div class="set-card"><div class="set-title">Test</div><button class="b2" data-a="tt" id="tt">▶ Tester mes IA</button><div id="tres">'+testHtml()+'</div><div class="set-note">Envoie simplement « 1 » à chaque IA pour vérifier qu\'elle répond (coût minimal).</div></div>';
 h+='<div class="set-card"><div class="set-title">Mémoire de Nexus</div><div class="set-note">Nexus retient, sur ce téléphone, ce que tu lui demandes de retenir (ex : « je m\'appelle … »).</div>'+memHtml()+'</div>';
-h+='<div class="set-card"><div class="set-title">Voix de Nexus</div><select id="voxsel" style="width:100%;padding:10px;border-radius:10px;margin-bottom:6px"><option value="">Automatique (la plus naturelle)</option>'+voixFR().map(v=>'<option value="'+esc(v.name)+'"'+(v.name===voixNom?' selected':'')+'>'+esc(v.name)+'</option>').join('')+'</select><button class="b2" data-a="voxt">🔊 Écouter un exemple</button><div class="set-note">Sur iPhone, pour une voix bien plus naturelle : Réglages → Accessibilité → Contenu énoncé → Voix → Français, puis télécharge une voix « Améliorée » ou « Premium ».</div></div>';
-{const qOn=qwenOn(),gpu=!!navigator.gpu;h+='<div class="set-card"><div class="set-title">Cerveau local (Qwen 2.5 · 0,5 Md)</div><div class="set-note">Petit modèle qui tourne sur ton téléphone, sans crédit. Nexus ne l\'utilise que pour les politesses (salut, merci, ça va…). Jamais pour les faits, le code, les traductions ni les réponses sérieuses, pour ne pas dégrader la qualité.</div><div class="set-note" id="qwst">'+(gpu?(qOn?'✅ Installé':(qwenMsg||'Non installé · téléchargement d\'environ 400 Mo, Wi-Fi conseillé')):'⚠️ Ton navigateur ne gère pas WebGPU : indisponible ici.')+'</div>'+(gpu?(qOn?'<button class="b2" data-a="qwt">▶ Tester</button><button class="b2 r" data-a="qwd">🗑️ Supprimer</button>':'<button class="b2" data-a="qwi">⬇️ Télécharger</button>'):'')+'</div>'}
-h+='<div class="set-card"><div class="set-title">Journal</div><div class="set-note" id="jcount">…</div><div class="set-note">Tout ce qui se passe dans l\'app est enregistré (messages, réponses, appels aux IA, erreurs, réseau, clics). Les clés sont masquées.</div><div class="j-row" data-a="vj"><span>👁️</span><b>Voir le journal</b><span>›</span></div><textarea id="rep" readonly placeholder="Le journal apparaît ici" style="display:none"></textarea><button class="b2" data-a="jdl">📥 Télécharger le journal complet</button><button class="b2" data-a="jcp">📋 Copier les 300 dernières lignes</button><button class="b2" data-a="jclr">🗑️ Vider le journal</button><button class="b2 r" data-a="all">Tout effacer (conversations, comptes, journal)</button></div>';
-h+='<div class="h" style="text-align:center;margin:14px">NEXUS AI v'+V+'</div>';
-$('#v-set').innerHTML=h;pstat();JN.count().then(n=>{const e=$('#jcount');if(e)e.textContent=n+' entrées enregistrées'});
+h+='<div class="set-card"><div class="set-title">Voix de Nexus</div><select id="voxeng" '+INP+'><option value="naturelle"'+(voxEng==='naturelle'?' selected':'')+'>Voix naturelle (en ligne)</option><option value="appareil"'+(voxEng==='appareil'?' selected':'')+'>Voix de l\'appareil</option></select><select id="voxsel" '+INP+'><option value="">Voix de l\'appareil : automatique</option>'+voixFR().map(v=>'<option value="'+esc(v.name)+'"'+(v.name===voixNom?' selected':'')+'>'+esc(v.name)+'</option>').join('')+'</select><button class="b2" data-a="voxt">🔊 Écouter un exemple</button></div>';
+h+='<div class="set-card"><div class="set-title">Journal</div><div class="set-note" id="jcount">…</div><div class="set-note">Tout ce qui se passe dans l\'app est enregistré sur ton appareil (messages, réponses, appels aux IA, erreurs, réseau, clics). Les clés sont masquées.</div><div class="j-row" data-a="vj"><span>👁️</span><b>Voir le journal</b><span>›</span></div><textarea id="rep" readonly placeholder="Le journal apparaît ici" style="display:none"></textarea><button class="b2" data-a="jdl">📥 Télécharger le journal complet</button><button class="b2" data-a="jcp">📋 Copier les 300 dernières lignes</button><button class="b2" data-a="jclr">🗑️ Vider le journal</button></div>';
+h+='<div class="set-card"><div class="set-title">Mes données</div><div class="set-note">Tout est stocké sur cet appareil. Tu peux l\'exporter ou tout effacer à tout moment.</div><button class="b2" data-a="dexp">📦 Exporter mes données</button><button class="b2 r" data-a="all">Tout effacer (conversations, mémoire, IA perso, journal)</button></div>';
+h+='<div class="legal-bas">'+ORDRE.map(k=>'<a href="#" data-a="leg" data-p="'+k+'">'+PAGES[k][0]+'</a>').join(' · ')+'<br>NEXUS AI v'+V+'</div>';
+$('#v-set').innerHTML=h;JN.count().then(n=>{const e=$('#jcount');if(e)e.textContent=n+' entrées enregistrées'});
 }
 async function tests(){const b=$('#tt');b.disabled=true;b.textContent='⏳ Test…';await pret;const t00=Date.now();JN.log('test_ias',{debut:true});
-  const un=async id=>{const es=entrees().filter(e=>provDe(e)===id&&e.actif!==false);if(!es.length){st.tests[id]={ok:false,d:'désactivée'};return}
-    const en=nx.annuaire.entrees.get(es[0].id),t0=Date.now(),ac2=new AbortController();
-    try{const r=await Promise.race([en.transport({fonctionnalite:es[0].fonctionnalites[0],messages:[{role:'user',content:'Réponds uniquement : OK'}],signal:ac2.signal}),new Promise((_,ko)=>setTimeout(()=>{ac2.abort();ko(new Error('délai dépassé'))},15000))]);const ok=!!(r&&String(r.texte||'').trim());st.tests[id]={ok,d:ok?((Date.now()-t0)/1000).toFixed(1)+' s':'réponse vide'}}
-    catch(e){st.tests[id]={ok:false,d:String(e&&e.status?'erreur '+e.status:e&&e.message||e).slice(0,60)}}
-    JN.log('test_ia',{ia:id,...st.tests[id]});pstat()};
-  await Promise.all(PROV.filter(id=>st.on[id]!==false).map(un));
-  PROV.filter(id=>st.on[id]===false).forEach(id=>{delete st.tests[id]});pstat();
-  JN.log('test_ias',{fin:true,ms:Date.now()-t00});b.disabled=false;b.textContent='▶ Tester mes IA'}
+  const best={},perso=[];for(const e of entrees().filter(e=>e.actif!==false)){const g=groupe(e);if(g==='perso'){perso.push(e);continue}const c=e.meta?.cout??5;if(!best[g]||c<(best[g].meta?.cout??5)){if(!e.fonctionnalites.includes('vision')||e.meta)best[g]=e}}
+  const taches=[['Cloudflare',best.cloudflare],['Puter',best.puter],['Pollinations',best.pollinations],...perso.map(e=>[(e.description||e.id).replace(/^perso-/,''),e])];
+  const un=async([nom,e])=>{if(!e)return{nom,ok:null,d:nom==='Puter'?'non connecté':'indisponible'};const t0=Date.now(),ac2=new AbortController();
+    try{const r=await Promise.race([e.transport({fonctionnalite:e.fonctionnalites[0],messages:[{role:'user',content:'1'}],signal:ac2.signal,test:true}),new Promise((_,ko)=>setTimeout(()=>{ac2.abort();ko(new Error('délai dépassé'))},15000))]);const ok=!!(r&&String(r.texte||'').trim());return{nom,ok,d:ok?((Date.now()-t0)/1000).toFixed(1)+' s':'réponse vide'}}
+    catch(x){return{nom,ok:false,d:String(x&&x.status?'erreur '+x.status:x&&x.message||x).slice(0,60)}}};
+  st.tests=await Promise.all(taches.map(un));st.tests.forEach(t=>JN.log('test_ia',t));JN.log('test_ias',{fin:true,ms:Date.now()-t00});
+  const r=$('#tres');if(r)r.innerHTML=testHtml();b.disabled=false;b.textContent='▶ Tester mes IA'}
 $('#v-set').addEventListener('change',e=>{const t=e.target;
-  if(t.id==='voxsel'){voixNom=t.value;S.s('voix',voixNom);return}if(t.dataset.on){st.on[t.dataset.on]=t.checked;S.s('on',st.on);appliquer();upd();return}
-  if(t.dataset.f){(st.comptes[t.dataset.f]??={})[t.dataset.k]=t.type==='checkbox'?t.checked:t.value.trim();S.s('comptes',st.comptes)}});
+  if(t.id==='voxsel'){voixNom=t.value;S.s('voix',voixNom);return}
+  if(t.id==='voxeng'){voxEng=t.value;S.s('voxeng',voxEng);return}
+  if(t.id==='pa-tpl'){const m=MODELES_PERSO[+t.value];$('#pa-nom').value=m.url?m.nom:'';$('#pa-url').value=m.url;$('#pa-model').value=m.model;$('#pa-aide').textContent=m.aide?'Clé à créer sur : '+m.aide:'Indique l\'URL de base de l\'API (se termine souvent par /v1).';return}
+  if(t.dataset.paOn!==undefined){const p=st.perso[+t.dataset.paOn];if(p){p.actif=t.checked;S.s('perso',st.perso);const en=nx.annuaire.entrees.get(persoId(p));if(en)t.checked?nx.activerTransport(en.id):nx.desactiverTransport(en.id);JN.log('perso_bascule',{nom:p.nom,actif:t.checked})}}});
 $('#v-set').addEventListener('click',async e=>{const el=e.target.closest('[data-a]');const a=el?el.dataset.a:null;if(!a)return;
-if(a==='pl'){try{if(!window.puter)throw new Error('Puter.js non chargé');puterOK?await window.puter.auth.signOut():await window.puter.auth.signIn();location.reload()}catch(x){toast('Puter : '+(x&&x.message||x))}}
-else if(a==='kedit'){const w=$('#kf-'+el.dataset.id);if(w)w.style.display=w.style.display==='none'?'block':'none'}
-else if(a==='savec'){S.s('comptes',st.comptes);location.reload()}
+if(a==='pl'){if(puterOK){try{await window.puter.auth.signOut()}catch{}location.reload()}else puterConnexion()}
+else if(a==='paadd'){const nom=$('#pa-nom').value.trim()||MODELES_PERSO[+$('#pa-tpl').value].nom,url=$('#pa-url').value.trim(),key=$('#pa-key').value.trim(),model=$('#pa-model').value.trim();
+  if(!/^https:\/\//i.test(url))return toast('L\'URL doit commencer par https://');if(key.length<8)return toast('Colle ta clé API');if(!model)return toast('Indique le modèle');
+  if(st.perso.some(p=>persoId(p)===persoId({nom})))return toast('Une IA porte déjà ce nom');
+  st.perso.push({nom,url,apiKey:key,model,actif:true});S.s('perso',st.perso);JN.log('perso_ajout',{nom,url:url.replace(/\/\/([^/]+).*/,'//$1'),model});toast('IA ajoutée');location.reload()}
+else if(a==='padel'){const p=st.perso[+el.dataset.i];if(p&&confirm('Supprimer « '+(p.nom||p.model)+' » ?')){st.perso.splice(+el.dataset.i,1);S.s('perso',st.perso);JN.log('perso_suppression',{nom:p.nom});location.reload()}}
+else if(a==='leg'){e.preventDefault();st.legal=el.dataset.p;view('guide')}
+else if(a==='dexp'){const blob=new Blob([JSON.stringify({app:'NEXUS AI',version:V,exporte:new Date().toISOString(),conversations:st.convs,memoire:nx.memoires,ia_personnelles:st.perso.map(p=>({...p,apiKey:'***'}))},null,1)],{type:'application/json'});const u=URL.createObjectURL(blob),x=document.createElement('a');x.href=u;x.download='nexus-mes-donnees.json';document.body.appendChild(x);x.click();setTimeout(()=>{x.remove();URL.revokeObjectURL(u)},4000);toast('Données exportées')}
 else if(a==='vj'){const r=$('#rep');if(r){if(r.style.display==='none'){const all=await JN.all();r.value=all.length?all.slice(-200).map(x=>{const {t,type,...rest}=x;return String(t).slice(11,19)+' '+type+' '+JSON.stringify(rest)}).join('\n'):'Journal vide.';r.style.display='block'}else r.style.display='none'}}
-else if(a==='tt')tests();else if(a==='rp'){const r=report();$('#rep').value=r;toast(await copy(r)?'Rapport copié':'Sélectionnez le texte')}
+else if(a==='tt')tests();
 else if(a==='jdl'){const all=await JN.all();const blob=new Blob([JSON.stringify({app:'NEXUS AI',version:V,exporte:new Date().toISOString(),entrees:all},null,1)],{type:'application/json'});const u=URL.createObjectURL(blob),x=document.createElement('a');x.href=u;x.download='nexus-journal-'+Date.now()+'.json';document.body.appendChild(x);x.click();setTimeout(()=>{x.remove();URL.revokeObjectURL(u)},4000);toast('Journal exporté ('+all.length+' lignes)')}
 else if(a==='jcp'){const all=await JN.all();toast(await copy(JSON.stringify(all.slice(-300)))?'Copié (300 dernières lignes)':'Copie impossible')}
-else if(a==='jclr'){if(confirm('Vider tout le journal détaillé ?')){await JN.clear();toast('Journal détaillé vidé');rset()}}
-else if(a==='qwi'){el.disabled=true;try{await qwenCharger(p=>{qwenMsg=p;const n=$('#qwst');if(n)n.textContent=p});S.s('qwen_on',true);toast('Cerveau local prêt');JN.log('qwen_installe',{})}catch(x){qwenMsg='';toast('Qwen : '+(x&&x.message||x));JN.log('qwen_erreur',{msg:String(x&&x.message||x)})}rset()}
-else if(a==='qwd'){S.s('qwen_on',false);try{const ks=await caches.keys();await Promise.all(ks.filter(k=>/webllm|mlc/i.test(k)).map(k=>caches.delete(k)))}catch{}try{BRM&&BRM.resetLLM()}catch{}toast('Cerveau local supprimé');rset()}
-else if(a==='qwt'){const r=await qwenRepondre('Salut');toast(r?'Qwen : '+r:'Pas de réponse (voir le journal)')}
+else if(a==='jclr'){if(confirm('Vider tout le journal ?')){await JN.clear();st.log=[];S.s('log',[]);toast('Journal vidé');rset()}}
 else if(a==='voxt'){lire('Bonjour, je suis Nexus. Voici ma voix. Que puis-je faire pour toi ?')}
-else if(a==='lc'){st.log=[];S.s('log',[]);toast('Journal vidé')}
 else if(a==='memdel'){nx.memoires.splice(+el.dataset.i,1);S.s('memoires',nx.memoires);rset()}
 else if(a==='memclr'){nx.memoires=[];S.s('memoires',[]);rset()}
-else if(a==='all'&&confirm('Tout effacer ?')){await JN.clear();Object.keys(localStorage).filter(k=>k.startsWith('nexus_')).forEach(k=>localStorage.removeItem(k));location.reload()}});
+else if(a==='all'&&confirm('Tout effacer ? Cette action est définitive.')){await JN.clear();Object.keys(localStorage).filter(k=>k.startsWith('nexus_')).forEach(k=>localStorage.removeItem(k));location.reload()}});
 function rhist(){const q=norm($('#q').value||''),l=[...st.convs].reverse().filter(c=>!q||norm(c.t+' '+c.m.map(m=>m.c).join(' ')).includes(q));$('#hl').innerHTML=l.length?l.map(c=>`<div class="hi" data-o="${c.id}"><div><b>${esc(c.t||'(vide)')}</b><br><small>${new Date(c.d).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${c.m.length} messages</small></div><button class="ib" data-del="${c.id}">🗑</button></div>`).join(''):'<div class="h">Aucune conversation.</div>';const sv=(st.saved||[]).filter(s=>!q||norm((s.t||'')+' '+(s.c||'')).includes(q));const se=$('#stock');if(se)se.innerHTML='<div class="stock-title">Stockage</div><div class="h" style="margin-top:0">'+sv.length+' élément'+(sv.length>1?'s':'')+' sauvegardé'+(sv.length>1?'s':'')+'</div>'+(sv.length?sv.slice().reverse().map(s=>`<div class="stock-card"><b>${esc(s.t||'Réponse sauvegardée')}</b><br><small>${new Date(s.d).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · ${'NEXUS'}</small><div class="h">${esc((s.c||'').slice(0,160))}${(s.c||'').length>160?'…':''}</div><div class="stock-actions"><button data-svcp="${s.id}">Copier</button><button data-svdel="${s.id}">Supprimer</button></div></div>`).join(''):'<div class="h">Aucun élément sauvegardé.</div>')}
 function report(){const c=cur0();return['# Rapport NEXUS AI v'+V,'Date : '+new Date().toISOString(),...(c?c.m.map(m=>'['+m.r+(m.p?' '+m.p:'')+'] '+m.c):['(aucune)']),...st.log.map(x=>JSON.stringify(x))].join('\n')}
 async function copy(t){try{await navigator.clipboard.writeText(t);return 1}catch{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();let ok=0;try{ok=document.execCommand('copy')}catch{}a.remove();return ok}}
 function view(v){const bar=document.getElementById('bar');if(bar)bar.style.display=(v==='chat'?'flex':'none');document.querySelectorAll('.v').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));if(v==='set')rset();if(v==='hist')rhist();if(v==='guide')rguide();syncAv()}
-function rguide(){$('#v-guide').innerHTML='<button class="b2" data-v="set" style="margin-bottom:12px">← Retour aux paramètres</button><div class="guide">'+GUIDE_HTML+'</div>'}
+function rguide(){const p=st.legal&&PAGES[st.legal];$('#v-guide').innerHTML='<button class="b2" data-v="set" style="margin-bottom:12px">← Retour aux paramètres</button><div class="guide">'+(p?'<h2>'+p[0]+'</h2>'+p[1]():GUIDE_HTML)+'</div>'}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;const v=b.dataset.v;const cur=document.querySelector('.v.on')?.id?.replace('v-','');if(b.classList&&b.classList.contains('head-center')){if(cur==='chat'){newChat();JN.log('nouveau_chat',{via:'logo'})}else view('chat');return}if(v===cur&&v!=='chat')view('chat');else view(v);});
 function newChat(){pf=null;chip();st.sug=null;st.cur=null;nx.effacerConversation();save();render();view('chat')}
 $('#sb').onclick=()=>send();$('#nw').onclick=newChat;$('#q').oninput=rhist;
 let rec=null,micOn=false,micBase='';
+const INTERRO=/^(qui|que|quoi|quand|où|ou|comment|pourquoi|combien|quel|quelle|quels|quelles|est[- ]ce|peux[- ]tu|peut[- ]on|as[- ]tu|es[- ]tu|tu peux|tu sais|sais[- ]tu|y a[- ]t[- ]il|c'est quoi)\b/i;
+function ponctuer(t){t=String(t||'').replace(/\s+/g,' ').trim();if(!t)return t;t=t[0].toUpperCase()+t.slice(1);if(/[.!?…]$/.test(t))return t;if(INTERRO.test(t))return t+' ?';return t.split(' ').length>=6?t+'.':t}
 function stopMic(){micOn=false;micBase='';if(rec){try{rec.onresult=null;rec.onend=null;rec.onerror=null;rec.abort?rec.abort():rec.stop()}catch{}rec=null}$('#mic').classList.remove('on')}
 $('#mic').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Micro non disponible dans ce navigateur');JN.log('mic',{etat:'indisponible'});return}
 if(micOn){stopMic();JN.log('mic',{etat:'stop'});return}
-try{rec=new SR();rec.lang='fr-FR';rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;micOn=true;micBase=$('#in').value.trim();$('#mic').classList.add('on');JN.log('mic',{etat:'start'});
-rec.onresult=e=>{let interim='';for(let k=e.resultIndex;k<e.results.length;k++){const r=e.results[k];if(r.isFinal)micBase=(micBase+' '+r[0].transcript).trim();else interim+=r[0].transcript}const inp=$('#in');inp.value=(micBase+(interim?' '+interim:'')).trim();inp.dispatchEvent(new Event('input'))};
+try{rec=new SR();rec.lang='fr-FR';rec.continuous=true;rec.interimResults=true;rec.maxAlternatives=1;micOn=true;micBase=$('#in').value.trim();$('#mic').classList.add('on');JN.log('mic',{etat:'start'});
+rec.onresult=e=>{let interim='';for(let k=e.resultIndex;k<e.results.length;k++){const r=e.results[k];if(r.isFinal)micBase=(micBase+' '+ponctuer(r[0].transcript)).trim();else interim+=r[0].transcript}const inp=$('#in');inp.value=(micBase+(interim?' '+interim.trim():'')).trim();inp.dispatchEvent(new Event('input'))};
 rec.onerror=e=>{JN.log('mic',{etat:'erreur',err:e&&e.error});if(e&&(e.error==='not-allowed'||e.error==='service-not-allowed')){toast('Micro refusé : autorise-le dans les réglages');stopMic()}};
 rec.onend=()=>{if(micOn){try{rec.start()}catch{stopMic()}}};
 rec.start()}catch(x){stopMic();toast('Micro impossible');JN.log('mic',{etat:'exception',msg:String(x&&x.message||x)})}};
-let ttsI=null,voixNom=S.g('voix','');
+// ---- Voix : naturelle (en ligne, douce) par défaut, sinon la meilleure voix de l'appareil, lue par phrases pour garder une intonation naturelle
+let ttsI=null,voixNom=S.g('voix',''),voxEng=S.g('voxeng','naturelle'),audioEl=null;
 const voixFR=()=>{try{return (speechSynthesis.getVoices()||[]).filter(v=>/^fr/i.test(v.lang))}catch{return[]}};
-function meilleureVoix(){const vs=voixFR();if(!vs.length)return null;const p=vs.find(v=>v.name===voixNom);if(p)return p;const sc=v=>{const n=v.name.toLowerCase();let s=0;if(/premium|enhanced|amélioré|ameliore/.test(n))s+=6;if(/siri/.test(n))s+=5;if(/amélie|amelie|audrey|aurélie|aurelie|thomas|marie|léa|lea|google/.test(n))s+=3;if(/fr[-_]fr/i.test(v.lang))s+=2;if(v.localService)s+=1;return s};return [...vs].sort((x,y)=>sc(y)-sc(x))[0]}
-function pourLire(t){return String(t).replace(/```[\s\S]*?```/g,' Voir le code à l\'écran. ').replace(/`([^`]+)`/g,'$1').replace(/https?:\/\/\S+/g,'lien').replace(/[*_#>~|]/g,'').replace(/^\s*[-•]\s+/gm,'').replace(/\p{Extended_Pictographic}/gu,'').replace(/\s*\n+\s*/g,'. ').replace(/\.{2,}/g,'.').replace(/\s+/g,' ').trim()}
-function phrases(t){const ph=t.match(/[^.!?;:]+[.!?;:]*/g)||[t],out=[];let cur='';for(const p of ph){if((cur+p).length>170&&cur){out.push(cur.trim());cur=p}else cur+=p}if(cur.trim())out.push(cur.trim());return out}
-function lire(txt){if(!('speechSynthesis' in window)){toast('Lecture vocale indisponible');return}const s=window.speechSynthesis,meme=ttsI===txt;if(s.speaking||s.pending){s.cancel();JN.log('tts',{etat:'stop'});ttsI=null;if(meme)return}ttsI=txt;const v=meilleureVoix();phrases(pourLire(txt).slice(0,5000)).forEach(ch=>{const u=new SpeechSynthesisUtterance(ch);u.lang='fr-FR';if(v)u.voice=v;u.rate=.97;u.pitch=1.02;u.onend=u.onerror=()=>{};s.speak(u)});JN.log('tts',{etat:'start',len:String(txt).length,voix:v&&v.name})}
+function meilleureVoix(){const vs=voixFR();if(!vs.length)return null;const p=vs.find(v=>v.name===voixNom);if(p)return p;const sc=v=>{const n=v.name.toLowerCase();let s=0;if(/premium|enhanced|amélioré|ameliore/.test(n))s+=8;if(/siri/.test(n))s+=6;if(/amélie|amelie|audrey|aurélie|aurelie|marie|léa|lea|google/.test(n))s+=3;if(/fr[-_]fr/i.test(v.lang))s+=2;if(v.localService)s+=1;return s};return [...vs].sort((x,y)=>sc(y)-sc(x))[0]}
+function pourLire(t){return String(t).replace(/```[\s\S]*?```/g,' Voir le code à l\'écran. ').replace(/`([^`]+)`/g,'$1').replace(/https?:\/\/\S+/g,'lien').replace(/[*_#>~|]/g,'').replace(/^\s*[-•]\s+/gm,'').replace(/\p{Extended_Pictographic}/gu,'').replace(/([.!?…:;])\s*\n+/g,'$1 ').replace(/\n+/g,'. ').replace(/\s+/g,' ').trim()}
+function phrases(t){const ph=t.match(/[^.!?;:]+[.!?;:]*/g)||[t],out=[];let cur='';for(const p of ph){if((cur+p).length>230&&cur){out.push(cur.trim());cur=p}else cur+=p}if(cur.trim())out.push(cur.trim());return out}
+function arretVoix(){try{speechSynthesis.cancel()}catch{}if(audioEl){try{audioEl.pause();audioEl.removeAttribute('src');audioEl.load()}catch{}audioEl=null}}
+function lireAppareil(txt){if(!('speechSynthesis' in window)){toast('Lecture vocale indisponible');return}const v=meilleureVoix();phrases(pourLire(txt).slice(0,5000)).forEach(ch=>{const u=new SpeechSynthesisUtterance(ch);u.lang='fr-FR';if(v)u.voice=v;u.rate=.92;u.pitch=1;u.volume=1;window.speechSynthesis.speak(u)});JN.log('tts',{etat:'start',moteur:'appareil',len:String(txt).length,voix:v&&v.name})}
+function lireNeuronal(txt){const t=pourLire(txt).slice(0,700);if(!t)return false;const c=GJ();if((c.tts||0)>=30){JN.log('tts',{etat:'plafond_jour'});return false}c.tts=(c.tts||0)+1;S.s('cnt',c);
+  let fait=false;const repli=(raison)=>{if(fait)return;fait=true;JN.log('tts',{etat:'repli_appareil',raison});lireAppareil(txt)};
+  audioEl=new Audio();audioEl.src='https://gen.pollinations.ai/audio/'+encodeURIComponent(t)+'?voice=shimmer&key='+encodeURIComponent(POLLINATIONS_KEY);audioEl.onerror=()=>repli('erreur audio');audioEl.onended=()=>{ttsI=null};
+  const p=audioEl.play();if(p&&p.catch)p.catch(e=>repli(String(e&&e.message||e)));JN.log('tts',{etat:'start',moteur:'naturelle',len:t.length});return true}
+function lire(txt){const meme=ttsI===txt;arretVoix();if(meme){ttsI=null;JN.log('tts',{etat:'stop'});return}ttsI=txt;if(voxEng==='naturelle'&&navigator.onLine&&lireNeuronal(txt))return;lireAppareil(txt)}
 if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=()=>{if(document.querySelector('#v-set.on'))rset()};
 const IC_SEND='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg>';
 const IC_STOP='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
@@ -301,7 +329,7 @@ $('#in').addEventListener('input',updSb);
 $('#in').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,120)+'px'});
 $('#in').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();send()}});
 async function regenImage(q){const c=cur();st.busy=1;st.stop=0;st.msg='Génération…';updSb();render();try{await genImage(c,q)}finally{st.busy=0;st.msg='';updSb();render()}}
-$('#msgs').onclick=async e=>{const lbi=e.target.closest('img[data-lb]');if(lbi){openLb(lbi.dataset.lb);return}const sg=e.target.closest('.sug');if(sg){send(sg.dataset.q);return}
+$('#msgs').onclick=async e=>{const lbi=e.target.closest('img[data-lb]');if(lbi){openLb(lbi.dataset.lb);return}const pc=e.target.closest('[data-a="pcn"]');if(pc){puterConnexion();return}const sg=e.target.closest('.sug');if(sg){send(sg.dataset.q);return}
 const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
 if(a==='cardok'){await cardOk();return}if(a==='cardalt'){if(st.card){st.card.open=!st.card.open;render()}return}if(a==='cardpick'){cardPick(b.dataset.id);return}if(a==='cardno'){st.card=null;render();return}
 const c=cur0(),m=c&&c.m[b.dataset.i];if(!m)return;
@@ -317,6 +345,20 @@ $('#stock').onclick=async e=>{const del=e.target.closest('[data-svdel]');if(del)
 addEventListener('online',upd);addEventListener('offline',upd);
 if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>L('sw_error',{msg:e.message})));
 function viewportDiag(tag){try{const sa=document.getElementById('sa'),r=x=>Math.round(x),ap=document.querySelector('#app').getBoundingClientRect(),bar=document.querySelector('#bar').getBoundingClientRect(),vv=window.visualViewport;JN.log('ecran',{tag,innerH:innerHeight,outerH:outerHeight,screenH:screen.height,vvH:vv&&r(vv.height),vvTop:vv&&r(vv.offsetTop),appH:r(ap.height),appBottom:r(ap.bottom),barBottom:r(bar.bottom),safeBottom:sa?r(sa.getBoundingClientRect().height):null,standalone:matchMedia('(display-mode: standalone)').matches,navStandalone:navigator.standalone})}catch{}}
-render();upd();view('chat');viewportDiag('start');setTimeout(()=>viewportDiag('1s'),1000);addEventListener('resize',()=>viewportDiag('resize'));addEventListener('pageshow',()=>view('chat'));setTimeout(upd,1500);setInterval(()=>{pstat();upd()},60000);
+function ecartBas(){try{const st0=matchMedia('(display-mode: standalone)').matches||navigator.standalone,g=st0?Math.max(0,screen.height-innerHeight-((window.visualViewport&&window.visualViewport.offsetTop)||0)):0;document.documentElement.style.setProperty('--gap',g+'px')}catch{}}
+ecartBas();addEventListener('resize',ecartBas);addEventListener('pageshow',ecartBas);document.addEventListener('visibilitychange',ecartBas);
+const FR=$('#fr');
+function frEtape(){if(!FR)return;if(!S.g('fr_ok',false)){FR.hidden=false;FR.innerHTML='<div class="frb"><h2>Bienvenue sur NEXUS AI</h2>'+ACCUEIL+'<p class="note">Détails : <a href="#" data-a="frleg" data-p="confidentialite">confidentialité</a> · <a href="#" data-a="frleg" data-p="cgu">conditions d\'utilisation</a>.</p><button class="b2 pri" data-a="frok">J\'ai compris, continuer</button></div>';return}
+ if(!S.g('fr_puter',false)&&!puterOK){FR.hidden=false;FR.innerHTML='<div class="frb"><h2>Débloque les IA gratuites</h2><p>Connecte-toi à <b>Puter</b> (gratuit, sans carte bancaire) : Nexus pourra alors répondre à tout, avec des modèles gratuits en priorité.</p><button class="b2 pri" data-a="frpl">🔌 Se connecter à Puter</button><button class="b2" data-a="frlater">Plus tard</button><p class="note">Tu pourras le faire à tout moment avec le bouton « Connecter Puter » ou dans Paramètres.</p></div>';return}
+ FR.hidden=true}
+if(FR)FR.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;e.preventDefault();const k=b.dataset.a;
+ if(k==='frok'){S.s('fr_ok',true);JN.log('consentement',{ok:true,version:V});frEtape();pbadge()}
+ else if(k==='frpl'){S.s('fr_puter',true);puterConnexion()}
+ else if(k==='frlater'){S.s('fr_puter',true);FR.hidden=true;pbadge()}
+ else if(k==='frleg'){const p=PAGES[b.dataset.p];FR.innerHTML='<div class="frb"><button class="b2" data-a="frback">← Retour</button><h2>'+p[0]+'</h2>'+p[1]()+'</div>'}
+ else if(k==='frback')frEtape()});
+pret.then(frEtape);
+const PB=$('#pbadge');if(PB)PB.onclick=puterConnexion;
+render();upd();view('chat');viewportDiag('start');setTimeout(()=>viewportDiag('1s'),1000);addEventListener('resize',()=>viewportDiag('resize'));addEventListener('pageshow',()=>view('chat'));setTimeout(upd,1500);setInterval(()=>{upd();pbadge()},60000);
 JN.instrumenter({version:V,standalone:(()=>{try{return matchMedia('(display-mode: standalone)').matches}catch{return null}})()});
 L('start',{v:V});
