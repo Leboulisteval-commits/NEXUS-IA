@@ -113,8 +113,8 @@ textarea#rep{width:100%;height:90px;margin-top:8px;background:var(--soft);color:
 .guide h2{margin:6px 0 10px}.guide h3{margin:18px 0 6px;color:var(--brand)}.guide h4{margin:10px 0 2px}.guide p{margin:0 0 8px;line-height:1.5;font-size:14px;overflow-wrap:anywhere}.guide a{color:var(--brand)}
 
 /* ===== v1.1 ===== */
-#app{top:0;left:0;right:0;bottom:auto;height:100%;height:100lvh}
-#bar{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 6px);align-items:flex-end}
+#app{top:0;left:0;right:0;bottom:auto;height:100%}
+#bar{position:absolute;bottom:max(10px,calc(env(safe-area-inset-bottom) + 6px - var(--gap,0px)));align-items:flex-end}
 #inwrap{background:rgba(255,255,255,.80);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 #in::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #msgs{padding-bottom:calc(205px + env(safe-area-inset-bottom));-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent 84px,#000 150px,#000 calc(100% - 200px - env(safe-area-inset-bottom)),transparent calc(100% - 84px - env(safe-area-inset-bottom)),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,transparent 84px,#000 150px,#000 calc(100% - 200px - env(safe-area-inset-bottom)),transparent calc(100% - 84px - env(safe-area-inset-bottom)),transparent 100%)}
@@ -130,17 +130,8 @@ textarea#rep{width:100%;height:90px;margin-top:8px;background:var(--soft);color:
 .wink::after{content:'';position:absolute;left:6%;right:6%;top:46%;height:3px;border-radius:3px;background:#c4e8ff;box-shadow:0 0 7px #8fd0ff}
 .avw.doWink .wink{animation:wk .9s ease-in-out}
 @keyframes wk{0%,100%{opacity:0;transform:scaleY(.1)}20%,80%{opacity:1;transform:scaleY(1)}}
-.hello{position:absolute;right:-4%;top:20%;font-size:36px;opacity:0;transform-origin:70% 80%}
-.avw.doWave{animation:fly 7s ease-in-out infinite,wave 1.9s ease-in-out}
-.avw.doWave .hello{animation:hi 1.9s ease-in-out}
-@keyframes wave{0%,100%{rotate:0deg}15%{rotate:-8deg}30%{rotate:7deg}45%{rotate:-7deg}60%{rotate:5deg}}
-@keyframes hi{0%{opacity:0;transform:scale(.4)}15%{opacity:1;transform:scale(1)}30%{transform:rotate(25deg)}45%{transform:rotate(-15deg)}60%{transform:rotate(25deg)}85%{opacity:1}100%{opacity:0;transform:scale(.6)}}
-/* accueil : l'avatar propose, les messages sont ses bulles */
+.avw.doWave /* accueil : l'avatar propose, les messages sont ses bulles */
 .wel{position:relative;text-align:center;color:var(--dm);padding:calc(236px) 6px 0;overflow:visible;display:flex;flex-direction:column;align-items:center;gap:12px}
-.spk{position:relative;max-width:92%;padding:12px 16px;border-radius:22px;background:rgba(255,255,255,.94);color:var(--tx);font-size:15px;line-height:1.45;box-shadow:0 8px 24px rgba(90,60,200,.16);animation:pop .55s both}
-.spk::before,.spk::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.94);box-shadow:0 3px 8px rgba(90,60,200,.14)}
-.spk::before{width:12px;height:12px;left:50%;top:-18px;margin-left:-6px}
-.spk::after{width:7px;height:7px;left:50%;top:-30px;margin-left:-3px}
 .sugs{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;transition:opacity .35s}
 .sugs.out{opacity:0}
 .sug{width:auto;max-width:92%;padding:11px 16px;border-radius:22px 22px 22px 8px;border:1px solid rgba(120,90,220,.16);background:rgba(255,255,255,.92);color:#5b4a8a;font-size:14.5px;text-align:left;box-shadow:0 6px 18px rgba(90,60,200,.12);animation:pop .55s both}
@@ -148,9 +139,30 @@ textarea#rep{width:100%;height:90px;margin-top:8px;background:var(--soft);color:
 .sug.fl{animation:pop .55s both,bob 4.6s ease-in-out .9s infinite}
 @keyframes pop{0%{opacity:0;transform:translateY(14px) scale(.9)}100%{opacity:1;transform:none}}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.hintaide{font-size:12.5px;color:var(--dm);margin-top:4px}
 @media (prefers-reduced-motion:reduce){#bgav .avw,.avw.doWave,.sug.fl,.spk,.sug{animation:none}}
 .mt{flex-wrap:wrap;row-gap:4px}.mt .who{flex-basis:100%;margin-bottom:2px}
+
+/* ===== v2.0 ===== */
+#bgav{perspective:900px}
+#bgav .avw{transform-style:preserve-3d}
+/* Coucou : l'avatar lève son bras (côté gauche) en se penchant, puis salue plusieurs fois */
+.avw.doWave img{transform-origin:78% 82%;animation:coucou 2.2s ease-in-out}
+@keyframes coucou{0%,100%{transform:rotate(0)}12%{transform:rotate(-13deg) translateY(-6px)}26%{transform:rotate(-6deg) translateY(-10px)}40%{transform:rotate(-14deg) translateY(-6px)}54%{transform:rotate(-6deg) translateY(-10px)}68%{transform:rotate(-13deg) translateY(-6px)}84%{transform:rotate(-2deg)}}
+.avw.doSpin img{animation:tour 1.7s cubic-bezier(.5,0,.3,1)}
+@keyframes tour{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+.avw.doHop img{animation:saut 1.1s ease-out}
+@keyframes saut{0%,100%{transform:translateY(0) scale(1,1)}18%{transform:translateY(4px) scale(1.06,.94)}45%{transform:translateY(-34px) scale(.97,1.04)}70%{transform:translateY(0) scale(1.05,.95)}85%{transform:translateY(-8px)}}
+.wel{padding-top:calc(246px)}
+.sug{font-size:15.5px;padding:13px 20px}
+#pbadge{position:absolute;z-index:6;top:calc(env(safe-area-inset-top) + 84px);left:50%;transform:translateX(-50%);align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid rgba(124,92,255,.28);background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--brand);font:inherit;font-size:13px;font-weight:600;box-shadow:0 6px 18px rgba(90,60,200,.16);cursor:pointer}
+#fr{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px);background:rgba(30,20,70,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#fr[hidden]{display:none}
+.frb{width:min(100%,440px);max-height:100%;overflow:auto;background:#fff;color:var(--tx);border-radius:24px;padding:22px 20px;box-shadow:0 24px 60px rgba(30,20,70,.35);line-height:1.5}
+.frb h2{margin:0 0 10px;font-size:20px}.frb h3{margin:14px 0 4px;font-size:15px;color:var(--brand)}.frb p,.frb li{font-size:14.5px}.frb ul{padding-left:18px}.frb .note{font-size:12.5px;color:var(--dm)}
+.frb .pri,.b2.pri{background:linear-gradient(135deg,#8b5cff,#c86bff);color:#fff;border:0;font-weight:600}
+.legal-bas{margin:18px 6px 8px;text-align:center;font-size:12px;color:var(--dm);line-height:1.9}.legal-bas a{color:var(--dm);text-decoration:underline}
+.pcn{margin-top:8px;font-size:13.5px}
+#hl small,.hi small{color:var(--dm)}
 </style></head><body>
 <div id="app">
 <header>
@@ -161,7 +173,7 @@ textarea#rep{width:100%;height:90px;margin-top:8px;background:var(--soft);color:
   </div>
   <button data-v="set" title="Réglages"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
 </header>
-<div id="bgav" class="home"><div class="avw"><img src="avatar.png" alt=""><i class="wink"></i><span class="hello">👋</span></div></div>
+<div id="bgav" class="home"><div class="avw"><img src="avatar.png" alt=""><i class="wink"></i></div></div>
 <main>
 <section class="v on" id="v-chat"><div id="msgs"><div style="text-align:center;color:var(--dm);padding:40px 10px"><h2 style="color:var(--tx)">NEXUS AI</h2>Je réponds seul aux demandes simples et je ne sollicite une IA que si c'est nécessaire.<br>Tapez <b>aide</b> pour voir ce que je sais faire.<div class="sugs"><button class="sug" data-q="Quelle heure est-il à Tokyo ?">🕐 Quelle heure est-il à Tokyo ?</button><button class="sug" data-q="Dans 3 semaines">📅 Dans 3 semaines</button><button class="sug" data-q="Explique-moi ce qu'est une étoile simplement">🧠 Explique-moi ce qu'est une étoile simplement</button></div></div></div></section>
 <section class="v" id="v-hist"><button class="b2 on" data-v="chat" style="margin-bottom:10px">← Retour au chat</button><input id="q" placeholder="Rechercher dans l'historique…"><div id="hl"></div><div id="stock"></div></section>
@@ -171,6 +183,8 @@ textarea#rep{width:100%;height:90px;margin-top:8px;background:var(--soft);color:
 <div id="bar" style="display: flex;"><button id="nw" title="Nouvelle conversation" aria-label="Nouvelle conversation"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><div id="inwrap"><div id="fchip"><img id="fth" alt=""><span id="fname"></span><button id="focr" title="Lire le texte de l'image (gratuit)">Aa</button><button id="fx" title="Retirer le fichier">✕</button></div><div id="inrow"><textarea id="in" rows="1" placeholder="Message à NEXUS…" enterkeyhint="send"></textarea><button id="mic" title="Parler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button><button id="att" title="Joindre un fichier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></button></div></div><button id="sb" aria-label="Envoyer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"></path><path d="M22 2 15 22l-4-9-9-4 20-7z"></path></svg></button></div><input type="file" id="attfile" style="display:none">
 </div>
 <div id="sa" style="position:fixed;left:0;bottom:0;width:1px;height:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none"></div>
+<button id="pbadge" type="button" style="display:none">🔌 Connecter Puter</button>
+<div id="fr" hidden></div>
 <div id="lb" hidden><img alt=""><button type="button" aria-label="Fermer">✕</button></div>
 <div id="ts"></div>
 <div id="dlmenu" style="display:none"><div id="dlbox"></div></div>
