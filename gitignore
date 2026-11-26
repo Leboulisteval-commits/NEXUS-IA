@@ -1,0 +1,10 @@
+# Ne jamais pousser de clés ni de secrets
+.env
+.env.*
+*.key
+*.pem
+secrets*
+*cle*.txt
+*keys*.json
+node_modules/
+.DS_Store
