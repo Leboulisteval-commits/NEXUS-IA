@@ -1310,10 +1310,11 @@ export function voixNexus(texteBrut){
   s=s.replace(/en tant qu['’]ia[^.\n]*[.\n]?/gi,"");
   s=s.replace(/je suis une ia[^.\n]*[.\n]?/gi,"");
   s=s.replace(/\b(propulse par|powered by|fourni par) (claude|chatgpt|gpt|gemini|groq|cloudflare|openrouter)[^.\n]*/gi,"");
-  s=s.replace(/[ \t]+/g," ").replace(/\n{3,}/g,"\n\n").trim();
+  const retire=s!==String(texteBrut||"").trim();
+  s=s.replace(/[ \t]+(?=\n|$)/g,"").replace(/\n{3,}/g,"\n\n").trim();
   if(!s) return s;
-  s=cap(s);
-  if(!/[.!?…]$/.test(s)) s+=".";
+  // v1.1 : le contenu n'est jamais modifié. Majuscule rendue seulement si on vient de retirer une auto-présentation en tête de phrase.
+  if(retire && /^[a-zà-ÿ]/.test(s)) s=cap(s);
   return s;
 }
 
@@ -2296,7 +2297,30 @@ const CATALOGUE_POLL = [
   ["gemini", 2, _N(4)],
   ["qwen-large", 3, { general: 4, code: 4, translation: 4 }],
 ];
-export const CATALOGUES = { cloudflare: CATALOGUE_CF, puter: CATALOGUE_PUTER, pollinations: CATALOGUE_POLL };
+// v1.1 : Groq et OpenRouter (via le Worker, clés en secret). [modèle, coût relatif, niveaux 1-5]
+const CATALOGUE_GROQ = [
+  ["openai/gpt-oss-20b", 3, { general: 4, explication_simple: 4, code: 4, long_context: 3, translation: 3, creative: 3 }],
+  ["meta-llama/llama-4-scout-17b-16e-instruct", 3, { general: 4, explication_simple: 4, long_context: 4, translation: 4, creative: 3, code: 3 }],
+  ["qwen/qwen3-32b", 5, { general: 4, explication_simple: 4, code: 4, translation: 4, creative: 4, long_context: 3 }],
+  ["openai/gpt-oss-120b", 7, { general: 5, explication_simple: 5, code: 5, long_context: 4, creative: 4, translation: 4 }],
+  ["moonshotai/kimi-k2-instruct", 9, { general: 5, explication_simple: 5, code: 5, long_context: 4, creative: 4, translation: 4 }],
+];
+const CATALOGUE_OR = [
+  ["liquid/lfm-3-1.7b:free", 1, { general: 2, explication_simple: 2 }],
+  ["recursive/flint-v1.0:free", 1, { general: 2, explication_simple: 2 }],
+  ["inclusionai/ling-3.2-flash:free", 1, { general: 3, explication_simple: 3, translation: 3 }],
+  ["baidu/ernie-5.5-flash-preview:free", 1, { general: 3, explication_simple: 3, translation: 3 }],
+  ["particle-ai/particle-1:free", 2, { general: 3, explication_simple: 3, creative: 3 }],
+  ["dots-studio/dots-3-note-preview:free", 2, { general: 3, explication_simple: 3, long_context: 3 }],
+  ["nvidia/nemotron-3.5-lightning:free", 2, { general: 3, explication_simple: 3, code: 3 }],
+  ["openrouter/free", 3, { general: 3, explication_simple: 3, code: 3, creative: 3, translation: 3 }],
+  ["google/gemma-4-26b-a4b-it:free", 3, { general: 4, explication_simple: 4, creative: 4, translation: 4, long_context: 3, code: 3 }],
+  ["nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", 4, { general: 4, explication_simple: 4, code: 4, long_context: 3 }],
+  ["google/gemma-4-31b-it:free", 4, { general: 4, explication_simple: 4, creative: 4, translation: 5, long_context: 3, code: 3 }],
+  ["nvidia/nemotron-3.5-super-vl:free", 5, { general: 4, explication_simple: 4, long_context: 4 }],
+  ["nvidia/nemotron-3-ultra-550b-a55b:free", 7, { general: 5, explication_simple: 5, code: 5, long_context: 4, creative: 4, translation: 4 }],
+];
+export const CATALOGUES = { cloudflare: CATALOGUE_CF, puter: CATALOGUE_PUTER, pollinations: CATALOGUE_POLL, groq: CATALOGUE_GROQ, openrouter: CATALOGUE_OR };
 
 class NexusAnnuaire {
   constructor(corps = null) {
@@ -2308,6 +2332,70 @@ class NexusAnnuaire {
     // Le corps l'a toujours avec soi, en mémoire, avec son carnet et ses quotas. Pas de fetch à chaque demande.
     this.fusionneAvecCorps = true;
     this.quotaUsage = new Map(); // id -> { jour, countJour, minute, countMinute, enPauseJusquA, raisonPause }
+    // v1.1 : on distingue la panne d'UN MODÈLE (entree.panneJusqua) de celle de son FOURNISSEUR (pannesFourn).
+    this.pannesFourn = new Map(); // fournisseur -> { jusqua, kind, raison }
+    this.echecsRecents = new Map(); // fournisseur -> [{ t, id, kind }]
+    this.surPanne = null; // callback facultatif (journal) : ({ niveau, fournisseur, id, kind, jusqua, raison })
+  }
+  // --- v1.1 : fournisseur d'une entrée (tag « fourn:xxx », sinon le premier tag connu, sinon l'id) ---
+  fournisseurDe(e) {
+    const t = (e && e.tags) || [];
+    const f = t.find((x) => String(x).startsWith("fourn:"));
+    if (f) return String(f).slice(6);
+    return ["cloudflare", "puter", "pollinations", "groq", "openrouter", "cohere"].find((x) => t.includes(x)) || (e && e.id) || "?";
+  }
+  fournisseurEnPause(f) {
+    const p = this.pannesFourn.get(f);
+    if (!p) return null;
+    if (Date.now() >= p.jusqua) { this.pannesFourn.delete(f); return null; }
+    return p;
+  }
+  modeleEnPause(e) {
+    if (!e || !e.panneJusqua) return false;
+    if (Date.now() >= e.panneJusqua) { e.panneJusqua = 0; e.enPanne = false; return false; }
+    return true;
+  }
+  poserPanneFournisseur(f, { kind = "unknown", raison = "", dureeMs = 120000, id = null } = {}) {
+    const jusqua = Date.now() + dureeMs;
+    const ex = this.pannesFourn.get(f);
+    if (!ex || ex.jusqua < jusqua) this.pannesFourn.set(f, { jusqua, kind, raison: String(raison).slice(0, 160) });
+    try { this.surPanne && this.surPanne({ niveau: "fournisseur", fournisseur: f, id, kind, jusqua, raison: String(raison).slice(0, 160) }); } catch {}
+  }
+  leverPanneFournisseur(f) { this.pannesFourn.delete(f); }
+  reinitialiserPannes() { this.pannesFourn.clear(); this.echecsRecents.clear(); for (const e of this.entrees.values()) { e.panneJusqua = 0; e.enPanne = false; } }
+  // Une IA a échoué : est-ce le MODÈLE (on n'écarte que lui) ou le FOURNISSEUR (on écarte tous ses modèles d'un coup) ?
+  signalerEchec(entree, err) {
+    const f = this.fournisseurDe(entree), cls = classifierErreur(err), msg = String(err?.message || err || ""), now = Date.now();
+    const hors = typeof navigator !== "undefined" && navigator.onLine === false;
+    if (hors) return { niveau: "aucun", fournisseur: f, kind: cls.kind }; // pas de réseau : ce n'est la faute d'aucune IA
+    const journalier = /per.?day|daily|jour|quotidien|month|mois|insufficient|credit|crédit|balance|funds|allowance|usage.?limit/i.test(msg);
+    const fenetre = (this.echecsRecents.get(f) || []).filter((x) => now - x.t < 120000);
+    fenetre.push({ t: now, id: entree.id, kind: cls.kind }); this.echecsRecents.set(f, fenetre);
+    const distincts = (ks) => new Set(fenetre.filter((x) => ks.includes(x.kind)).map((x) => x.id)).size;
+    const modele = (ms, raison) => { entree.panneJusqua = now + ms; entree.enPanne = true; entree.raisonPanne = raison || msg.slice(0, 120); try { this.surPanne && this.surPanne({ niveau: "modele", fournisseur: f, id: entree.id, kind: cls.kind, jusqua: entree.panneJusqua, raison: entree.raisonPanne }); } catch {} return { niveau: "modele", fournisseur: f, kind: cls.kind }; };
+    const fourn = (ms) => { this.poserPanneFournisseur(f, { kind: cls.kind, raison: msg, dureeMs: ms, id: entree.id }); return { niveau: "fournisseur", fournisseur: f, kind: cls.kind }; };
+    if (cls.kind === "auth") return fourn(f === "puter" ? 6 * 3600e3 : 30 * 60e3); // clé / connexion refusée : concerne tout le fournisseur
+    if (cls.kind === "network") return fourn(90e3);
+    if (cls.kind === "quota") {
+      if (journalier) return fourn(f === "puter" ? 3 * 3600e3 : 30 * 60e3);
+      if (distincts(["quota"]) >= 2) return fourn(90e3); // plusieurs modèles refusés pour quota = limite du compte, pas d'un modèle
+      return modele(60e3);
+    }
+    // Puter qui ne répond pas (fenêtre bloquée, connexion perdue, crédit) : c'est le compte, pas un modèle -> on l'écarte tout de suite, sans faire attendre l'utilisateur modèle après modèle.
+    if (cls.kind === "timeout") return f === "puter" ? fourn(10 * 60e3) : (distincts(["timeout", "network"]) >= 3 ? fourn(120e3) : modele(3 * 60e3));
+    if (cls.status >= 500 && cls.status < 600) return distincts(["unknown", "timeout", "network"]) >= 3 || fenetre.filter((x) => x.kind === "unknown").length >= 3 ? fourn(120e3) : modele(5 * 60e3);
+    if (cls.kind === "empty" || cls.kind === "truncated") return modele(3 * 60e3);
+    // 400 / 404 / 422 : modèle indisponible ou refusé, le reste du fournisseur marche
+    return distincts(["unknown"]) >= 4 ? fourn(120e3) : modele(10 * 60e3);
+  }
+  etatFournisseurs() {
+    const out = {};
+    for (const e of this.entrees.values()) {
+      const f = this.fournisseurDe(e), o = (out[f] ??= { fournisseur: f, modeles: 0, modelesEnPanne: [], pause: null });
+      o.modeles++; if (this.modeleEnPause(e)) o.modelesEnPanne.push(e.id);
+    }
+    for (const [f, o] of Object.entries(out)) { const p = this.fournisseurEnPause(f); if (p) o.pause = { jusqua: p.jusqua, kind: p.kind, raison: p.raison }; }
+    return out;
   }
   // --- QUOTAS GRATUITS : ne pas gaspiller un appel qu'on sait déjà perdu ---
   _cleJour(){ return new Date().toISOString().slice(0,10); }
@@ -2399,7 +2487,8 @@ class NexusAnnuaire {
     // Exception : "long_context" peut aussi prendre "general" en fallback si aucun long_context ? Non, strict : pas de fallback implicite entre fonctionnalités.
     // Le fallback est UNIQUEMENT entre transports de LA MÊME fonctionnalité, jamais vers Qwen.
     const cands = [...this.entrees.values()].filter(e => {
-      if(!e.actif || e.enPanne) return false;
+      if(!e.actif) return false;
+      if(this.modeleEnPause(e) || this.fournisseurEnPause(this.fournisseurDe(e))) return false; // v1.1 : pannes temporaires (modèle / fournisseur)
       if(!e.fonctionnalites.includes(f)) return false;
       if(e.quotaMax !== null && e.quotaUtilise >= e.quotaMax) return false;
       // Quota gratuit : si déjà dépassé, on ne propose même pas ce transport, on passe au suivant sans gaspiller d'appel.
@@ -2415,8 +2504,10 @@ class NexusAnnuaire {
     const metaOk = cands.some((e) => e.meta);
     if (metaOk && f !== "vision") {
       const niv = (f === "code" && (rg.niveau || 3) >= 4) ? 5 : (rg.niveau || 3), lvl = (e) => e.meta?.niveau?.[f] ?? 3, cout = (e) => (e.meta?.cout ?? e.priorite ?? 5) * (e.meta?.poids ?? 1);
+      // v1.1 : 1) IA personnelles de l'utilisateur, 2) crédits Puter de son compte, 3) crédits partagés de Nexus (Groq, Cloudflare, OpenRouter), 4) Pollinations en secours.
       const perso = (e) => ((e.tags || []).includes("perso") ? 0 : 1), secours = (e) => ((e.tags || []).includes("pollinations") ? 1 : 0), ok = (e) => (lvl(e) >= niv ? 0 : 1);
-      cands.sort((a, b) => perso(a) - perso(b) || secours(a) - secours(b) || ok(a) - ok(b) || (ok(a) === 0 ? cout(a) - cout(b) : (lvl(b) - lvl(a)) || cout(a) - cout(b)) || a.id.localeCompare(b.id));
+      const palierPuter = (e) => ((e.tags || []).includes("puter") ? 0 : 1);
+      cands.sort((a, b) => perso(a) - perso(b) || secours(a) - secours(b) || ok(a) - ok(b) || palierPuter(a) - palierPuter(b) || (ok(a) === 0 ? cout(a) - cout(b) : (lvl(b) - lvl(a)) || cout(a) - cout(b)) || a.id.localeCompare(b.id));
       return cands;
     }
     if (f === "vision") cands.sort((a,b) => (a.priorite - b.priorite) || a.id.localeCompare(b.id));
@@ -2446,6 +2537,8 @@ class NexusAnnuaire {
     let essaisTotal = 0;
     let tousQuotaDepasse = true;
     for (const entree of liste) {
+      // v1.1 : un fournisseur mis en panne pendant cet appel est écarté tout de suite, sans attendre
+      if (this.fournisseurEnPause(this.fournisseurDe(entree)) || this.modeleEnPause(entree)) continue;
       // Quota : on ne dépasse pas
       if (entree.quotaMax !== null && entree.quotaUtilise >= entree.quotaMax) continue;
       // Quota gratuit : si déjà dépassé, on saute sans appeler (pas de gaspillage)
@@ -2461,28 +2554,16 @@ class NexusAnnuaire {
           const res = await appelerFonctionnalite({ fonctionnalite: f, messages, transport: entree.transport, timeoutMs, maxEssais: 1 });
           // Succès : on marque OK, on incrémente quota, on retourne
           entree.quotaUtilise++;
-          entree.enPanne = false;
+          entree.enPanne = false; entree.panneJusqua = 0;
+          this.echecsRecents.delete(this.fournisseurDe(entree));
           this.stats.reussites++;
           return { ok: true, texte: res.texte, essais: essaisTotal, fonctionnalite: f, via: `annuaire:${entree.id}`, transportId: entree.id };
         } catch (e) {
           lastErr = e;
-          // Si auth / quota / vide / coupé, on ne réessaie pas CE transport, on passe au suivant de la même fonctionnalité
-          // Si réseau / timeout, on a déjà réessayé dans appelerFonctionnalite (maxEssais=1 ici, donc on passe au suivant)
-          // On marque panne uniquement pour réseau / timeout / 5xx, pas pour auth / quota (qui sont des configs, pas des pannes)
-          const cls = classifierErreur(e);
-          // 429 = quota gratuit dépassé : on met en pause, on ne réessaie pas ce transport, on passe au suivant
-          if (cls.status === 429 || cls.kind === "quota" || /429|rate limit|quota|per-day|per-minute/i.test(e?.message || "")) {
-            this.marquerQuotaDepasse(entree.id, { raison: e?.message || "429 quota", pauseMs: 60000 });
-            entree.pannes++;
-            this.stats.pannes++;
-            if (liste.length > 1) this.stats.fallbacks++;
-          } else if (["network","timeout"].includes(cls.kind) || (cls.status >= 500 && cls.status < 600)) {
-            entree.enPanne = true;
-            entree.pannes++;
-            this.stats.pannes++;
-            if (liste.length > 1) this.stats.fallbacks++;
-          }
-          // Sinon, on passe au transport suivant sans marquer panne (ex : auth = config à corriger, pas panne réseau)
+          // v1.1 : on distingue la panne du MODÈLE de celle du FOURNISSEUR (voir signalerEchec), puis on passe au suivant.
+          entree.pannes++; this.stats.pannes++;
+          if (liste.length > 1) this.stats.fallbacks++;
+          this.signalerEchec(entree, e);
           break; // on ne réessaie pas le même transport ici, on passe au suivant
         }
       }
@@ -2614,7 +2695,7 @@ class NexusAnnuaire {
     // 2 modes : binding Workers AI (pas de clé, pas de fetch) ou REST (clé + accountId)
     if (binding && typeof binding.run === "function") {
       return async ({ fonctionnalite, messages, signal }) => {
-        const data = await binding.run(model, { messages: messages.map(m => ({ role: m.role, content: m.content })) });
+        const data = await binding.run(model, { messages: messages.map(m => ({ role: m.role, content: m.content })), signal });
         const texte = data?.response || data?.result?.response || (typeof data === "string" ? data : "");
         return { texte, finishReason: "stop" };
       };
@@ -3409,11 +3490,9 @@ export function detecterHumeur(texte, historique=[]){
 export function adapterTon(texte, humeurInfo){
   let s=String(texte||"").trim();
   if(!s) return s;
+  // v1.1 : le contenu de la réponse n'est jamais coupé ni réécrit. Code, tableaux et longues réponses restent intacts.
+  if(/```|^\s*\|.*\|\s*$/m.test(s) || s.length>600) return s;
   if(humeurInfo?.humeur==="enerve") return "Compris, je fais plus court : "+s;
-  if(humeurInfo?.humeur==="presse"){
-    const phrases=decouperEnSouffles(s);
-    return phrases.slice(0,2).join(" ");
-  }
   if(humeurInfo?.humeur==="fatigue") return "On y va doucement : "+s;
   return s;
 }
@@ -3731,13 +3810,15 @@ export class NexusCorpsV12 extends NexusCorpsV11{
   // Chaque IA a : un coût relatif, un niveau de qualité (1-5) par fonctionnalité, un poids selon QUI paie.
   // poids : IA perso 0 (c'est la tienne), Puter gratuit 0.1, Puter au solde de l'utilisateur 0.8, Cloudflare (crédits Nexus partagés) 1, Pollinations 3 (secours, toujours en dernier).
   // Nexus choisit, pour chaque demande, l'IA la MOINS COÛTEUSE qui atteint le niveau requis, puis bascule en silence sur les suivantes.
-  configurerNexus({ workerUrl = "", workerVersion = 1, pollinationsKey = "", puterChat = null, perso = [], fetchFn = null } = {}) {
+  configurerNexus({ workerUrl = "", workerVersion = 1, workerCaps = {}, pollinationsKey = "", puterChat = null, perso = [], fetchFn = null } = {}) {
     const ff = fetchFn || (typeof fetch === "function" ? (...a) => fetch(...a) : null);
     const ajoutes = [], refuses = [];
     const T = ["general", "explication_simple", "code", "creative", "translation", "long_context"];
     const nv = (n, extra = {}) => { const o = {}; for (const k of T) o[k] = n; return { ...o, ...extra }; };
     const reg = (id, transport, niveau, cout, poids, tags) => {
       if (!transport) { refuses.push({ id, raison: "transport indisponible" }); return; }
+      // v1.1 : chaque IA porte l'étiquette de son fournisseur (fourn:xxx) pour séparer panne de modèle et panne de fournisseur
+      if (!(tags || []).some((x) => String(x).startsWith("fourn:"))) tags = [...(tags || []), "fourn:" + (["cloudflare", "puter", "pollinations", "groq", "openrouter"].find((x) => (tags || []).includes(x)) || id)];
       const r = this.annuaire.ajouter({ id, transport, fonctionnalites: Object.keys(niveau), priorite: cout, cout: "0", tags, description: id });
       if (r && r.ok === false) { refuses.push({ id, raison: r.raison || "refusé" }); return; }
       const en = this.annuaire.entrees.get(id); if (en) en.meta = { niveau, cout, poids };
@@ -3747,16 +3828,41 @@ export class NexusCorpsV12 extends NexusCorpsV11{
     // --- IA personnelles (OpenAI-compatibles) : toujours en premier ---
     for (const p of perso || []) {
       if (!p || !p.url || !p.apiKey || !p.model || p.actif === false) continue;
-      const t = this.creerTransportPerso({ url: p.url, apiKey: p.apiKey, model: p.model, fetchFn: ff });
-      reg("perso-" + slug(p.nom || p.model) , t, nv(5), 0, 0, ["perso"]);
+      const base = "perso-" + slug(p.nom || p.model), cat = CATALOGUES[p.cat];
+      if (p.model === "*" && cat) {
+        // Clé personnelle d'un fournisseur que Nexus connaît : tous ses modèles passent par TA clé, les crédits partagés sont épargnés.
+        for (const [m, , niveau] of cat) {
+          const t = this.creerTransportPerso({ url: p.url, apiKey: p.apiKey, model: m, fetchFn: ff });
+          reg(base + "-" + slug(m.replace("@cf/", "")), t, niveau, 0, 0, ["perso", "fourn:" + base]);
+        }
+      } else {
+        const t = this.creerTransportPerso({ url: p.url, apiKey: p.apiKey, model: p.model, fetchFn: ff });
+        reg(base, t, nv(5), 0, 0, ["perso", "fourn:" + base]);
+      }
     }
     // --- Cloudflare via ton Worker ---
     if (workerUrl && ff) {
-      const binding = { run: async (model, { messages }) => {
-        const r = await ff(workerUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, model }) });
-        if (!r.ok) { const e = new Error("Cloudflare " + r.status); e.status = r.status; e.kind = r.status === 401 || r.status === 403 ? "auth" : r.status === 429 ? "quota" : "network"; throw e; }
+      const erreurWorker = async (r, nom) => {
+        let d = {}; try { d = await r.json(); } catch {}
+        const e = new Error(nom + " " + r.status + (d && d.error ? " : " + String(d.error).slice(0, 140) : "")); e.status = r.status;
+        e.kind = r.status === 401 || r.status === 403 ? "auth" : r.status === 429 || r.status === 402 ? "quota" : r.status === 400 || r.status === 404 || r.status === 422 ? "unknown" : (r.status >= 500 || r.status === 0) ? "unknown" : "network";
+        if (d && d.kind === "empty") e.kind = "empty";
+        throw e;
+      };
+      const binding = { run: async (model, { messages, signal }) => {
+        const r = await ff(workerUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, model }), signal });
+        if (!r.ok) await erreurWorker(r, "Cloudflare");
         return r.json();
       } };
+      // Groq / OpenRouter : mêmes modèles pour tous, clés gardées en secret dans le Worker.
+      const viaWorker = (provider, model) => async ({ messages, signal }) => {
+        const r = await ff(workerUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider, model, messages: messages.map((x) => ({ role: x.role, content: x.content })) }), signal });
+        if (!r.ok) await erreurWorker(r, provider);
+        const j = await r.json();
+        return { texte: String(j?.response ?? j?.choices?.[0]?.message?.content ?? "").trim(), finishReason: "stop" };
+      };
+      if (workerVersion >= 3 && workerCaps.groq) for (const [m, cout, niveau] of CATALOGUE_GROQ) reg("groq-" + slug(m), viaWorker("groq", m), niveau, cout, 0.8, ["groq"]);
+      if (workerVersion >= 3 && workerCaps.openrouter) for (const [m, cout, niveau] of CATALOGUE_OR) reg("openrouter-" + slug(m), viaWorker("openrouter", m), niveau, cout, 1.6, ["openrouter"]);
       for (const [m, cout, niveau] of CATALOGUE_CF) {
         if (workerVersion < 2 && !m.includes("llama-3.3-70b")) continue; // l'ancien Worker ne lit que result.response
         const t = this.annuaire.creerTransportCloudflare({ binding, model: m });
@@ -3774,7 +3880,7 @@ export class NexusCorpsV12 extends NexusCorpsV11{
       for (const [m, cout, niveau] of CATALOGUE_POLL) {
         const t = async ({ messages, signal }) => {
           const r = await ff("https://gen.pollinations.ai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + pollinationsKey }, body: JSON.stringify({ model: m, messages: messages.map((x) => ({ role: x.role, content: x.content })) }), signal });
-          if (!r.ok) { const e = new Error("Pollinations " + r.status); e.status = r.status; e.kind = r.status === 401 || r.status === 402 || r.status === 403 || r.status === 429 ? "quota" : "network"; throw e; }
+          if (!r.ok) { const e = new Error("Pollinations " + r.status); e.status = r.status; e.kind = r.status === 401 || r.status === 402 || r.status === 403 || r.status === 429 ? "quota" : r.status === 400 || r.status === 404 || r.status === 422 ? "unknown" : r.status >= 500 ? "unknown" : "network"; throw e; }
           const j = await r.json();
           return { texte: String(j?.choices?.[0]?.message?.content ?? "").trim(), finishReason: j?.choices?.[0]?.finish_reason || "stop" };
         };
@@ -3789,6 +3895,14 @@ export class NexusCorpsV12 extends NexusCorpsV11{
         const j = await r.json(); return { texte: String(j?.response ?? j?.result?.response ?? "").trim(), finishReason: "stop" };
       };
       const en = this.annuaire.ajouter({ id: "cf-vision", transport: tv, fonctionnalites: ["vision"], priorite: 1, cout: "0", tags: ["cloudflare", "vision"], description: "Cloudflare — vision" }); if (en?.ok !== false) ajoutes.push("cf-vision");
+    }
+    if (workerUrl && ff && workerVersion >= 3 && workerCaps.groq) {
+      const tv = async ({ messages, signal }) => {
+        const r = await ff(workerUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: "groq", model: "meta-llama/llama-4-scout-17b-16e-instruct", messages }), signal });
+        if (!r.ok) { const e = new Error("Groq vision " + r.status); e.status = r.status; e.kind = r.status === 429 ? "quota" : r.status === 401 || r.status === 403 ? "auth" : "unknown"; throw e; }
+        const j = await r.json(); return { texte: String(j?.response ?? "").trim(), finishReason: "stop" };
+      };
+      const en = this.annuaire.ajouter({ id: "groq-vision", transport: tv, fonctionnalites: ["vision"], priorite: 0.5, cout: "0", tags: ["groq", "vision", "fourn:groq"], description: "Groq — vision" }); if (en?.ok !== false) ajoutes.push("groq-vision");
     }
     if (ff && pollinationsKey) {
       const tv = async ({ messages, signal }) => {
@@ -3810,7 +3924,7 @@ export class NexusCorpsV12 extends NexusCorpsV11{
     const u = /\/chat\/completions\/?$/.test(url) ? url : url.replace(/\/+$/, "") + "/chat/completions";
     return async ({ messages, signal }) => {
       const r = await fetchFn(u, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + apiKey }, body: JSON.stringify({ model, messages: messages.map((x) => ({ role: x.role, content: x.content })) }), signal });
-      if (!r.ok) { const e = new Error("IA perso " + r.status); e.status = r.status; e.kind = r.status === 401 || r.status === 403 ? "auth" : r.status === 429 || r.status === 402 ? "quota" : "network"; throw e; }
+      if (!r.ok) { const e = new Error("IA perso " + r.status); e.status = r.status; e.kind = r.status === 401 || r.status === 403 ? "auth" : r.status === 429 || r.status === 402 ? "quota" : r.status >= 400 && r.status < 600 ? "unknown" : "network"; try { const d = await r.clone().json(); const m = String(d?.error?.message || d?.error || ""); if (m) e.message += " : " + m.slice(0, 120); } catch {} throw e; }
       const j = await r.json();
       return { texte: String(j?.choices?.[0]?.message?.content ?? "").trim(), finishReason: j?.choices?.[0]?.finish_reason || "stop" };
     };
