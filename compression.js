@@ -80,3 +80,26 @@ export function compresser({ name = "", text = "", question = "", budget = 2800 
   if (apres < avant * 0.97) t = `[Texte condensé automatiquement (${apres} sur ${avant} caractères) ; […] marque un passage omis.]\n` + t;
   return { text: t, avant, apres: t.length, methode };
 }
+
+// ---------- Normalisation des réponses (v1.1) ----------
+// Ne change JAMAIS le contenu : mêmes mots, mêmes chiffres, même code. Seulement la propreté invisible :
+// fins de ligne uniformes, espaces parasites en fin de ligne, caractères de largeur nulle, lignes vides en trop,
+// accents sous une seule forme Unicode (NFC). Les blocs de code ne sont pas touchés. Si la vérification échoue, le texte d'origine est rendu tel quel.
+const INVISIBLES = /[​﻿⁠]/g;
+const visible = (t) => String(t).replace(/[\s​﻿⁠]+/g, "").normalize("NFC");
+function proseNette(t) {
+  return t.replace(INVISIBLES, "").normalize("NFC").replace(/[ \t]+(?=\n|$)/g, "").replace(/\n{3,}/g, "\n\n");
+}
+export function normaliserReponse(brut) {
+  const original = String(brut ?? "");
+  if (!original.trim()) return original;
+  try {
+    const parts = original.replace(/\r\n?/g, "\n").split(/(```[\s\S]*?```)/g);
+    const out = parts.map((p, i) => {
+      if (i % 2) return p;                       // bloc de code fermé : intact
+      const k = p.indexOf("```");                // bloc de code jamais refermé : tout ce qui suit reste intact
+      return k < 0 ? proseNette(p) : proseNette(p.slice(0, k)) + p.slice(k);
+    }).join("").replace(/^\s*\n/, "").replace(/\s+$/, "");
+    return visible(out) === visible(original) ? out : original;
+  } catch { return original; }
+}
