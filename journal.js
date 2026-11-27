@@ -16,8 +16,9 @@ function nettoie(v, d = 0) {
 function ouvrir() {
   ready ??= new Promise((res) => {
     try {
-      const r = indexedDB.open(DB, 1);
-      r.onupgradeneeded = () => r.result.createObjectStore(ST, { keyPath: "id", autoIncrement: true });
+      // v1.1 : clé interne « _k ». Avant, la clé était « id » : les événements qui portent un champ id (appels d'IA, clics) entraient en conflit et étaient perdus.
+      const r = indexedDB.open(DB, 2);
+      r.onupgradeneeded = () => { if (r.result.objectStoreNames.contains(ST)) r.result.deleteObjectStore(ST); r.result.createObjectStore(ST, { keyPath: "_k", autoIncrement: true }); };
       r.onsuccess = () => { db = r.result; res(db); };
       r.onerror = () => res(null); r.onblocked = () => res(null);
     } catch { res(null); }
@@ -66,3 +67,29 @@ export function instrumenter(info = {}) {
   w.addEventListener && w.addEventListener("pagehide", () => log("page_masquee", {}));
   try { navigator.serviceWorker && navigator.serviceWorker.addEventListener("controllerchange", () => log("sw", { evenement: "controllerchange" })); } catch {}
 }
+
+// ---------- Rapport technique ANONYME (envoyé au plus 1 fois par jour, seulement si l'utilisateur l'a accepté) ----------
+// Liste blanche : seules les clés ci-dessous sortent de l'appareil. Aucun texte de message, de réponse, de recherche, de fichier ni de mémoire.
+const BLANC = new Set("type t t2 n id groupe ia voie statut ok ms envoye m chemin intent bloque fonctionnalite nb_messages taille v version etat via limite kind at moteur tag standalone en_ligne fournisseur niveau modele raison bon bad p jusqua err source mode avant apres methode hors_ligne worker_v actifs puter perso ajoutes refuses test debut fin innerH vvH appH safeBottom navStandalone nom".split(" "));
+const court = (v, n) => masque(String(v)).slice(0, n);
+function epure(e) {
+  const o = {};
+  for (const [k, v] of Object.entries(e)) {
+    if (k === "msg") { o.msg = court(v, 160); continue; }
+    if (k === "url") { try { o.h = new URL(String(v)).host.slice(0, 60); } catch {} continue; }
+    if (k === "erreurs" && v && typeof v === "object") { o.erreurs = court(JSON.stringify(v), 120); continue; }
+    if (k === "ecran" && Array.isArray(v)) { o.ecran = v.slice(0, 3).map((x) => +x || 0); continue; }
+    if (!BLANC.has(k)) continue;
+    if (typeof v === "number" || typeof v === "boolean" || v == null) o[k] = v;
+    else if (typeof v === "string") o[k] = court(v, 60);
+  }
+  return o;
+}
+/** Entrées plus récentes que `depuis` (ISO), épurées. -> { entrees, dernier } */
+export async function rapportAnonyme(depuis = "", max = 1200) {
+  const all = await all_();
+  const neuves = all.filter((e) => e && e.t && e.t > depuis && e.type !== "message_utilisateur");
+  const sel = neuves.slice(-max).map(epure);
+  return { entrees: sel, dernier: neuves.length ? neuves[neuves.length - 1].t : depuis };
+}
+const all_ = () => all();
