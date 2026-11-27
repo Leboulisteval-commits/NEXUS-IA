@@ -2,13 +2,13 @@
 export const LEGAL = { editeur: "", contact: "", ville: "" };
 const ED = () => LEGAL.editeur ? `<b>${LEGAL.editeur}</b>${LEGAL.ville ? ", " + LEGAL.ville : ""}` : "le propriétaire de cette application (voir la page du dépôt GitHub de l'application)";
 const CT = () => LEGAL.contact ? `<a href="mailto:${LEGAL.contact}">${LEGAL.contact}</a>` : "via la page du dépôt GitHub de l'application (onglet « Issues »)";
-const MAJ = "25 novembre 2026";
+const MAJ = "26 novembre 2026";
 
 export const PAGES = {
   mentions: ["Mentions légales", () => `
 <p><b>Éditeur et directeur de la publication :</b> ${ED()}.</p>
 <p><b>Contact :</b> ${CT()}.</p>
-<p><b>Hébergement :</b> GitHub, Inc., 88 Colin P. Kelly Jr Street, San Francisco, CA 94107, États-Unis (GitHub Pages).</p>
+<p><b>Hébergement :</b> GitHub, Inc., 88 Colin P. Kelly Jr Street, San Francisco, CA 94107, États-Unis (GitHub Pages) pour l'application ; Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis (Cloudflare Workers) pour le relais technique.</p>
 <p><b>Nature du service :</b> NEXUS AI est un assistant conversationnel qui transmet tes demandes à des services d'intelligence artificielle tiers puis te renvoie leur réponse. Il est fourni gratuitement, « en l'état », sans garantie de disponibilité.</p>
 <p><b>Propriété intellectuelle :</b> le code, le nom et l'avatar de NEXUS AI appartiennent à leur éditeur. Les bibliothèques et services tiers restent soumis à leurs propres licences (voir « Licences et crédits »).</p>
 <p>Dernière mise à jour : ${MAJ}.</p>`],
@@ -16,17 +16,22 @@ export const PAGES = {
   confidentialite: ["Politique de confidentialité", () => `
 <p>NEXUS AI est conçu pour collecter le moins de données possible. <b>L'éditeur n'a aucun serveur qui stocke tes conversations.</b></p>
 <h3>Ce qui reste sur ton appareil</h3>
-<p>Tes conversations, la mémoire de Nexus (ex. ton prénom), tes réglages, tes éventuelles IA personnelles (avec leur clé) et le journal technique sont enregistrés <b>uniquement dans ton navigateur</b> (stockage local, IndexedDB, cache). Rien de tout cela n'est envoyé à l'éditeur. Il n'y a ni cookie publicitaire, ni traceur, ni statistiques : le stockage local est strictement nécessaire au fonctionnement, donc sans bannière de consentement.</p>
+<p>Tes conversations, les images qu'elles contiennent, la mémoire de Nexus (ex. ton prénom), tes réglages, tes éventuelles IA personnelles (avec leur clé) et le journal technique sont enregistrés <b>uniquement dans ton navigateur</b> (stockage local, IndexedDB, cache). Rien de tout cela n'est envoyé à l'éditeur, sauf ce que tu choisis d'envoyer toi-même (voir « Rapport technique anonyme » et « Remarques envoyées »). Il n'y a ni cookie publicitaire, ni traceur, ni statistiques : le stockage local est strictement nécessaire au fonctionnement, donc sans bannière de consentement.</p>
 <h3>Ce qui part vers des services tiers</h3>
 <p>Pour répondre, Nexus envoie ta demande (et, si tu en joins, une version <b>condensée</b> de ta pièce jointe ou de ton image) à un ou plusieurs services d'IA, choisis selon la demande :</p>
-<ul><li><b>Cloudflare Workers AI</b>, via un relais appartenant à l'éditeur (le relais transmet la demande et ne conserve pas son contenu ; Cloudflare peut toutefois traiter des données techniques selon sa propre politique) ;</li>
+<ul><li><b>Cloudflare Workers AI</b>, <b>Groq</b> et <b>OpenRouter</b>, via un relais appartenant à l'éditeur (le relais transmet la demande et ne conserve pas son contenu ; ces services peuvent toutefois traiter des données techniques selon leur propre politique) ;</li>
 <li><b>Puter</b>, avec <b>ton propre compte</b> Puter (tes échanges relèvent alors de la politique de Puter) ;</li>
 <li><b>Pollinations</b>, en dernier recours ;</li>
 <li><b>tes IA personnelles</b>, si tu en ajoutes (le fournisseur choisi par toi reçoit alors ta demande) ;</li>
-<li><b>Wikipédia</b> et <b>DuckDuckGo</b> : les mots de ta question peuvent leur être envoyés pour une recherche.</li></ul>
+<li><b>Wikipédia</b>, <b>DuckDuckGo</b> et un moteur de recherche web (<b>Tavily</b> ou <b>Brave Search</b>), ce dernier via le relais : les mots de ta question peuvent leur être envoyés pour une recherche. Si tu colles l'adresse d'une page web, le relais la télécharge pour Nexus ;</li>
+<li>pour les images, ta description est d'abord <b>traduite en anglais</b> par une IA, puis envoyée à un générateur d'images (Cloudflare, Pollinations ou Puter).</li></ul>
 <p>Ces services peuvent être situés hors de l'Union européenne (notamment aux États-Unis). <b>N'envoie jamais de données sensibles</b> (santé, mots de passe, numéros de carte, pièces d'identité, informations sur des tiers sans leur accord).</p>
+<h3>Rapport technique anonyme (facultatif)</h3>
+<p>Si, et seulement si, tu l'acceptes (au premier lancement ou dans Paramètres → Journal), Nexus envoie <b>au plus une fois par jour</b> à l'éditeur un rapport technique : types d'événements, erreurs, pannes d'IA, durées, version de Nexus, système et navigateur (ex. « iOS 18, Safari »), taille d'écran, mode d'installation, et un <b>identifiant aléatoire</b> propre à l'appareil (il ne permet pas de t'identifier). Ce rapport <b>ne contient jamais</b> le texte de tes messages, des réponses, des recherches, des fichiers ni de ta mémoire. Il est conservé 60 jours au plus. Tu peux retirer ton accord à tout moment ; les rapports déjà envoyés restent liés à l'identifiant aléatoire et peuvent être supprimés sur demande (contacte l'éditeur en indiquant cet identifiant, visible dans l'export de tes données).</p>
+<h3>Remarques envoyées</h3>
+<p>Quand tu envoies une remarque depuis Paramètres, le texte que tu écris (et l'e-mail, si tu le donnes) est transmis à l'éditeur, avec la version de Nexus et l'identifiant aléatoire de l'appareil. Ne mets pas d'information personnelle ou sensible dans ton message.</p>
 <h3>Base légale et durée</h3>
-<p>Le traitement repose sur l'exécution du service que tu demandes et sur ton consentement (accepté au premier lancement). Les données locales durent jusqu'à ce que tu les supprimes (Paramètres → Mes données) ou que tu effaces les données du site.</p>
+<p>Le traitement repose sur l'exécution du service que tu demandes et sur ton consentement (accepté au premier lancement ; le rapport technique anonyme fait l'objet d'un accord séparé). Les données locales durent jusqu'à ce que tu les supprimes (Paramètres → Mes données) ou que tu effaces les données du site.</p>
 <h3>Tes droits (RGPD)</h3>
 <p>Tu peux accéder à tes données, les exporter, les corriger ou les effacer à tout moment depuis <b>Paramètres → Mes données</b>. Pour toute question ou réclamation : ${CT()}. Tu peux aussi saisir la CNIL (cnil.fr).</p>
 <h3>Mineurs</h3>
@@ -52,6 +57,7 @@ export const PAGES = {
 <li><b>Pollinations</b> (pollinations.ai) : IA de secours et génération d'images ;</li>
 <li><b>Wikipédia</b> (CC BY-SA) et <b>Wiktionnaire</b> : extraits cités avec leur source ;</li>
 <li><b>DuckDuckGo</b> : réponses instantanées ;</li>
+<li><b>Groq</b>, <b>OpenRouter</b> : modèles d'IA ; <b>Tavily</b> / <b>Brave Search</b> : recherche web ;</li>
 <li><b>Tesseract.js</b> (Apache-2.0) : lecture du texte des images ;</li>
 <li><b>PDF.js</b> (Apache-2.0), <b>Mammoth</b> (BSD-2), <b>SheetJS</b> (Apache-2.0), <b>JSZip</b> (MIT/GPLv3), <b>jsPDF</b> (MIT) : lecture et création de fichiers ;</li>
 <li>Les modèles d'IA appartiennent à leurs auteurs respectifs (Meta, Google, OpenAI, Mistral, Qwen, Z.ai, DeepSeek, etc.) et sont soumis à leurs licences.</li></ul>
