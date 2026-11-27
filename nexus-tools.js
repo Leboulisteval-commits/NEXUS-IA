@@ -352,45 +352,57 @@ async function wikiSearch(q, timeout) {
     return null;
   } finally { clearTimeout(t); }
 }
-function jsonp(url, timeout) {
-  return new Promise((ok, ko) => {
-    const cb = '__ddg' + Math.random().toString(36).slice(2);
-    const s = document.createElement('script');
-    let t;
-    const clean = () => { delete window[cb]; s.remove(); clearTimeout(t); };
-    t = setTimeout(() => { clean(); ko(new Error('délai')); }, timeout);
-    window[cb] = d => { clean(); ok(d); };
-    s.onerror = () => { clean(); ko(new Error('erreur')); };
-    s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
-    document.head.appendChild(s);
-  });
+/** Recherche web réelle via le Worker (Tavily/Brave si configurés + réponse instantanée DuckDuckGo), puis Wikipédia en direct. */
+async function workerWeb(workerUrl, q, timeout) {
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeout + 2500);
+  try {
+    const r = await fetch(workerUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'web', q }), signal: ctl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
 }
-async function ddgSearch(q, timeout) {
-  const url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(q) + '&format=json&no_html=1&skip_disambig=1&t=nexusai';
-  let d;
-  // 1) JSONP (contourne CORS) ; 2) si ça échoue, requête directe. L'erreur éventuelle est remontée (journal), jamais avalée en silence.
-  try { d = await jsonp(url, timeout); }
-  catch (e1) {
-    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), timeout);
-    try { const r = await fetch(url, { signal: ctl.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); d = await r.json(); }
-    catch (e2) { throw new Error('jsonp: ' + (e1 && e1.message || e1) + ' | fetch: ' + (e2 && e2.message || e2)); }
-    finally { clearTimeout(to); }
-  }
-  const text = d.AbstractText || d.Answer || d.Definition || ((d.RelatedTopics || []).find(x => x.Text) || {}).Text || '';
-  return text ? { text: String(text).slice(0, 700), source: d.AbstractSource || '', url: d.AbstractURL || '' } : null;
-}
-export async function searchWeb(question, { timeout = 6000 } = {}) {
+export async function searchWeb(question, { timeout = 6000, workerUrl = '', workerWebOk = false } = {}) {
   const q = searchQuery(question);
   const erreurs = {};
-  const [wiki, ddg] = await Promise.all([wikiSearch(q, timeout).catch((e) => { erreurs.wikipedia = String(e && e.message || e); return null; }), ddgSearch(q, timeout).catch((e) => { erreurs.duckduckgo = String(e && e.message || e); return null; })]);
+  const [wiki, w] = await Promise.all([
+    wikiSearch(q, timeout).catch((e) => { erreurs.wikipedia = String(e && e.message || e); return null; }),
+    (workerUrl && workerWebOk ? workerWeb(workerUrl, q, timeout) : Promise.resolve(null)).catch((e) => { erreurs.web = String(e && e.message || e); return null; })
+  ]);
+  const ddg = w && w.instantane ? { text: w.instantane.texte, source: w.instantane.source || '', url: w.instantane.url || '' } : null;
+  const web = w && Array.isArray(w.resultats) ? w.resultats.filter((x) => x && x.url && x.extrait) : [];
   const parts = [];
   if (wiki) parts.push('[Wikipédia — ' + wiki.title + '] ' + wiki.text);
   if (ddg) parts.push('[DuckDuckGo' + (ddg.source ? ' — ' + ddg.source : '') + '] ' + ddg.text);
+  web.forEach((x, i) => parts.push('[Web ' + (i + 1) + ' — ' + x.titre + ' (' + x.url + ')] ' + x.extrait));
+  const sources = [];
+  if (wiki) sources.push({ t: 'Wikipédia — ' + wiki.title, u: wiki.url });
+  web.forEach((x) => sources.push({ t: x.titre || x.url, u: x.url }));
+  if (ddg && ddg.url) sources.push({ t: ddg.source || 'DuckDuckGo', u: ddg.url });
   return {
-    wiki, ddg, erreurs, found: parts.length,
-    summary: '📖 Wikipédia ' + (wiki ? '✓' : '✗') + ' · 🦆 DuckDuckGo ' + (ddg ? '✓ (Source : DuckDuckGo)' : '✗'),
-    context: parts.length ? "Sources trouvées gratuitement sur Internet pour t'aider (elles peuvent être incomplètes ou hors sujet) :\n" + parts.join('\n') + "\n\nConsigne : compare ces sources. Si elles se contredisent, ou si elles ne répondent pas à la question, dis-le clairement ; sinon appuie ta réponse dessus et indique la source (Wikipédia ou DuckDuckGo)." : ''
+    wiki, ddg, web, sources, erreurs, found: parts.length,
+    summary: '📖 Wikipédia ' + (wiki ? '✓' : '✗') + ' · 🌐 Web ' + (web.length ? '✓ (' + web.length + ')' : '✗') + ' · 🦆 DuckDuckGo ' + (ddg ? '✓' : '✗'),
+    context: parts.length ? "Sources trouvées sur Internet pour t'aider (elles peuvent être incomplètes ou hors sujet) :\n" + parts.join('\n') + "\n\nConsigne : compare ces sources. Si elles se contredisent, ou si elles ne répondent pas à la question, dis-le clairement ; sinon appuie ta réponse dessus et cite la source (nom du site). N'invente rien qui ne soit pas dans les sources ou dans ce que tu sais avec certitude." : ''
   };
+}
+
+/** Lit une page web (adresse collée par l'utilisateur) via le Worker. -> { url, titre, texte } ou { erreur } */
+export async function readPage(workerUrl, adresse, timeout = 12000) {
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), timeout);
+  try {
+    const r = await fetch(workerUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'page', url: adresse }), signal: ctl.signal });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.erreur) return { erreur: j.erreur || j.error || 'page illisible' };
+    return j;
+  } catch (e) { return { erreur: e && e.name === 'AbortError' ? 'délai dépassé' : 'page injoignable' }; }
+  finally { clearTimeout(t); }
+}
+export const urlDans = (t) => { const m = String(t).match(/https?:\/\/[^\s<>"')\]]+/i); return m ? m[0].replace(/[.,;:!?]+$/, '') : null; };
+/** La question demande-t-elle une information fraîche ou une recherche explicite ? */
+export function needsWeb(text) {
+  const n = norm(text);
+  if (n.length < 6 || n.length > 260) return false;
+  if (/\b(cherche|recherche|trouve|va chercher|regarde)\b.*\b(web|internet|google|en ligne|sur le net)\b/.test(n) || /\bsur (le )?(web|internet|net)\b/.test(n)) return true;
+  return /\b(actualite|actualites|news|dernieres nouvelles|aujourd hui|en ce moment|actuellement|cette semaine|ce mois|cette annee|derniere version|dernier(e)? (sorti|film|album|resultat)|prix (de|du|des)|cours (de|du)|resultat(s)? (du|de la|des)|score (du|de|des)|classement|sorti en 202\d)\b/.test(n);
 }
 
 // ---------- MÉMOIRE PERSONNELLE (règles simples, sur le téléphone) ----------
